@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.hervekakiang.logbook.dashboard.DashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/ueListFragment"
+        android:name="com.hervekakiang.logbook.ue.UeListFragment"
+        android:label="Unités d'Enseignement" />
+
+    <fragment
+        android:id="@+id/matiereListFragment"
+        android:name="com.hervekakiang.logbook.matiere.MatiereListFragment"
+        android:label="Matières" />
+
+    <fragment
+        android:id="@+id/seanceListFragment"
+        android:name="com.hervekakiang.logbook.seance.SeanceListFragment"
+        android:label="Seances" />
+
+</navigation>

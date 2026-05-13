@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    style="@style/Widget.Material3.CardView.Filled">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header Row: Code and Count -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textViewCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"
+                tools:text="INF101" />
+
+            <TextView
+                android:id="@+id/textViewNombreMatiere"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/colorOutline"
+                tools:text="4 Matières" />
+
+        </RelativeLayout>
+
+        <!-- UE Name: Below the header row -->
+        <TextView
+            android:id="@+id/textViewNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            tools:text="Introduction aux Systèmes d'Exploitation" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<com.google.android.material.card.MaterialCardView-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginHorizontal="16dp"-->
+<!--    android:layout_marginVertical="8dp"-->
+<!--    app:cardCornerRadius="12dp"-->
+<!--    app:cardElevation="0dp"-->
+<!--    style="@style/Widget.Material3.CardView.Filled">-->
+
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:padding="16dp">-->
+
+<!--        &lt;!&ndash; UE Code: Top Left &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/textViewCode"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"-->
+<!--            android:textColor="?attr/colorPrimary"-->
+<!--            android:textStyle="bold"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            tools:text="INF101" />-->
+
+<!--        &lt;!&ndash; Count/Metadata: Top Right (Same line as Code) &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/textViewNombreMatiere"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textAppearance="@style/TextAppearance.Material3.BodySmall"-->
+<!--            android:textColor="?attr/colorOutline"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/textViewCode"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@id/textViewCode"-->
+<!--            tools:text="4 Matières" />-->
+
+<!--        &lt;!&ndash; UE Name: Below the top row &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/textViewNom"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"-->
+<!--            android:textColor="?attr/colorOnSurface"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/textViewCode"-->
+<!--            tools:text="Introduction aux Systèmes d'Exploitation" />-->
+
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+<!--</com.google.android.material.card.MaterialCardView>-->

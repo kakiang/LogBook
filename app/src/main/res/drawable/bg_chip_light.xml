@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The background color of your "chip" -->
+    <!-- Using a semi-transparent version of your primary color looks very modern -->
+    <solid android:color="#1A6750A4" /> <!-- 10% opacity Primary -->
+
+    <!-- The rounded corners -->
+    <corners android:radius="8dp" />
+
+    <!-- Optional: a subtle border -->
+    <stroke
+        android:width="1dp"
+        android:color="#336750A4" />
+</shape>

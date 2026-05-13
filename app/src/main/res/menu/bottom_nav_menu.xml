@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/dashboardFragment"
+        android:icon="@drawable/baseline_dashboard_24"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/ueListFragment"
+        android:icon="@drawable/baseline_menu_book_24"
+        android:title="UE" />
+
+    <item
+        android:id="@+id/matiereListFragment"
+        android:icon="@drawable/baseline_menu_book_24"
+        android:title="Matières" />
+
+    <item
+        android:id="@+id/seanceListFragment"
+        android:icon="@drawable/baseline_menu_book_24"
+        android:title="Seances" />
+</menu>
