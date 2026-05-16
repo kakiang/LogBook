@@ -22,6 +22,14 @@ public class Seance implements Serializable {
         this.contenuPedagogique = contenuPedagogique;
     }
 
+    public Seance(int matiereId, String date, String heureDebut, int duree, String contenuPedagogique) {
+        this.matiereId = matiereId;
+        this.date = date;
+        this.heureDebut = heureDebut;
+        this.duree = duree;
+        this.contenuPedagogique = contenuPedagogique;
+    }
+
     public int getId() {
         return id;
     }

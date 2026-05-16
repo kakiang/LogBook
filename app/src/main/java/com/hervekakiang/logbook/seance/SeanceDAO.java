@@ -3,20 +3,22 @@ package com.hervekakiang.logbook.seance;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.hervekakiang.logbook.db.DAOBase;
 import com.hervekakiang.logbook.db.MyDatabaseHelper;
+import com.hervekakiang.logbook.matiere.Matiere;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeanceDAO extends DAOBase {
+public class SeanceDAO extends DAOBase<Seance> {
 
     public SeanceDAO(Context context) {
         super(context);
     }
 
-    public long insert(Seance seance) {
+    public long add(Seance seance) {
         ContentValues values = new ContentValues();
         values.put(MyDatabaseHelper.SEANCE_MATIERE_ID, seance.getMatiereId());
         values.put(MyDatabaseHelper.SEANCE_DATE, seance.getDate());
@@ -26,21 +28,67 @@ public class SeanceDAO extends DAOBase {
         return myDb.insert(MyDatabaseHelper.TABLE_SEANCE, null, values);
     }
 
-    public List<Seance> getAllSeances() {
-        Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, null, null, null, null, null);
+    public void insert(Seance seance, Runnable onComplete) {
+        executorService.execute(() -> {
+            add(seance);
+            onComplete.run();
+        });
+    }
+
+    public List<Seance> fetchAll() {
         List<Seance> seances = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
-            int matiereId = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_MATIERE_ID));
-            String date = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DATE));
-            String heureDebut = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_HEURE_DEBUT));
-            int duree = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DUREE));
-            String contenuPedagogique = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_CONTENU_PEDAGOGIQUE));
-            seances.add(new Seance(id, matiereId, date, heureDebut, duree, contenuPedagogique));
+
+        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, null, null, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
+                int matiereId = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_MATIERE_ID));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DATE));
+                String heureDebut = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_HEURE_DEBUT));
+                int duree = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DUREE));
+                String contenuPedagogique = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_CONTENU_PEDAGOGIQUE));
+                seances.add(new Seance(id, matiereId, date, heureDebut, duree, contenuPedagogique));
+            }
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching seances", e);
         }
-        cursor.close();
         return seances;
     }
+
+    public void getAll(SeanceDAO.Callback<List<Seance>> callback){
+        executorService.execute(() -> {
+            List<Seance> ues = fetchAll();
+            callback.onResult(ues);
+        });
+    }
+
+    public int getTotalVolumeHoraireEffectueByUeId(int ueId) {
+        String query ="SELECT SUM(s.duree) FROM seances s INNER JOIN matieres m ON s.matiere_id = m.id WHERE m.ue_id = ?";
+        try(Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})){
+            int totalVolumeHoraireEffectue = 0;
+            if (cursor.moveToFirst()) {
+                totalVolumeHoraireEffectue = cursor.getInt(0);
+            }
+            return totalVolumeHoraireEffectue;
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching total volume horaire effectué", e);
+        }
+        return 0;
+    }
+
+    public int getTotalVolumeHoraireEffectue() {
+        String query ="SELECT SUM(s.duree) FROM seances s";
+        try(Cursor cursor = myDb.rawQuery(query, null)){
+            int totalVolumeHoraireEffectue = 0;
+            if (cursor.moveToFirst()) {
+                totalVolumeHoraireEffectue = cursor.getInt(0);
+            }
+            return totalVolumeHoraireEffectue;
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching total volume horaire effectué", e);
+        }
+        return 0;
+    }
+
 
     public int update(Seance seance) {
         ContentValues values = new ContentValues();

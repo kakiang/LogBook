@@ -1,10 +1,12 @@
 package com.hervekakiang.logbook.ue;
 
 import android.app.Dialog;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -41,6 +43,11 @@ public class AddUeFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        NestedScrollView nestedScrollView = view.findViewById(R.id.scrollView_add_ue);
+        nestedScrollView.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+
         UEViewModel viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
         TextInputEditText editUeCode = view.findViewById(R.id.editUeCode);
         TextInputEditText editUeNom = view.findViewById(R.id.editUeNom);
@@ -51,11 +58,14 @@ public class AddUeFragment extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 String code = editUeCode.getText() != null ? editUeCode.getText().toString() : null;
                 String nom = editUeNom.getText() != null ? editUeNom.getText().toString() : null;
-                if (code != null && nom != null) {
-                    viewModel.addUE(new UE(code, nom));
-                    Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                if (code == null || nom == null) {
+                    Toast.makeText(getActivity(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                viewModel.addUE(new UE(code, nom));
+                Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
+                dismiss();
+
             }
         });
     }

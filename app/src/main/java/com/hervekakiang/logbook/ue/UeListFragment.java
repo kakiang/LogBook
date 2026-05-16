@@ -14,9 +14,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
+import com.hervekakiang.logbook.matiere.Matiere;
+import com.hervekakiang.logbook.matiere.MatiereViewModel;
+import com.hervekakiang.logbook.seance.Seance;
+import com.hervekakiang.logbook.seance.SeanceViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class UeListFragment extends Fragment {
 
@@ -44,18 +55,17 @@ public class UeListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AddUeFragment addUeFragment = new AddUeFragment();
-                addUeFragment.show(getChildFragmentManager(), "AddUeFragment");
+                addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
             }
         });
 
         mAdapter = new UEListAdapter();
         recyclerView.setAdapter(mAdapter);
 
-        UEViewModel mViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
 
-        mViewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
-            mAdapter.submitList(ues);
-            Log.d("UEListFragment", "Size of list of UEs: " + ues.size());
+        ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
+            mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });
     }
 }

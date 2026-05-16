@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="2dp"
+    app:cardCornerRadius="12dp"
+    style="@style/Widget.Material3.CardView.Elevated">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <!-- Timeline Line -->
+        <View
+            android:id="@+id/timelineLine"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:background="?attr/colorOutlineVariant"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="8dp" />
+
+        <!-- Timeline Dot (The Indicator) -->
+        <View
+            android:id="@+id/timelineDot"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/shape_timeline_dot"
+            app:layout_constraintStart_toStartOf="@+id/timelineLine"
+            app:layout_constraintEnd_toEndOf="@+id/timelineLine"
+            app:layout_constraintTop_toTopOf="@+id/tvSeanceDate"
+            app:layout_constraintBottom_toBottomOf="@+id/tvSeanceDate" />
+
+        <!-- Header: Date and Duration -->
+        <TextView
+            android:id="@+id/tvSeanceDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="Jeu. 14 Mai 2026"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintEnd_toStartOf="@+id/tvSeanceDuree"
+            app:layout_constraintStart_toEndOf="@+id/timelineLine"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSeanceDuree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30h"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium.Emphasized"
+            android:textColor="?attr/colorPrimary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvSeanceDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvSeanceDate" />
+
+        <!-- Content -->
+        <TextView
+            android:id="@+id/tvSeanceContenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="2"
+            android:text="Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3."
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvSeanceDate"
+            app:layout_constraintTop_toBottomOf="@+id/tvSeanceDate" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

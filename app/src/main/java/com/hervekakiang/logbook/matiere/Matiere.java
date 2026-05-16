@@ -20,6 +20,13 @@ public class Matiere implements Serializable {
         this.volumeHoraire = volumeHoraire;
     }
 
+    public Matiere(int ueId, String nom, String enseignant, int volumeHoraire) {
+        this.ueId = ueId;
+        this.nom = nom;
+        this.enseignant = enseignant;
+        this.volumeHoraire = volumeHoraire;
+    }
+
     public int getId() {
         return id;
     }

@@ -2,4 +2,7 @@
     <string name="app_name">LogBook</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ajouter_une_ue">Ajouter une UE</string>
+    <string name="enregistrer">Enregistrer</string>
+    <string name="vue_d_ensemble_des_ue">Vue d\'ensemble des Unités d\'Enseignement</string>
 </resources>

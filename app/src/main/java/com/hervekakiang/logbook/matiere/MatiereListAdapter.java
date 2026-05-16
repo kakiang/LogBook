@@ -1,5 +1,6 @@
 package com.hervekakiang.logbook.matiere;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,26 +15,33 @@ import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ue.UE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-public class MatiereListAdapter extends ListAdapter<Matiere, MatiereListAdapter.ViewHolder> {// RecyclerView.Adapter<MatiereListAdapter.ViewHolder> {
+public class MatiereListAdapter extends ListAdapter<Pair<Matiere, String>, MatiereListAdapter.ViewHolder> {
 
-    private List<Matiere> matieres = new ArrayList<>();
+    private Map<Integer, String> ueMap = new HashMap<>();
 
     public MatiereListAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    private static final DiffUtil.ItemCallback<Matiere> DIFF_CALLBACK = new DiffUtil.ItemCallback<Matiere>() {
+    private static final DiffUtil.ItemCallback<Pair<Matiere, String>> DIFF_CALLBACK =new DiffUtil.ItemCallback<Pair<Matiere, String>>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Matiere oldItem, @NonNull Matiere newItem) {
-            return oldItem.getId() == newItem.getId();
+        public boolean areItemsTheSame(@NonNull Pair<Matiere, String> oldItem, @NonNull Pair<Matiere, String> newItem) {
+            // Compare using the Matiere's identity (e.g., name or unique constraint)
+            return oldItem.first.getNom().equals(newItem.first.getNom()) &&
+                    oldItem.first.getUeId() == newItem.first.getUeId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Matiere oldItem, @NonNull Matiere newItem) {
-            return oldItem.getNom().equals(newItem.getNom()) &&
-                    oldItem.getUeId()==newItem.getUeId();
+        public boolean areContentsTheSame(@NonNull Pair<Matiere, String> oldItem, @NonNull Pair<Matiere, String> newItem) {
+            // Check if any details or the bound UE Name itself changed
+            return oldItem.second.equals(newItem.second) &&
+                    oldItem.first.getVolumeHoraire() == newItem.first.getVolumeHoraire() &&
+                    oldItem.first.getEnseignant().equals(newItem.first.getEnseignant());
         }
     };
 
@@ -61,23 +69,20 @@ public class MatiereListAdapter extends ListAdapter<Matiere, MatiereListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Matiere matiere = matieres.get(position);
-//        holder.textViewUeNom.setText(matiere.getUeNom());
-        holder.textViewVolumeHoraire.setText(String.valueOf(matiere.getVolumeHoraire()));
+        Pair<Matiere, String> pair = getItem(position);
+        Matiere matiere = pair.first;
+        String ueNom = pair.second;
+        holder.textViewUeNom.setText(ueNom != null ? ueNom.toUpperCase() : "UE NON TROUVÉE");
+        holder.textViewVolumeHoraire.setText(String.format(Locale.getDefault(), "%dh", matiere.getVolumeHoraire()));
         holder.textViewMatiereNom.setText(matiere.getNom());
         holder.textViewEnseignant.setText(matiere.getEnseignant());
     }
 
-    @Override
-    public int getItemCount() {
-        return matieres.size();
+    public Map<Integer, String> getUeMap() {
+        return ueMap;
     }
 
-    public List<Matiere> getMatieres() {
-        return matieres;
-    }
-
-    public void setMatieres(List<Matiere> matieres) {
-        this.matieres = matieres;
+    public void setUeMap(Map<Integer, String> ueMap) {
+        this.ueMap = ueMap;
     }
 }

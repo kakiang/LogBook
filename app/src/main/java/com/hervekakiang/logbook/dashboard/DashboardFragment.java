@@ -7,16 +7,38 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.hervekakiang.logbook.R;
+import com.hervekakiang.logbook.matiere.Matiere;
+import com.hervekakiang.logbook.matiere.MatiereViewModel;
+import com.hervekakiang.logbook.seance.Seance;
+import com.hervekakiang.logbook.seance.SeanceViewModel;
+import com.hervekakiang.logbook.ue.UEListAdapter;
+import com.hervekakiang.logbook.ue.UEViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class DashboardFragment extends Fragment {
 
     private DashboardViewModel mViewModel;
+    private List<Seance> seances = new ArrayList<>();
+    private List<Matiere> matieres = new ArrayList<>();
+
+    private ProgressBar progressBar;
+    private TextView tvChartPercentage;
+    private TextView tvVhEffectue;
+    private TextView tvVhRestant;
 
     public static DashboardFragment newInstance() {
         return new DashboardFragment();
@@ -29,10 +51,58 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
-        // TODO: Use the ViewModel
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        progressBar = view.findViewById(R.id.chartProgress);
+        tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
+        tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
+        tvVhRestant = view.findViewById(R.id.tvVhRestant);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        mViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
+            this.matieres = matieres;
+            calculHoraire();
+        });
+
+        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
+        seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
+            this.seances = seances;
+            calculHoraire();
+        });
+
+
+        UEListAdapter mAdapter = new UEListAdapter();
+        recyclerView.setAdapter(mAdapter);
+
+        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+
+        ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
+            mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
+        });
+
     }
 
+    private void calculHoraire() {
+        if (matieres.isEmpty() || seances.isEmpty()) return;
+        int horaireEffectue = 0;
+        int horaireTotal = 0;
+
+        for (Matiere m : matieres) {
+            horaireTotal += m.getVolumeHoraire();
+        }
+        for (Seance s : seances) {
+            horaireEffectue += s.getDuree();
+        }
+
+        tvVhEffectue.setText(String.format(Locale.getDefault(),"%dh", horaireEffectue));
+        tvVhRestant.setText(String.format(Locale.getDefault(),"%dh", horaireTotal - horaireEffectue));
+
+        int percentage = (horaireTotal > 0) ? (horaireEffectue * 100) / horaireTotal : 0;
+        progressBar.setProgress(percentage);
+        tvChartPercentage.setText(String.format(Locale.getDefault(),"%d%%", percentage));
+    }
 }

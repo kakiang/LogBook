@@ -30,8 +30,25 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String SEANCE_DUREE = "duree";
     public static final String SEANCE_CONTENU_PEDAGOGIQUE = "contenu_pedagogique";
 
-    public MyDatabaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    private static MyDatabaseHelper instance;
+    private SQLiteDatabase database;
+
+    public MyDatabaseHelper(@Nullable Context context, @Nullable String dbname, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context != null ? context.getApplicationContext() : null, dbname, factory, version);
+    }
+
+    public static synchronized MyDatabaseHelper getInstance(Context context, String dbname, int version) {
+        if (instance == null) {
+            instance = new MyDatabaseHelper(context, dbname, null, version);
+        }
+        return instance;
+    }
+
+    public synchronized SQLiteDatabase openDatabase() {
+        if (database == null || !database.isOpen()) {
+            database = this.getWritableDatabase();
+        }
+        return database;
     }
 
     @Override
@@ -62,6 +79,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_MATIERE);
         db.execSQL(CREATE_TABLE_SEANCE);
 
+        insertDefaultData(db);
     }
 
     @Override
@@ -70,5 +88,37 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MATIERE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEANCE);
         onCreate(db);
+    }
+
+    private void insertDefaultData(SQLiteDatabase db) {
+        db.beginTransaction();
+        try {
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE1', 'Administration Système')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE2', 'Communication')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE4', 'Propagation')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE5', 'Electronique')");
+
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (1, 'Administration Réseaux Sous Linux', 'Dr. Drame', 40)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (1, 'Administration Linux', 'Dr. Gaye Lamine', 30)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (1, 'Systeme dexploitation', 'Dr. Mamadou Dia', 40)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (2, 'Anglais', 'Dr. Alioune Cisse', 20)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (3, 'Antennes et signal', 'Dr. Ibra Dioum', 30)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (3, 'Antenna & Microwave', 'Dr. Ibra Dioum', 35)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (4, 'Système embarqué', 'Dr. Ouya Samuel', 40)");
+
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '14 Mai 2026', '16h:00', 2, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '07 Mai 2026', '12h:30', 1, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '14 Mai 2026', '16h:00', 3, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '05 Mai 2026', '12h:30', 2, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '14 Mai 2026', '16h:00', 2, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '10 Avril 2026', '12h:30', 3, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.hervekakiang.logbook.ue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,33 +16,44 @@ import com.hervekakiang.logbook.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UEListAdapter extends ListAdapter<UE, UEListAdapter.ViewHolder> {//<UEListAdapter.ViewHolder> {
+public class UEListAdapter extends ListAdapter<UEListAdapter.UeUiModel, UEListAdapter.ViewHolder> {
 
     public UEListAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    private static final DiffUtil.ItemCallback<UE> DIFF_CALLBACK = new DiffUtil.ItemCallback<UE>() {
+    public record UeUiModel(
+            UE ue,
+            String volumeHoraireStat,
+            int pourcentage) {}
+
+    private static final DiffUtil.ItemCallback<UeUiModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<UeUiModel>() {
         @Override
-        public boolean areItemsTheSame(@NonNull UE oldItem, @NonNull UE newItem) {
-            return oldItem.getId() == newItem.getId();
+        public boolean areItemsTheSame(@NonNull UeUiModel oldItem, @NonNull UeUiModel newItem) {
+            return oldItem.ue.getId() == newItem.ue.getId() ;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull UE oldItem, @NonNull UE newItem) {
-            return oldItem.getNom().equals(newItem.getNom()) &&
-                    oldItem.getCode().equals(newItem.getCode());
+        public boolean areContentsTheSame(@NonNull UeUiModel oldItem, @NonNull UeUiModel newItem) {
+            return oldItem.equals(newItem);
         }
     };
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewCode;
         private final TextView textViewNom;
+        private final ProgressBar progressBar;
+        private final TextView tvChartPercentage;
+        private final TextView textViewVolumehoraireStat;
 
         public ViewHolder(View itemView) {
             super(itemView);
             textViewCode = itemView.findViewById(R.id.textViewCode);
-            textViewNom = itemView.findViewById(R.id.textViewNom);        }
+            textViewNom = itemView.findViewById(R.id.textViewNom);
+            progressBar = itemView.findViewById(R.id.chartProgress);
+            tvChartPercentage = itemView.findViewById(R.id.tvChartPercentage);
+            textViewVolumehoraireStat = itemView.findViewById(R.id.textViewVhStat);
+        }
     }
 
     @NonNull
@@ -53,8 +65,12 @@ public class UEListAdapter extends ListAdapter<UE, UEListAdapter.ViewHolder> {//
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UE ue = getItem(position);
-        holder.textViewCode.setText(ue.getCode());
-        holder.textViewNom.setText(ue.getNom());
+        UeUiModel ueUiModel = getItem(position);
+        holder.textViewCode.setText(ueUiModel.ue.getCode());
+        holder.textViewNom.setText(ueUiModel.ue.getNom());
+        holder.progressBar.setProgress(ueUiModel.pourcentage());
+        String percent = ueUiModel.pourcentage() + "%";
+        holder.tvChartPercentage.setText(percent);
+        holder.textViewVolumehoraireStat.setText(ueUiModel.volumeHoraireStat());
     }
 }
