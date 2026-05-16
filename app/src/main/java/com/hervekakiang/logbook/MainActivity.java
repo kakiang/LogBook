@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     static {
         TOP_LEVEL_DESTINATIONS.add(R.id.dashboardFragment);
-        TOP_LEVEL_DESTINATIONS.add(R.id.ueListFragment);
+//        TOP_LEVEL_DESTINATIONS.add(R.id.ueListFragment);
         TOP_LEVEL_DESTINATIONS.add(R.id.matiereListFragment);
         TOP_LEVEL_DESTINATIONS.add(R.id.seanceListFragment);
     }

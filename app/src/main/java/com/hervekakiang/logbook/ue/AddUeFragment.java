@@ -45,6 +45,8 @@ public class AddUeFragment extends BottomSheetDialogFragment {
 
         bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setSkipCollapsed(true);
+
         NestedScrollView nestedScrollView = view.findViewById(R.id.scrollView_add_ue);
         nestedScrollView.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
 

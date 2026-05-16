@@ -16,11 +16,13 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
 import com.hervekakiang.logbook.seance.Seance;
 import com.hervekakiang.logbook.seance.SeanceViewModel;
+import com.hervekakiang.logbook.ue.AddUeFragment;
 import com.hervekakiang.logbook.ue.UEListAdapter;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
@@ -61,6 +63,15 @@ public class DashboardFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        FloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddUeFragment addUeFragment = new AddUeFragment();
+                addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
+            }
+        });
 
         MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
         mViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {

@@ -58,6 +58,7 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setSkipCollapsed(true);
 
         NestedScrollView nestedScrollView = view.findViewById(R.id.scrollView_add_matiere);
         nestedScrollView.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
