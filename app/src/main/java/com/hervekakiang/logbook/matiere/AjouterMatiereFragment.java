@@ -19,8 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -60,8 +62,12 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setSkipCollapsed(true);
 
-        NestedScrollView nestedScrollView = view.findViewById(R.id.scrollView_add_matiere);
-        nestedScrollView.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+        LinearLayout layout = view.findViewById(R.id.layoutAddMatiere);
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+        MaterialToolbar toolbar = view.findViewById(R.id.matiereToolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            dismiss();
+        });
 
         AutoCompleteTextView autoCompleteUE = view.findViewById(R.id.autoCompleteUE);
         TextInputEditText editMatiereNom = view.findViewById(R.id.editMatiereNom);

@@ -1,13 +1,23 @@
 package com.hervekakiang.logbook.seance;
 
+import android.app.Dialog;
+import android.content.res.Resources;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.hervekakiang.logbook.R;
 
 /**
@@ -15,46 +25,17 @@ import com.hervekakiang.logbook.R;
  * Use the {@link AjouterSeanceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AjouterSeanceFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class AjouterSeanceFragment extends BottomSheetDialogFragment {
+    BottomSheetBehavior<View> bottomSheetBehavior;
+    private int originalSoftInputMode;
 
     public AjouterSeanceFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AjouterSeanceFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AjouterSeanceFragment newInstance(String param1, String param2) {
-        AjouterSeanceFragment fragment = new AjouterSeanceFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -62,5 +43,45 @@ public class AjouterSeanceFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_ajouter_seance, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setSkipCollapsed(true);
+
+        LinearLayout layout = view.findViewById(R.id.layoutAddSeance);
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+
+        MaterialToolbar toolbar = view.findViewById(R.id.seanceToolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            dismiss();
+        });
+    }
+
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        // Store the activity current mode
+        if (getActivity() != null && getActivity().getWindow() != null) {
+            originalSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
+            // CRITICAL: Set to PAN so activity does NOT resize
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        }
+        return dialog;
+    }
+
+    @Override
+    public void onDestroyView() {
+        // Restore original mode when bottom sheet is dismissed
+        if (getActivity() != null && getActivity().getWindow() != null) {
+            getActivity().getWindow().setSoftInputMode(originalSoftInputMode);
+        }
+        super.onDestroyView();
     }
 }

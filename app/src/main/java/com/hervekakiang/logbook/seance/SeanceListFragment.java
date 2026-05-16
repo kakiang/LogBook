@@ -52,6 +52,13 @@ public class SeanceListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment();
+                ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
+            }
+        });
 
         seanceListAdaper = new SeanceListAdaper();
         recyclerView.setAdapter(seanceListAdaper);

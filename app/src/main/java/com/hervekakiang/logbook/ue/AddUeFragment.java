@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -47,8 +49,12 @@ public class AddUeFragment extends BottomSheetDialogFragment {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setSkipCollapsed(true);
 
-        NestedScrollView nestedScrollView = view.findViewById(R.id.scrollView_add_ue);
-        nestedScrollView.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+        LinearLayout layout = view.findViewById(R.id.layoutAddUe);
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+        MaterialToolbar toolbar = view.findViewById(R.id.ueToolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            dismiss();
+        });
 
         UEViewModel viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
         TextInputEditText editUeCode = view.findViewById(R.id.editUeCode);
