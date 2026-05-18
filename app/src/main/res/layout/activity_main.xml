@@ -33,7 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingHorizontal="16dp"
-            android:paddingBottom="80dp"
             android:clipToPadding="false"
             app:defaultNavHost="true"
             app:layout_constraintEnd_toEndOf="parent"

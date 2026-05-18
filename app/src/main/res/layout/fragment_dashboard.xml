@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="80dp"
     tools:context=".dashboard.DashboardFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -155,8 +156,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
-                android:paddingBottom="4dp"
-                android:text="Unités d'enseignement (X)" />
+                android:paddingBottom="8dp"
+                tools:text="Unités d'enseignement (X)" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -169,9 +170,9 @@
         android:id="@+id/recyclerviewUE"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="88dp"
         android:clipToPadding="false"
         android:paddingTop="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

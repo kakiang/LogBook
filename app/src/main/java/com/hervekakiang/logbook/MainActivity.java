@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean isTopLevel = TOP_LEVEL_DESTINATIONS.contains(navDestination.getId());
 
                 if (isTopLevel) {
+//                    fragmentContainerView.setPadding(16,0,16,88);
                     bottomNavigationView.animate()
                             .translationY(0)
                             .setDuration(200)

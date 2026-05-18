@@ -72,8 +72,6 @@ public class UeDetailFragment extends Fragment {
         tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
 
         if (model != null) {
-//            progressBar.setProgress(model.pourcentage());
-
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, model.pourcentage());
             animator.setDuration(1500);
             animator.setInterpolator(new FastOutSlowInInterpolator());

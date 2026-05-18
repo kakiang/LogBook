@@ -23,7 +23,8 @@
                 android:id="@+id/textViewVhStat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="312H effectuées / 440H"
+                android:gravity="center"
+                tools:text="312H effectuées / 440H"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
             <RelativeLayout
@@ -52,7 +53,7 @@
                     android:layout_alignParentEnd="true"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOutline"
-                    android:text="41%" />
+                    tools:text="41%" />
             </RelativeLayout>
 
             <TextView
@@ -60,8 +61,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
-                android:textColor="?attr/colorOnSurface"
-                android:text="Matières (X)" />
+                android:paddingBottom="8dp"
+                tools:text="Matières (X)" />
 
             <View
                 android:layout_width="match_parent"
@@ -76,6 +77,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:paddingBottom="88dp"
         android:paddingTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />

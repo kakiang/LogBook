@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,13 @@ public class SeanceListFragment extends Fragment {
                 AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment();
                 ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
             }
+        });
+
+        Log.d("FAB", "visibility = " + fab.getVisibility());
+        fab.post(() -> {
+            int[] location = new int[2];
+            fab.getLocationOnScreen(location);
+            Log.d("FAB", "Y = " + location[1] + ", screen height = " + fab.getRootView().getHeight());
         });
 
         seanceListAdaper = new SeanceListAdaper();

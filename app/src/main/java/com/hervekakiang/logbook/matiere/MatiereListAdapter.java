@@ -73,7 +73,7 @@ public class MatiereListAdapter extends ListAdapter<MatiereListAdapter.MatiereWi
         Matiere matiere = m.ue();
         holder.textViewMatiereNom.setText(matiere.getNom());
         holder.textViewEnseignant.setText(matiere.getEnseignant());
-        String stat = m.volumeHoraireStat() + " " + m.pourcentage()+"%";
+        String stat = m.volumeHoraireStat() + " : " + m.pourcentage()+"%";
         holder.textViewVhStats.setText(stat);
     }
 

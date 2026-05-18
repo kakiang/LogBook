@@ -3,12 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="80dp"
     tools:context=".seance.SeanceListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerviewSeance"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="88dp"
         android:clipToPadding="false"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
