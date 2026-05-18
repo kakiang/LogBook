@@ -59,11 +59,26 @@ public class UeListFragment extends Fragment {
             }
         });
 
+        UEListAdapter.OnItemClickListener listener = new UEListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {
+                UeDetailFragment ueDetailFragment = UeDetailFragment.newInstance(ueWithStats.ue());
+                getChildFragmentManager().beginTransaction()
+                        .replace(R.id.navHostFragment, ueDetailFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+
+            @Override
+            public void onItemLongClick(UEListAdapter.UeWithStats ue) {
+
+            }
+        };
         mAdapter = new UEListAdapter();
+        mAdapter.setOnItemClickListener(listener);
         recyclerView.setAdapter(mAdapter);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-
         ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });

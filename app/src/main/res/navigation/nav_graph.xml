@@ -12,7 +12,13 @@
     <fragment
         android:id="@+id/ueListFragment"
         android:name="com.hervekakiang.logbook.ue.UeListFragment"
-        android:label="Unités d'Enseignement" />
+        android:label="Unités d'Enseignement">
+
+        <action
+            android:id="@+id/action_ueListFragment_to_ueDetailFragment"
+            app:destination="@id/ueDetailFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/matiereListFragment"
@@ -23,5 +29,15 @@
         android:id="@+id/seanceListFragment"
         android:name="com.hervekakiang.logbook.seance.SeanceListFragment"
         android:label="Seances" />
+
+    <fragment
+        android:id="@+id/ueDetailFragment"
+        android:name="com.hervekakiang.logbook.ue.UeDetailFragment"
+        android:label="{fragmentTitle}">
+
+        <argument
+            android:name="fragmentTitle"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

@@ -75,6 +75,20 @@ public class SeanceDAO extends DAOBase<Seance> {
         return 0;
     }
 
+    public int getTotalVolumeHoraireEffectueByMatiereId(int matiereId) {
+        String query ="SELECT SUM(s.duree) FROM seances s WHERE s.matiere_id = ?";
+        try(Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(matiereId)})){
+            int totalVolumeHoraireEffectue = 0;
+            if (cursor.moveToFirst()) {
+                totalVolumeHoraireEffectue = cursor.getInt(0);
+            }
+            return totalVolumeHoraireEffectue;
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching total volume horaire effectué", e);
+        }
+        return 0;
+    }
+
     public int getTotalVolumeHoraireEffectue() {
         String query ="SELECT SUM(s.duree) FROM seances s";
         try(Cursor cursor = myDb.rawQuery(query, null)){

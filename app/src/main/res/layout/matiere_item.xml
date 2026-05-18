@@ -7,75 +7,48 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    style="@style/Widget.Material3.CardView.Filled">
+    app:cardElevation="4dp"
+    style="@style/Widget.Material3.CardView.Elevated">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvMatiereNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            tools:text="Administration Réseaux Sous Linux" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tvUeNom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                tools:text="RESEAUX ET TELECOMS" />
-
-            <TextView
-                android:id="@+id/tvVolumeHoraire"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:background="@drawable/bg_chip_light"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
-                tools:text="45h" />
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/tvMatiereNom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            tools:text="Administration Réseaux Sous Linux" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_person"
-                app:tint="?attr/colorOutline" />
-
-            <TextView
                 android:id="@+id/tvEnseignant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_centerVertical="true"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                 android:textColor="?attr/colorOutline"
                 tools:text="M. Hervé Kakiang" />
-        </LinearLayout>
 
+            <TextView
+                android:id="@+id/textViewVhStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="?attr/colorPrimary"
+                android:padding="8dp"
+                tools:text="45H / 90H : 70%"/>
+
+        </RelativeLayout>
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

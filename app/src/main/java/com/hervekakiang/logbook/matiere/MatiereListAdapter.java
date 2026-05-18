@@ -12,15 +12,12 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ue.UE;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MatiereListAdapter extends ListAdapter<Pair<Matiere, String>, MatiereListAdapter.ViewHolder> {
+public class MatiereListAdapter extends ListAdapter<MatiereListAdapter.MatiereWithStats, MatiereListAdapter.ViewHolder> {
 
     private Map<Integer, String> ueMap = new HashMap<>();
 
@@ -28,33 +25,36 @@ public class MatiereListAdapter extends ListAdapter<Pair<Matiere, String>, Matie
         super(DIFF_CALLBACK);
     }
 
-    private static final DiffUtil.ItemCallback<Pair<Matiere, String>> DIFF_CALLBACK =new DiffUtil.ItemCallback<Pair<Matiere, String>>() {
+    public record MatiereWithStats(
+            Matiere ue,
+            String volumeHoraireStat,
+            int pourcentage) {}
+
+    private static final DiffUtil.ItemCallback<MatiereListAdapter.MatiereWithStats> DIFF_CALLBACK =new DiffUtil.ItemCallback<MatiereListAdapter.MatiereWithStats>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Pair<Matiere, String> oldItem, @NonNull Pair<Matiere, String> newItem) {
+        public boolean areItemsTheSame(@NonNull MatiereListAdapter.MatiereWithStats oldItem, @NonNull MatiereListAdapter.MatiereWithStats newItem) {
             // Compare using the Matiere's identity (e.g., name or unique constraint)
-            return oldItem.first.getNom().equals(newItem.first.getNom()) &&
-                    oldItem.first.getUeId() == newItem.first.getUeId();
+            return oldItem.ue().getNom().equals(newItem.ue().getNom()) &&
+                    oldItem.ue().getUeId() == newItem.ue().getUeId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Pair<Matiere, String> oldItem, @NonNull Pair<Matiere, String> newItem) {
+        public boolean areContentsTheSame(@NonNull MatiereListAdapter.MatiereWithStats oldItem, @NonNull MatiereListAdapter.MatiereWithStats newItem) {
             // Check if any details or the bound UE Name itself changed
-            return oldItem.second.equals(newItem.second) &&
-                    oldItem.first.getVolumeHoraire() == newItem.first.getVolumeHoraire() &&
-                    oldItem.first.getEnseignant().equals(newItem.first.getEnseignant());
+            return oldItem.equals(newItem) &&
+                    oldItem.ue().getVolumeHoraire() == newItem.ue().getVolumeHoraire() &&
+                    oldItem.ue().getEnseignant().equals(newItem.ue().getEnseignant());
         }
     };
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textViewUeNom;
-        private final TextView textViewVolumeHoraire;
+        private final TextView textViewVhStats;
         private final TextView textViewMatiereNom;
         private final TextView textViewEnseignant;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textViewUeNom = itemView.findViewById(R.id.tvUeNom);
-            textViewVolumeHoraire = itemView.findViewById(R.id.tvVolumeHoraire);
+            textViewVhStats = itemView.findViewById(R.id.textViewVhStats);
             textViewMatiereNom = itemView.findViewById(R.id.tvMatiereNom);
             textViewEnseignant = itemView.findViewById(R.id.tvEnseignant);
         }
@@ -69,13 +69,12 @@ public class MatiereListAdapter extends ListAdapter<Pair<Matiere, String>, Matie
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Pair<Matiere, String> pair = getItem(position);
-        Matiere matiere = pair.first;
-        String ueNom = pair.second;
-        holder.textViewUeNom.setText(ueNom != null ? ueNom.toUpperCase() : "UE NON TROUVÉE");
-        holder.textViewVolumeHoraire.setText(String.format(Locale.getDefault(), "%dh", matiere.getVolumeHoraire()));
+        MatiereListAdapter.MatiereWithStats m = getItem(position);
+        Matiere matiere = m.ue();
         holder.textViewMatiereNom.setText(matiere.getNom());
         holder.textViewEnseignant.setText(matiere.getEnseignant());
+        String stat = m.volumeHoraireStat() + " " + m.pourcentage()+"%";
+        holder.textViewVhStats.setText(stat);
     }
 
     public Map<Integer, String> getUeMap() {

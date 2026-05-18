@@ -1,155 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingVertical="16dp"
     tools:context=".dashboard.DashboardFragment">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        app:liftOnScroll="false"
+        app:elevation="4dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
-            android:textColor="?attr/colorOnSurface"
-            android:text="@string/vue_d_ensemble_des_ue"
-            android:letterSpacing="0.05"
-            tools:text="Vue d'ensemble des Unités d'Enseignement" />
+            android:orientation="vertical">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Material3.CardView.Elevated"
-            android:layout_marginVertical="16dp"
-            android:layout_marginHorizontal="4dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:strokeWidth="0dp">
-
-            <RelativeLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="16dp">
+                android:letterSpacing="0.05"
+                android:paddingVertical="16dp"
+                android:text="@string/vue_d_ensemble_des_ue"
+                android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="Vue d'ensemble des Unités d'Enseignement" />
 
-                <FrameLayout
-                    android:id="@+id/chartContainer"
-                    android:layout_width="84dp"
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginHorizontal="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignBottom="@id/containerMetrics"
-                    android:layout_marginEnd="18dp">
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="16dp">
 
-                    <ProgressBar
-                        android:id="@+id/chartProgress"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:indeterminate="false"
-                        android:max="100"
-                        android:progress="41"
-                        android:progressDrawable="@drawable/donut_progress_bar" />
+                    <FrameLayout
+                        android:id="@+id/chartContainer"
+                        android:layout_width="84dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/containerMetrics"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginEnd="18dp">
+
+                        <ProgressBar
+                            android:id="@+id/chartProgress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:indeterminate="false"
+                            android:max="100"
+                            android:progress="41"
+                            android:progressDrawable="@drawable/donut_progress_bar" />
+
+                        <TextView
+                            android:id="@+id/tvChartPercentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:fontFamily="sans-serif-medium"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="41%" />
+                    </FrameLayout>
 
                     <TextView
-                        android:id="@+id/tvChartPercentage"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCardTitle"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_alignParentTop="true"
+                        android:layout_toEndOf="@id/chartContainer"
                         android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.1"
+                        android:text="Volume horaire"
                         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:textColor="?attr/colorOnSurface"
-                        tools:text="41%" />
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvCardTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/chartContainer"
-                    android:layout_alignParentTop="true"
-                    android:fontFamily="sans-serif-medium"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:text="Volume horaire"
-                    android:letterSpacing="0.1"/>
-
-                <LinearLayout
-                    android:id="@+id/containerMetrics"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tvCardTitle"
-                    android:layout_toEndOf="@id/chartContainer"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false">
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:id="@+id/containerMetrics"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_below="@id/tvCardTitle"
+                        android:layout_marginTop="12dp"
+                        android:layout_toEndOf="@id/chartContainer"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="?attr/colorOutline"
-                            android:text="Effectué" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvVhEffectue"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Effectué"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                                android:textColor="?attr/colorOutline" />
+
+                            <TextView
+                                android:id="@+id/tvVhEffectue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                                android:textColor="?attr/colorPrimary"
+                                android:textStyle="bold"
+                                tools:text="35h" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="?attr/colorPrimary"
-                            android:textStyle="bold"
-                            tools:text="35h" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Restant"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                                android:textColor="?attr/colorOutline" />
+
+                            <TextView
+                                android:id="@+id/tvVhRestant"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textStyle="bold"
+                                tools:text="50h" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                </RelativeLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="?attr/colorOutline"
-                            android:text="Restant" />
+            </com.google.android.material.card.MaterialCardView>
 
-                        <TextView
-                            android:id="@+id/tvVhRestant"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textStyle="bold"
-                            tools:text="50h" />
-                    </LinearLayout>
+            <TextView
+                android:id="@+id/textViewUeListTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
+                android:paddingBottom="4dp"
+                android:text="Unités d'enseignement (X)" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorOutlineVariant" />
+        </LinearLayout>
 
-                </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerviewUE"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerviewUE"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_ue"
@@ -158,8 +181,8 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="@string/ajouter_une_ue"
-        app:srcCompat="@drawable/baseline_add_24"
         app:backgroundTint="?attr/colorPrimary"
+        app:srcCompat="@drawable/baseline_add_24"
         app:tint="?attr/colorOnPrimary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

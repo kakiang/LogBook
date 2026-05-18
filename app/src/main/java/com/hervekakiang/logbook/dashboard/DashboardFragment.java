@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +63,8 @@ public class DashboardFragment extends Fragment {
         tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
         tvVhRestant = view.findViewById(R.id.tvVhRestant);
 
+        TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -85,16 +89,40 @@ public class DashboardFragment extends Fragment {
             calculHoraire();
         });
 
-
-        UEListAdapter mAdapter = new UEListAdapter();
+        UEListAdapter mAdapter = getUeListAdapter();
         recyclerView.setAdapter(mAdapter);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-
         ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
+            String uet = "Unités d'enseignement (" + ueUiModels.size() + ")";
+            textViewUeListTitle.setText(uet);
             mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });
 
+    }
+
+    @NonNull
+    private UEListAdapter getUeListAdapter() {
+        UEListAdapter.OnItemClickListener listener = new UEListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(UEListAdapter.UeWithStats model) {
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
+                Bundle args = new Bundle();
+                args.putSerializable("ueModel", model);
+                String fragmentTitle = model.ue().getCode() + " " + model.ue().getNom();
+                args.putString("fragmentTitle", fragmentTitle);
+                navController.navigate(R.id.ueDetailFragment, args);
+            }
+
+            @Override
+            public void onItemLongClick(UEListAdapter.UeWithStats uiModel) {
+
+            }
+        };
+
+        UEListAdapter mAdapter = new UEListAdapter();
+        mAdapter.setOnItemClickListener(listener);
+        return mAdapter;
     }
 
     private void calculHoraire() {
@@ -109,11 +137,11 @@ public class DashboardFragment extends Fragment {
             horaireEffectue += s.getDuree();
         }
 
-        tvVhEffectue.setText(String.format(Locale.getDefault(),"%dh", horaireEffectue));
-        tvVhRestant.setText(String.format(Locale.getDefault(),"%dh", horaireTotal - horaireEffectue));
+        tvVhEffectue.setText(String.format(Locale.getDefault(), "%dh", horaireEffectue));
+        tvVhRestant.setText(String.format(Locale.getDefault(), "%dh", horaireTotal - horaireEffectue));
 
         int percentage = (horaireTotal > 0) ? (horaireEffectue * 100) / horaireTotal : 0;
         progressBar.setProgress(percentage);
-        tvChartPercentage.setText(String.format(Locale.getDefault(),"%d%%", percentage));
+        tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
     }
 }

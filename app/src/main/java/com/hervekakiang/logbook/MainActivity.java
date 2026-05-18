@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
@@ -35,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private NavController navController;
-    private AppBarConfiguration appBarConfiguration;
     private MaterialToolbar topAppBar;
     private BottomNavigationView bottomNavigationView;
 
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
         topAppBar = binding.topAppBar;
         bottomNavigationView = binding.bottomNavigationView;
-//        setSupportActionBar(topAppBar);
 
         setupNavigation();
         setupToolbarActions();
@@ -57,16 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupNavigation() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.navHostFragment);
+        FragmentContainerView fragmentContainerView = findViewById(R.id.navHostFragment);
         if (navHostFragment == null) {
-            throw new IllegalStateException(
-                    "NavHostFragment not found. Check that R.id.navHostFragment " +
-                            "is a <FragmentContainerView> with app:navGraph set.");
+            throw new IllegalStateException("NavHostFragment R.id.navHostFragment not found");
         }
         navController = navHostFragment.getNavController();
-
-        appBarConfiguration = new AppBarConfiguration.Builder(TOP_LEVEL_DESTINATIONS).build();
-        NavigationUI.setupWithNavController(topAppBar, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
@@ -84,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }).start();
                 } else {
+                    fragmentContainerView.setPadding(16,0,16,0);
                     bottomNavigationView.animate()
                             .translationY(bottomNavigationView.getHeight())
                             .setDuration(200)
@@ -91,8 +86,16 @@ public class MainActivity extends AppCompatActivity {
                             .start();
                 }
 
+                if (bundle != null && bundle.containsKey("fragmentTitle")) {
+                    String fragmentTitle = bundle.getString("fragmentTitle");
+                    topAppBar.setTitle(fragmentTitle);
+                }
+
             }
         });
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(TOP_LEVEL_DESTINATIONS).build();
+        NavigationUI.setupWithNavController(topAppBar, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
 
     private void setupToolbarActions() {

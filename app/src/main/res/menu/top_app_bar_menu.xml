@@ -6,7 +6,7 @@
         android:id="@+id/action_search"
         android:icon="@drawable/baseline_search_24"
         android:title="Search"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_settings"

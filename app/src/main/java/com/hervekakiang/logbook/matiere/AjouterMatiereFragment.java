@@ -100,7 +100,7 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             }
         });
 
-        MatiereViewModel viewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
         btnSaveMatiere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,7 +131,7 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
                     return;
                 }
                 Matiere m = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
-                viewModel.addMatiere(m);
+                matiereViewModel.addMatiere(m);
                 ueViewModel.refreshAllList();
                 Toast.makeText(getActivity(), "Matière " + nom + " ajoutée avec succès", Toast.LENGTH_SHORT).show();
                 dismiss();

@@ -85,6 +85,6 @@ public class MatiereListFragment extends Fragment {
             combinedList.add(new Pair<>(m, ueMap.get(m.getUeId())));
         }
 
-        mAdapter.submitList(combinedList);
+//        mAdapter.submitList(combinedList);
     }
 }

@@ -50,5 +50,5 @@
         android:layout_gravity="bottom"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu"
-        app:layout_dodgeInsetEdges="bottom"/>
+        android:fitsSystemWindows="true"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

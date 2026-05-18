@@ -23,7 +23,7 @@ public class UEViewModel extends AndroidViewModel {
     private final SeanceDAO seanceDao;
     private final MatiereDAO matiereDao;
 
-    private final MediatorLiveData<List<UEListAdapter.UeUiModel>> ueUiModels = new MediatorLiveData<>();
+    private final MediatorLiveData<List<UEListAdapter.UeWithStats>> ueUiModels = new MediatorLiveData<>();
     private final MutableLiveData<List<UE>> listUEs = new MutableLiveData<>();
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
@@ -55,7 +55,7 @@ public class UEViewModel extends AndroidViewModel {
         return listUEs;
     }
 
-    public LiveData<List<UEListAdapter.UeUiModel>> getUeUiModels() {
+    public LiveData<List<UEListAdapter.UeWithStats>> getUeUiModels() {
         return ueUiModels;
     }
 
@@ -64,17 +64,17 @@ public class UEViewModel extends AndroidViewModel {
         if (ues == null) return;
 
         ueDao.getExecutorService().execute(()->{
-            List<UEListAdapter.UeUiModel> map = new ArrayList<>();
+            List<UEListAdapter.UeWithStats> ueWithStats = new ArrayList<>();
             for (UE ue : ues) {
                 int horaireEffectue = seanceDao.getTotalVolumeHoraireEffectueByUeId(ue.getId());
                 int horaireTotal = matiereDao.getTotalVolumeHoraireByUeId(ue.getId());
 
                 int percentage = (horaireTotal > 0) ? (horaireEffectue * 100) / horaireTotal : 0;
-                String volumeHoraireStat = String.format(Locale.getDefault(),"%dh / %dh", horaireEffectue, horaireTotal);
+                String volumeHoraireStat = String.format(Locale.getDefault(),"%dH / %dH", horaireEffectue, horaireTotal);
 
-                map.add(new UEListAdapter.UeUiModel(ue, volumeHoraireStat, percentage));
+                ueWithStats.add(new UEListAdapter.UeWithStats(ue, volumeHoraireStat, percentage));
             }
-            ueUiModels.postValue(map);
+            ueUiModels.postValue(ueWithStats);
         });
     }
 }

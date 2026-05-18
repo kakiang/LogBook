@@ -91,7 +91,8 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:hint="Durée"
-                    app:suffixText="Min">
+                    app:suffixText="Heures">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editSeanceDuree"
                         android:layout_width="match_parent"
