@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
@@ -110,7 +111,7 @@ public class DashboardFragment extends Fragment {
 
     @NonNull
     private UEListAdapter getUeListAdapter() {
-        UEListAdapter.OnItemClickListener listener = new UEListAdapter.OnItemClickListener() {
+        OnItemClickListener<UEListAdapter.UeWithStats> listener = new OnItemClickListener<>() {
             @Override
             public void onItemClick(UEListAdapter.UeWithStats model) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);

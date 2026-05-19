@@ -8,6 +8,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -17,24 +20,16 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.Matiere;
+import com.hervekakiang.logbook.ViewModelFactory;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class UeDetailFragment extends Fragment {
-    private UEListAdapter.UeWithStats model;
-    private TextView tvMatiereListTitle;
-    private List<Matiere> matieres = new ArrayList<>();
-
-    private ProgressBar progressBar;
-    private TextView tvChartPercentage;
-    private TextView textViewVhStat;
-
+    private UEListAdapter.UeWithStats ueWithStats;
 
     public UeDetailFragment() {
     }
@@ -64,28 +59,30 @@ public class UeDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
-            model = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueModel");
+            ueWithStats = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueModel");
         }
-        progressBar = view.findViewById(R.id.chartProgress);
-        tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
-        textViewVhStat = view.findViewById(R.id.textViewVhStat);
-        tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
+        ProgressBar progressBar = view.findViewById(R.id.chartProgress);
+        TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
+        TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
+        TextView tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
 
-        if (model != null) {
-            ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, model.pourcentage());
+        if (ueWithStats != null) {
+            ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, ueWithStats.pourcentage());
             animator.setDuration(1500);
             animator.setInterpolator(new FastOutSlowInInterpolator());
             animator.start();
 
-            tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", model.pourcentage()));
-            textViewVhStat.setText(model.volumeHoraireStat());
+            tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", ueWithStats.pourcentage()));
+            textViewVhStat.setText(ueWithStats.volumeHoraireStat());
         }
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
-        MatiereListAdapter mAdapter = new MatiereListAdapter();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        MatiereListAdapter mAdapter = getMatiereListAdapter();
+
         recyclerView.setAdapter(mAdapter);
 
-        MatiereViewModel.Factory factory = new MatiereViewModel.Factory(requireActivity().getApplication(), model.ue().getId());
+        ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), ueWithStats.ue().getId());
         MatiereViewModel mViewModel = new ViewModelProvider(this, factory).get(MatiereViewModel.class);
 
         Log.d("UEDETAIL mViewModel.getUeId()", String.valueOf(mViewModel.getUeId()));
@@ -95,5 +92,28 @@ public class UeDetailFragment extends Fragment {
             mAdapter.submitList(matieres);
         });
 
+    }
+
+    @NonNull
+    private MatiereListAdapter getMatiereListAdapter() {
+        MatiereListAdapter mAdapter = new MatiereListAdapter();
+
+        OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener = new OnItemClickListener<MatiereListAdapter.MatiereWithStats>() {
+            @Override
+            public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
+                Bundle args = new Bundle();
+                args.putSerializable("matiereWithStats", matiereWithStats);
+                args.putString("fragmentTitle", matiereWithStats.matiere().getNom());
+                navController.navigate(R.id.matiereDetailFragment, args);
+            }
+
+            @Override
+            public void onItemLongClick(MatiereListAdapter.MatiereWithStats obj) {
+
+            }
+        };
+        mAdapter.setOnItemClickListener(listener);
+        return mAdapter;
     }
 }

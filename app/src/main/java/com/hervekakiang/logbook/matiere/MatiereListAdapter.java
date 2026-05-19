@@ -1,6 +1,5 @@
 package com.hervekakiang.logbook.matiere;
 
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,39 +10,38 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.io.Serializable;
 
 public class MatiereListAdapter extends ListAdapter<MatiereListAdapter.MatiereWithStats, MatiereListAdapter.ViewHolder> {
 
-    private Map<Integer, String> ueMap = new HashMap<>();
+    private OnItemClickListener<MatiereWithStats> onItemClickListener;
 
     public MatiereListAdapter() {
         super(DIFF_CALLBACK);
     }
 
     public record MatiereWithStats(
-            Matiere ue,
+            Matiere matiere,
             String volumeHoraireStat,
-            int pourcentage) {}
+            int pourcentage) implements Serializable {}
 
     private static final DiffUtil.ItemCallback<MatiereListAdapter.MatiereWithStats> DIFF_CALLBACK =new DiffUtil.ItemCallback<MatiereListAdapter.MatiereWithStats>() {
         @Override
         public boolean areItemsTheSame(@NonNull MatiereListAdapter.MatiereWithStats oldItem, @NonNull MatiereListAdapter.MatiereWithStats newItem) {
             // Compare using the Matiere's identity (e.g., name or unique constraint)
-            return oldItem.ue().getNom().equals(newItem.ue().getNom()) &&
-                    oldItem.ue().getUeId() == newItem.ue().getUeId();
+            return oldItem.matiere().getNom().equals(newItem.matiere().getNom()) &&
+                    oldItem.matiere().getUeId() == newItem.matiere().getUeId();
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull MatiereListAdapter.MatiereWithStats oldItem, @NonNull MatiereListAdapter.MatiereWithStats newItem) {
             // Check if any details or the bound UE Name itself changed
             return oldItem.equals(newItem) &&
-                    oldItem.ue().getVolumeHoraire() == newItem.ue().getVolumeHoraire() &&
-                    oldItem.ue().getEnseignant().equals(newItem.ue().getEnseignant());
+                    oldItem.matiere().getVolumeHoraire() == newItem.matiere().getVolumeHoraire() &&
+                    oldItem.matiere().getEnseignant().equals(newItem.matiere().getEnseignant());
         }
     };
 
@@ -69,19 +67,28 @@ public class MatiereListAdapter extends ListAdapter<MatiereListAdapter.MatiereWi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        MatiereListAdapter.MatiereWithStats m = getItem(position);
-        Matiere matiere = m.ue();
+        MatiereListAdapter.MatiereWithStats matiereWithStats = getItem(position);
+        Matiere matiere = matiereWithStats.matiere();
         holder.textViewMatiereNom.setText(matiere.getNom());
         holder.textViewEnseignant.setText(matiere.getEnseignant());
-        String stat = m.volumeHoraireStat() + " : " + m.pourcentage()+"%";
+        String stat = matiereWithStats.volumeHoraireStat() + " : " + matiereWithStats.pourcentage()+"%";
         holder.textViewVhStats.setText(stat);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(matiereWithStats);
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemLongClick(matiereWithStats);
+            }
+            return false;
+        });
     }
 
-    public Map<Integer, String> getUeMap() {
-        return ueMap;
-    }
-
-    public void setUeMap(Map<Integer, String> ueMap) {
-        this.ueMap = ueMap;
+    public void setOnItemClickListener(OnItemClickListener<MatiereWithStats> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 }

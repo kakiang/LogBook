@@ -40,4 +40,14 @@
             app:argType="string" />
     </fragment>
 
+    <fragment
+        android:id="@+id/matiereDetailFragment"
+        android:name="com.hervekakiang.logbook.matiere.MatiereDetailFragment"
+        android:label="{fragmentTitle}">
+
+        <argument
+            android:name="fragmentTitle"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

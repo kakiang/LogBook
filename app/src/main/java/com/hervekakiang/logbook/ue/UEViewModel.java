@@ -70,7 +70,7 @@ public class UEViewModel extends AndroidViewModel {
                 int horaireTotal = matiereDao.getTotalVolumeHoraireByUeId(ue.getId());
 
                 int percentage = (horaireTotal > 0) ? (horaireEffectue * 100) / horaireTotal : 0;
-                String volumeHoraireStat = String.format(Locale.getDefault(),"%dH / %dH", horaireEffectue, horaireTotal);
+                String volumeHoraireStat = String.format(Locale.getDefault(),"%dH dispensées / %dH", horaireEffectue, horaireTotal);
 
                 ueWithStats.add(new UEListAdapter.UeWithStats(ue, volumeHoraireStat, percentage));
             }

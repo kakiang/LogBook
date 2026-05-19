@@ -11,23 +11,20 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 
 import java.io.Serializable;
 
 public class UEListAdapter extends ListAdapter<UEListAdapter.UeWithStats, UEListAdapter.ViewHolder> {
-    private OnItemClickListener onItemClickListener;
 
+    private OnItemClickListener<UeWithStats> onItemClickListener;
 
-    public interface OnItemClickListener {
-        void onItemClick(UeWithStats ue);
-        void onItemLongClick(UeWithStats ue);
-    }
     public UEListAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    public UEListAdapter(OnItemClickListener onItemClickListener) {
+    public UEListAdapter(OnItemClickListener<UeWithStats> onItemClickListener) {
         super(DIFF_CALLBACK);
         this.onItemClickListener = onItemClickListener;
     }
@@ -101,7 +98,7 @@ public class UEListAdapter extends ListAdapter<UEListAdapter.UeWithStats, UEList
         });
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener<UeWithStats> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 }

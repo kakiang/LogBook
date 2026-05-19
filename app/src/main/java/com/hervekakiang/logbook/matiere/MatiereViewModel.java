@@ -95,22 +95,22 @@ public class MatiereViewModel extends AndroidViewModel {
 
     }
 
-    public static class Factory implements ViewModelProvider.Factory {
-        private final Application application;
-        private final int ueId;
-
-        public Factory(Application application, int ueId) {
-            this.application = application;
-            this.ueId = ueId;
-        }
-
-        @NonNull
-        @Override
-        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            if (modelClass.isAssignableFrom(MatiereViewModel.class)) {
-                return (T) new MatiereViewModel(application, ueId);
-            }
-            throw new IllegalArgumentException("Unknown ViewModel class");
-        }
-    }
+//    public static class Factory implements ViewModelProvider.Factory {
+//        private final Application application;
+//        private final int ueId;
+//
+//        public Factory(Application application, int ueId) {
+//            this.application = application;
+//            this.ueId = ueId;
+//        }
+//
+//        @NonNull
+//        @Override
+//        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+//            if (modelClass.isAssignableFrom(MatiereViewModel.class)) {
+//                return (T) new MatiereViewModel(application, ueId);
+//            }
+//            throw new IllegalArgumentException("Unknown ViewModel class");
+//        }
+//    }
 }

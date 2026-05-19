@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
@@ -59,7 +60,7 @@ public class UeListFragment extends Fragment {
             }
         });
 
-        UEListAdapter.OnItemClickListener listener = new UEListAdapter.OnItemClickListener() {
+        OnItemClickListener<UEListAdapter.UeWithStats> listener = new OnItemClickListener<>() {
             @Override
             public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {
                 UeDetailFragment ueDetailFragment = UeDetailFragment.newInstance(ueWithStats.ue());

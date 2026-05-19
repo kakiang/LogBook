@@ -34,9 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOutline"
-                tools:text="M. Hervé Kakiang" />
+                tools:text="Prof. Albert Einstein" />
 
             <TextView
                 android:id="@+id/textViewVhStats"

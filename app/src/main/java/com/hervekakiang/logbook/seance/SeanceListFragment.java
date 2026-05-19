@@ -21,17 +21,14 @@ import com.hervekakiang.logbook.matiere.Matiere;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SeanceListFragment extends Fragment {
 
-    private SeanceListAdaper seanceListAdaper;
+    private SeanceListGroupAdaper seanceListGroupAdaper;
     private List<Seance> seances = new ArrayList<>();
     private List<Matiere> matieres = new ArrayList<>();
 
@@ -68,8 +65,8 @@ public class SeanceListFragment extends Fragment {
             Log.d("FAB", "Y = " + location[1] + ", screen height = " + fab.getRootView().getHeight());
         });
 
-        seanceListAdaper = new SeanceListAdaper();
-        recyclerView.setAdapter(seanceListAdaper);
+        seanceListGroupAdaper = new SeanceListGroupAdaper();
+        recyclerView.setAdapter(seanceListGroupAdaper);
 
         MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
         SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
@@ -102,6 +99,6 @@ public class SeanceListFragment extends Fragment {
             }
             items.add(new SeanceListItem(s));
         }
-        seanceListAdaper.submitList(items);
+        seanceListGroupAdaper.submitList(items);
     }
 }

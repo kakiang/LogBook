@@ -37,7 +37,6 @@ public class SeanceDAO extends DAOBase<Seance> {
 
     public List<Seance> fetchAll() {
         List<Seance> seances = new ArrayList<>();
-
         try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, null, null, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
@@ -54,9 +53,34 @@ public class SeanceDAO extends DAOBase<Seance> {
         return seances;
     }
 
+    public List<Seance> fetchByMatiereId(int matiereId) {
+        List<Seance> seances = new ArrayList<>();
+        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, MyDatabaseHelper.SEANCE_MATIERE_ID + " = ?", new String[]{String.valueOf(matiereId)}, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DATE));
+                String heureDebut = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_HEURE_DEBUT));
+                int duree = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DUREE));
+                String contenuPedagogique = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_CONTENU_PEDAGOGIQUE));
+                seances.add(new Seance(id, matiereId, date, heureDebut, duree, contenuPedagogique));
+            }
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching seances", e);
+        }
+        return seances;
+    }
+
+
     public void getAll(SeanceDAO.Callback<List<Seance>> callback){
         executorService.execute(() -> {
             List<Seance> ues = fetchAll();
+            callback.onResult(ues);
+        });
+    }
+
+    public void getSeancesByMatiereId(int matiereId, SeanceDAO.Callback<List<Seance>> callback){
+        executorService.execute(() -> {
+            List<Seance> ues = fetchByMatiereId(matiereId);
             callback.onResult(ues);
         });
     }
