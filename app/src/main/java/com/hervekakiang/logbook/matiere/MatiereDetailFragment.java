@@ -17,8 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ViewModelFactory;
+import com.hervekakiang.logbook.seance.AjouterSeanceFragment;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
 import com.hervekakiang.logbook.seance.SeanceListGroupAdaper;
 import com.hervekakiang.logbook.seance.SeanceViewModel;
@@ -67,6 +69,15 @@ public class MatiereDetailFragment extends Fragment {
             String enseignant = "Enseignant : "+matiereWithStats.matiere().getEnseignant();
             tvEnseignant.setText(enseignant);
         }
+
+        FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment();
+                ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
+            }
+        });
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

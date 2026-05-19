@@ -20,9 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ViewModelFactory;
+import com.hervekakiang.logbook.matiere.AjouterMatiereFragment;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
 
@@ -75,6 +77,15 @@ public class UeDetailFragment extends Fragment {
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", ueWithStats.pourcentage()));
             textViewVhStat.setText(ueWithStats.volumeHoraireStat());
         }
+
+        FloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment();
+                ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
+            }
+        });
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
