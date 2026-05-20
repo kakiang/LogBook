@@ -14,40 +14,41 @@ Les différentes fonctionnalités implémentées sont :
 
 <table>
   <tr>
-    <td align="center">
+    <td>
       <strong>Dashboard</strong><br>
       <img src="screenshots/dashboard.jpg" alt="Dashboard" width="572">
     </td>
-    <td align="center">
+    <td>
       <strong>UE Detail - Matière List</strong><br>
       <img src="screenshots/ue_detail.jpg" alt="UE Detail, Matière List" width="572">
     </td>
   </tr>
   <tr>
-    <td align="center">
+    <td>
       <strong>Ajout d'UE</strong><br>
       <img src="screenshots/ue_add.jpg" alt="UE Add" width="572">
     </td>
-    <td align="center">
+    <td>
       <strong>Matière Detail - Séance List</strong><br>
       <img src="screenshots/matiere_detail.jpg" alt="Matière Detail, seance List" width="572">
     </td>
   </tr>
   <tr>
-    <td align="center">
+    <td>
       <strong>Ajout de matière</strong><br>
       <img src="screenshots/matiere_add.jpg" alt="Matière Add" width="572">
     </td>
-    <td align="center">
+    <td>
       <strong>Liste des séances</strong><br>
       <img src="screenshots/seance_list.jpg" alt="Seance List" width="572">
     </td>
   </tr>
   <tr>
-    <td align="center" colspan="2">
+    <td>
       <strong>Ajout de séance</strong><br>
       <img src="screenshots/seance_add.jpg" alt="Seance Add" width="572">
     </td>
+    <td></td>
   </tr>
 </table>
 
