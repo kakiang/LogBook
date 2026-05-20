@@ -11,12 +11,12 @@ Les différentes fonctionnalités implémentées sont :
 
 ## Screenshots
 
-![Dashboard](screenshots/dashboard.jpg)
-![UE Detail, Matière List](screenshots/ue_detail.jpg)
-![UE Add](screenshots/ue_add.jpg)
-![Matière Detail, seance List](screenshots/matiere_detail.jpg)
-![Matière Add](screenshots/matiere_add.jpg)
-![Seance List](screenshots/seance_list.jpg)
-![Seance Add](screenshots/seance_add.jpg)
+![Dashboard](screenshots/dashboard.jpg){ width=50% height=50% }
+![UE Detail, Matière List](screenshots/ue_detail.jpg){ width=50% height=50% }
+![UE Add](screenshots/ue_add.jpg){ width=50% height=50% }
+![Matière Detail, seance List](screenshots/matiere_detail.jpg){ width=50% height=50% }
+![Matière Add](screenshots/matiere_add.jpg){ width=50% height=50% }
+![Seance List](screenshots/seance_list.jpg){ width=50% height=50% }
+![Seance Add](screenshots/seance_add.jpg){ width=50% height=50% }
 
 
