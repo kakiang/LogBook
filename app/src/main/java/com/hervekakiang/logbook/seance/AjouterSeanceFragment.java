@@ -44,8 +44,6 @@ import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     private MatiereViewModel matiereViewModel;
-    private SeanceViewModel seanceViewModel;
-    private UEViewModel ueViewModel;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
@@ -83,10 +81,6 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         toolbar.setNavigationOnClickListener(v -> {
             dismiss();
         });
-        matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-
 
         setupPickers();
         loadMatieres();
@@ -128,8 +122,14 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
             return;
         }
         Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
+
+        matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
+        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+
         seanceViewModel.addSeance(seance);
         ueViewModel.refreshAllList();
+        matiereViewModel.refreshList();
         dismiss();
         Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
     }

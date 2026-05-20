@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hervekakiang.logbook.R;
+import com.hervekakiang.logbook.ViewModelFactory;
 import com.hervekakiang.logbook.ue.UE;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
@@ -42,6 +44,10 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
     private int selectedUeId = -1;
 
     public AjouterMatiereFragment() {
+    }
+
+    public AjouterMatiereFragment(int ueId) {
+        this.selectedUeId = ueId;
     }
 
     @Override
@@ -90,6 +96,11 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, ueNoms);
             autoCompleteUE.setAdapter(adapter);
+
+            if (selectedUeId != -1) {
+                autoCompleteUE.setText(ueList.stream().filter(ue -> ue.getId() == selectedUeId).findFirst().get().getNom(), false);
+                autoCompleteUE.setListSelection(selectedUeId);
+            }
         });
 
         autoCompleteUE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -100,7 +111,10 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             }
         });
 
-        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), selectedUeId);
+        String key = "MatiereViewModel_" + selectedUeId;
+        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity(), factory).get(key, MatiereViewModel.class);
+
         btnSaveMatiere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,6 +146,7 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
                 }
                 Matiere m = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
                 matiereViewModel.addMatiere(m);
+                matiereViewModel.refreshList();
                 ueViewModel.refreshAllList();
                 Toast.makeText(getActivity(), "Matière " + nom + " ajoutée avec succès", Toast.LENGTH_SHORT).show();
                 dismiss();

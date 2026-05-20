@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class DAOBase<T> {
-    protected final static int VERSION = 1;
+    protected final static int VERSION = 3;
     protected static final String DATABASE_NAME = "logbook.db";
     protected SQLiteDatabase myDb;
     protected MyDatabaseHelper myDbHelper;

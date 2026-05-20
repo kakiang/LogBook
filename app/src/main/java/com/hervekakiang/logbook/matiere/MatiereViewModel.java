@@ -68,7 +68,7 @@ public class MatiereViewModel extends AndroidViewModel {
         return matieresWithStats;
     }
 
-    private void refreshList() {
+    public void refreshList() {
         if (ueId != 0) {
             Log.d("UEID", String.valueOf(ueId));
             matiereDao.getMatieresByUeId(ueId, listMatieres::postValue);

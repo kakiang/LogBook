@@ -104,11 +104,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int itemId = item.getItemId();
-                if (itemId == R.id.action_settings) {
-//                    navController.navigate(R.id.settingsFragment);
-                    Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
 
                 if (itemId == R.id.action_search) {
 //                    navController.navigate(R.id.searchFragment);
@@ -119,10 +114,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-//    @Override
-//    public boolean onSupportNavigateUp() {
-//        return NavigationUI.navigateUp(navController, appBarConfiguration)
-//                || super.onSupportNavigateUp();
-//    }
 }

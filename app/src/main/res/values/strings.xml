@@ -5,4 +5,5 @@
     <string name="ajouter_une_ue">Ajouter une UE</string>
     <string name="enregistrer">Enregistrer</string>
     <string name="vue_d_ensemble_des_ue">Vue d\'ensemble des unités d\'enseignement</string>
+    <string name="search">Search</string>
 </resources>

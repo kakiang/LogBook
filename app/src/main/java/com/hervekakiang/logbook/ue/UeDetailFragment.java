@@ -82,7 +82,7 @@ public class UeDetailFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment();
+                AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment(ueWithStats.ue().getId());
                 ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
             }
         });
@@ -94,7 +94,8 @@ public class UeDetailFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
 
         ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), ueWithStats.ue().getId());
-        MatiereViewModel mViewModel = new ViewModelProvider(this, factory).get(MatiereViewModel.class);
+        String key = "MatiereViewModel_" + ueWithStats.ue().getId();
+        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity(), factory).get(key, MatiereViewModel.class);
 
         Log.d("UEDETAIL mViewModel.getUeId()", String.valueOf(mViewModel.getUeId()));
         mViewModel.getMatieresWithStats().observe(getViewLifecycleOwner(), matieres -> {

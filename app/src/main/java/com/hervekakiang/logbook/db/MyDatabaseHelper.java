@@ -64,7 +64,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 + MATIERE_NOM + " TEXT,"
                 + MATIERE_ENSEIGNANT + " TEXT,"
                 + MATIERE_VOLUME_HORAIRE + " INTEGER,"
-                + "FOREIGN KEY(" + MATIERE_UE_ID + ") REFERENCES " + TABLE_UE + "(" + UE_ID + "))";
+                + "FOREIGN KEY(" + MATIERE_UE_ID + ") REFERENCES " + TABLE_UE + "(" + UE_ID + ") ON DELETE CASCADE)";
 
         String CREATE_TABLE_SEANCE = "CREATE TABLE " + TABLE_SEANCE + "("
                 + SEANCE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -73,7 +73,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 + SEANCE_HEURE_DEBUT + " TEXT,"
                 + SEANCE_DUREE + " INTEGER,"
                 + SEANCE_CONTENU_PEDAGOGIQUE + " TEXT,"
-                + "FOREIGN KEY(" + SEANCE_MATIERE_ID + ") REFERENCES " + TABLE_MATIERE + "(" + MATIERE_ID + "))";
+                + "FOREIGN KEY(" + SEANCE_MATIERE_ID + ") REFERENCES " + TABLE_MATIERE + "(" + MATIERE_ID + ") ON DELETE CASCADE)";
 
         db.execSQL(CREATE_TABLE_UE);
         db.execSQL(CREATE_TABLE_MATIERE);

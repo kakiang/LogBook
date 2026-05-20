@@ -5,12 +5,6 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/baseline_search_24"
-        android:title="Search"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/baseline_settings_24"
-        android:title="Settings"
+        android:title="@string/search"
         app:showAsAction="never" />
 </menu>
