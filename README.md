@@ -1,6 +1,4 @@
 # LogBook
-LogBook est un cahier de texte électronique
-
 LogBook est une application de gestion d’un cahier de texte électronique destinée aux responsables de classe.
 
 ## Fonctionnalités
