@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +20,16 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ViewModelFactory;
 import com.hervekakiang.logbook.seance.AjouterSeanceFragment;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
-import com.hervekakiang.logbook.seance.SeanceListGroupAdaper;
 import com.hervekakiang.logbook.seance.SeanceViewModel;
 
 import java.util.Locale;
 
 public class MatiereDetailFragment extends Fragment {
 
-    private MatiereListAdapter.MatiereWithStats matiereWithStats;
+//    private MatiereListAdapter.MatiereWithStats matiereWithStats;
+    private int matiereId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,19 +46,26 @@ public class MatiereDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(getArguments()!=null) {
-            matiereWithStats = (MatiereListAdapter.MatiereWithStats) getArguments().getSerializable("matiereWithStats");
-        }
-
         ProgressBar progressBar = view.findViewById(R.id.chartProgress);
         TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
         TextView tvSeanceListTitle = view.findViewById(R.id.tvSeanceListTitle);
         TextView tvEnseignant = view.findViewById(R.id.tvEnseignant);
+        FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
 
-        if (matiereWithStats != null) {
+        if (getArguments() == null || !getArguments().containsKey("matiereId")) return;
+
+        matiereId = getArguments().getInt("matiereId");
+
+        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
+
+        matiereViewModel.setCurrentMatiereId(matiereId);
+        matiereViewModel.getCurrentMatiereWithStats().observe(getViewLifecycleOwner(), matiereWithStats -> {
+
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, matiereWithStats.pourcentage());
-            animator.setDuration(1500);
+            animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
             animator.start();
 
@@ -66,27 +73,28 @@ public class MatiereDetailFragment extends Fragment {
             String vhStat = matiereWithStats.volumeHoraireStat();
             vhStat = vhStat.replace("/", "dispensées /");
             textViewVhStat.setText(vhStat);
-            String enseignant = "Enseignant : "+matiereWithStats.matiere().getEnseignant();
+            String enseignant = "Enseignant : " + matiereWithStats.matiere().getEnseignant();
             tvEnseignant.setText(enseignant);
-        }
-
-        FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment();
-                ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
-            }
         });
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
+
+        fab.setOnClickListener(v -> {
+            AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment(matiereId);
+            ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
+        });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         SeanceListAdaper mAdapter = new SeanceListAdaper();
         recyclerView.setAdapter(mAdapter);
 
-        ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), matiereWithStats.matiere().getId());
-        SeanceViewModel seanceViewModel = new ViewModelProvider(this, factory).get(SeanceViewModel.class);
+        seanceViewModel.setMatiereId(matiereId);
         seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
+            Log.d("Performance", "Seance count = " + seances.size());
+            long start = System.nanoTime();
+            mAdapter.submitList(seances);
+            long end = System.nanoTime();
+            Log.d("Performance", "submitList took " + (end - start) / 1_000_000 + " ms");
+
             String seanceListTitle = "Seances de cours (" + seances.size() + ")";
             tvSeanceListTitle.setText(seanceListTitle);
             mAdapter.submitList(seances);

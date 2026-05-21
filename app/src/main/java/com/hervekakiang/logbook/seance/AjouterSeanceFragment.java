@@ -1,13 +1,10 @@
 package com.hervekakiang.logbook.seance;
 
 import android.app.Dialog;
-import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.TextUtils;
@@ -19,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -44,6 +40,8 @@ import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     private MatiereViewModel matiereViewModel;
+    private SeanceViewModel seanceViewModel;
+    private UEViewModel ueViewModel;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
@@ -53,6 +51,10 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     private int originalSoftInputMode;
 
     public AjouterSeanceFragment() {
+    }
+
+    public AjouterSeanceFragment(int matiereId) {
+        this.selectedMatiereId = matiereId;
     }
 
     @Override
@@ -77,6 +79,11 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         editDuree = view.findViewById(R.id.editSeanceDuree);
         editContenu = view.findViewById(R.id.editSeanceContenu);
         Button btnSave = view.findViewById(R.id.btnSaveSeance);
+
+        matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+
+        seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
+        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
 
         toolbar.setNavigationOnClickListener(v -> {
             dismiss();
@@ -123,13 +130,10 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         }
         Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
 
-        matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-
         seanceViewModel.addSeance(seance);
-        ueViewModel.refreshAllList();
-        matiereViewModel.refreshList();
+        ueViewModel.refreshList();
+        matiereViewModel.refreshSeances();
+        matiereViewModel.setCurrentMatiereId(selectedMatiereId);
         dismiss();
         Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
     }
@@ -143,6 +147,11 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, matiereNoms);
             autoCompleteMatiere.setAdapter(adapter);
+            if (selectedMatiereId != -1) {
+                autoCompleteMatiere.setText(matiereList.stream().filter(m -> m.getId() == selectedMatiereId).findFirst().get().getNom(), false);
+                autoCompleteMatiere.setListSelection(selectedMatiereId);
+            }
+
             autoCompleteMatiere.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

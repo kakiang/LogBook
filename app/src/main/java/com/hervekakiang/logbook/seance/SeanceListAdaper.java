@@ -1,5 +1,6 @@
 package com.hervekakiang.logbook.seance;
 
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,9 +69,12 @@ public class SeanceListAdaper extends ListAdapter<Seance, SeanceListAdaper.Seanc
 
     @Override
     public void onBindViewHolder(@NonNull SeanceViewHolder holder, int position) {
+        long start = System.nanoTime();
         Seance seance = getItem(position);
         holder.textViewSeanceDate.setText(seance.getDate());
         holder.textViewSeanceDuree.setText(String.format(Locale.getDefault(), "%dh", seance.getDuree()));
         holder.textViewSeanceContenu.setText(seance.getContenuPedagogique());
+        long end = System.nanoTime();
+        Log.d("Adapter", "bind position " + position + " took " + (end - start) / 1_000_000 + " ms");
     }
 }

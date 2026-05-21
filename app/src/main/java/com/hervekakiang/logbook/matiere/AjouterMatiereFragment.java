@@ -6,12 +6,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +22,10 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ViewModelFactory;
 import com.hervekakiang.logbook.ue.UE;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
@@ -111,10 +106,8 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             }
         });
 
-        ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), selectedUeId);
-        String key = "MatiereViewModel_" + selectedUeId;
-        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity(), factory).get(key, MatiereViewModel.class);
-
+        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        matiereViewModel.setCurrentUeId(selectedUeId);
         btnSaveMatiere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +117,7 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
                 if (selectedUeId == -1 || nom == null || enseignant == null || volumeHoraire == null) {
                     if (selectedUeId == -1) {
                         textInputLayoutUE.setError("Veuillez sélectionner une UE");
-                    } else{
+                    } else {
                         textInputLayoutUE.setError(null);
                     }
                     if (nom == null) {
@@ -146,8 +139,8 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
                 }
                 Matiere m = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
                 matiereViewModel.addMatiere(m);
-                matiereViewModel.refreshList();
-                ueViewModel.refreshAllList();
+//                matiereViewModel.refreshList();
+                ueViewModel.refreshList();
                 Toast.makeText(getActivity(), "Matière " + nom + " ajoutée avec succès", Toast.LENGTH_SHORT).show();
                 dismiss();
             }

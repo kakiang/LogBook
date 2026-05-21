@@ -72,6 +72,21 @@ public class UEDAO extends DAOBase<UE> {
         return volumeHoraire;
     }
 
+    public void getCombine(){
+        String query = """
+                SELECT\s
+                    ue.id AS ueId,\s
+                    ue.nom AS ueNom,
+                    SUM(s.duration) AS horaireEffectue,
+                    SUM(m.volume_horaire) AS horaireTotal
+                FROM UE ue
+                LEFT JOIN Subject sub ON sub.ue_id = ue.id
+                LEFT JOIN Session s ON s.subject_id = sub.id
+                LEFT JOIN Matiere m ON m.ue_id = ue.id
+                GROUP BY ue.id;
+                """;
+    }
+
     public void update(UE ue) {
         ContentValues values = new ContentValues();
         values.put(MyDatabaseHelper.UE_CODE, ue.getCode());

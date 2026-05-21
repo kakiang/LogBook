@@ -13,7 +13,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ViewModelFactory;
 import com.hervekakiang.logbook.matiere.AjouterMatiereFragment;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 import com.hervekakiang.logbook.matiere.MatiereViewModel;
@@ -52,7 +50,6 @@ public class UeDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_ue_detail, container, false);
 
     }
@@ -93,11 +90,8 @@ public class UeDetailFragment extends Fragment {
 
         recyclerView.setAdapter(mAdapter);
 
-        ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication(), ueWithStats.ue().getId());
-        String key = "MatiereViewModel_" + ueWithStats.ue().getId();
-        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity(), factory).get(key, MatiereViewModel.class);
-
-        Log.d("UEDETAIL mViewModel.getUeId()", String.valueOf(mViewModel.getUeId()));
+        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        mViewModel.setCurrentUeId(ueWithStats.ue().getId());
         mViewModel.getMatieresWithStats().observe(getViewLifecycleOwner(), matieres -> {
             String mt = "Matières (" + matieres.size() + ")";
             tvMatiereListTitle.setText(mt);
@@ -115,7 +109,7 @@ public class UeDetailFragment extends Fragment {
             public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("matiereWithStats", matiereWithStats);
+                args.putSerializable("matiereId", matiereWithStats.matiere().getId());
                 args.putString("fragmentTitle", matiereWithStats.matiere().getNom());
                 navController.navigate(R.id.matiereDetailFragment, args);
             }

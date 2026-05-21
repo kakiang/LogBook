@@ -78,12 +78,6 @@ public class DashboardFragment extends Fragment {
                 addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
             }
         });
-        Log.d("FAB", "visibility = " + fab.getVisibility());
-        fab.post(() -> {
-            int[] location = new int[2];
-            fab.getLocationOnScreen(location);
-            Log.d("FAB", "Y = " + location[1] + ", screen height = " + fab.getRootView().getHeight());
-        });
 
         MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
         mViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
@@ -91,7 +85,9 @@ public class DashboardFragment extends Fragment {
             calculHoraire();
         });
 
+
         SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
+        seanceViewModel.setMatiereId(0);
         seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
             this.seances = seances;
             calculHoraire();

@@ -2,7 +2,7 @@ package com.hervekakiang.logbook.seance;
 
 import java.io.Serializable;
 
-public class Seance implements Serializable {
+public class Seance extends Object implements Serializable {
     private int id;
     private int matiereId;
     private String date;

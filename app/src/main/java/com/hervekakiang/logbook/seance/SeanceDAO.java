@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.hervekakiang.logbook.db.DAOBase;
 import com.hervekakiang.logbook.db.MyDatabaseHelper;
 import com.hervekakiang.logbook.matiere.Matiere;
@@ -13,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeanceDAO extends DAOBase<Seance> {
+
+    private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
 
     public SeanceDAO(Context context) {
         super(context);
@@ -78,11 +83,21 @@ public class SeanceDAO extends DAOBase<Seance> {
         });
     }
 
-    public void getSeancesByMatiereId(int matiereId, SeanceDAO.Callback<List<Seance>> callback){
+    public LiveData<List<Seance>> getAll(){
         executorService.execute(() -> {
-            List<Seance> ues = fetchByMatiereId(matiereId);
-            callback.onResult(ues);
+            List<Seance> list = fetchAll();
+            listSeances.postValue(list);
         });
+
+        return listSeances;
+    }
+
+    public LiveData<List<Seance>> getSeancesByMatiereId(int matiereId){
+        executorService.execute(() -> {
+            List<Seance> list = fetchByMatiereId(matiereId);
+            listSeances.postValue(list);
+        });
+        return listSeances;
     }
 
     public int getTotalVolumeHoraireEffectueByUeId(int ueId) {

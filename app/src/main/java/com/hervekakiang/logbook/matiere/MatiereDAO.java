@@ -5,17 +5,24 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.hervekakiang.logbook.db.DAOBase;
 import com.hervekakiang.logbook.db.MyDatabaseHelper;
+import com.hervekakiang.logbook.seance.Seance;
 import com.hervekakiang.logbook.ue.UE;
 import com.hervekakiang.logbook.ue.UEDAO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MatiereDAO extends DAOBase<Matiere> {
+    private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
+
     public MatiereDAO(Context context) {
         super(context);
     }
@@ -38,7 +45,6 @@ public class MatiereDAO extends DAOBase<Matiere> {
 
     public List<Matiere> fetchAll() {
         List<Matiere> matieres = new ArrayList<>();
-
         try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, null, null, null, null, null)) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_ID));
@@ -71,18 +77,50 @@ public class MatiereDAO extends DAOBase<Matiere> {
 
     }
 
+    public Matiere getMatiereById(int matiereId) {
+        try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, MyDatabaseHelper.MATIERE_ID + " = ?", new String[]{String.valueOf(matiereId)}, null, null, null)) {
+            if (cursor.moveToFirst()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_ID));
+                int ueId = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_UE_ID));
+                String nom = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_NOM));
+                String enseignant = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_ENSEIGNANT));
+                int volumeHoraire = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_VOLUME_HORAIRE));
+                return new Matiere(id, ueId, nom, enseignant, volumeHoraire);
+            }
+        }catch (Exception e) {
+            Log.e("MatiereDAO", "Error fetching matiere", e);
+        }
+        return null;
+    }
+
     public void getAll(MatiereDAO.Callback<List<Matiere>> callback){
         executorService.execute(() -> {
-            List<Matiere> ues = fetchAll();
-            callback.onResult(ues);
+            List<Matiere> m = fetchAll();
+            callback.onResult(m);
         });
+    }
+
+    public LiveData<List<Matiere>> getAll(){
+        executorService.execute(() -> {
+            List<Matiere> matieres = fetchAll();
+            listMatieres.postValue(matieres);
+        });
+        return listMatieres;
     }
 
     public void getMatieresByUeId(int ueId, MatiereDAO.Callback<List<Matiere>> callback){
         executorService.execute(() -> {
-            List<Matiere> ues = fetchByUeId(ueId);
-            callback.onResult(ues);
+            List<Matiere> m = fetchByUeId(ueId);
+            callback.onResult(m);
         });
+    }
+
+    public LiveData<List<Matiere>> getMatieresByUeId(int ueId){
+        executorService.execute(() -> {
+            List<Matiere> matieres = fetchByUeId(ueId);
+            listMatieres.postValue(matieres);
+        });
+        return listMatieres;
     }
 
     public int getTotalVolumeHoraireByUeId(int ueId) {

@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import com.hervekakiang.logbook.matiere.Matiere;
 import com.hervekakiang.logbook.matiere.MatiereDAO;
@@ -33,7 +34,7 @@ public class UEViewModel extends AndroidViewModel {
         ueDao = new UEDAO(application);
         seanceDao = new SeanceDAO(application);
         matiereDao = new MatiereDAO(application);
-        refreshAllList();
+        refreshList();
 
         ueUiModels.addSource(listUEs, ues -> combineAndProcess());
         ueUiModels.addSource(listMatieres, matieres -> combineAndProcess());
@@ -41,14 +42,13 @@ public class UEViewModel extends AndroidViewModel {
     }
 
     public void addUE(UE ue) {
-        ueDao.insert(ue, this::refreshAllList);
+        ueDao.insert(ue, this::refreshList);
     }
 
-    public void refreshAllList(){
+    public void refreshList(){
         ueDao.getAll(listUEs::postValue);
         matiereDao.getAll(listMatieres::postValue);
         seanceDao.getAll(listSeances::postValue);
-        Log.d("UEViewModel", "refreshList is called");
     }
 
     public LiveData<List<UE>> getListUEs() {

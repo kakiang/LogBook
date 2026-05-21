@@ -1,54 +1,50 @@
 package com.hervekakiang.logbook.seance;
 
 import android.app.Application;
+import android.service.autofill.Transformation;
 import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import java.util.List;
 
 public class SeanceViewModel extends AndroidViewModel {
-    private Integer matiereId;
+    private final MutableLiveData<Integer> matiereId = new MutableLiveData<>();
     private final SeanceDAO seanceDao;
-    private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
+    private final LiveData<List<Seance>> listSeances;
 
     public SeanceViewModel(Application application) {
         super(application);
         seanceDao = new SeanceDAO(application);
-        refreshList();
-    }
 
-    public SeanceViewModel(Application application, int matiereId) {
-        super(application);
-        this.matiereId = matiereId;
-        seanceDao = new SeanceDAO(application);
-        refreshList();
+        this.listSeances = Transformations.switchMap(matiereId, id ->{
+            if (id == null || id == 0) {
+                return seanceDao.getAll();
+            }
+            return seanceDao.getSeancesByMatiereId(id);
+        });
+        setMatiereId(0);
     }
 
     public void addSeance(Seance seance) {
-        seanceDao.insert(seance, this::refreshList);
+        seanceDao.insert(seance, () -> {
+            Integer currentId = matiereId.getValue();
+            if (currentId != null && currentId != 0) {
+                matiereId.postValue(currentId);
+            } else {
+                matiereId.postValue(0);
+            }
+        });
     }
 
     public LiveData<List<Seance>> getListSeances() {
         return listSeances;
     }
 
-    public int getTotalVolumeHoraireEffectue() {
-        return seanceDao.getTotalVolumeHoraireEffectue();
-    }
-
-    public int getTotalVolumeHoraireEffectueByUeId(int ueId) {
-        return seanceDao.getTotalVolumeHoraireEffectueByUeId(ueId);
-    }
-
-    private void refreshList() {
-        if (matiereId != null) {
-            Log.d("MATIEREID", String.valueOf(matiereId));
-            seanceDao.getSeancesByMatiereId(matiereId, listSeances::postValue);
-        } else {
-            seanceDao.getAll(listSeances::postValue);
-        }
+    public void setMatiereId(int matiereId) {
+        this.matiereId.setValue(matiereId);
     }
 }
