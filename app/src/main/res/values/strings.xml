@@ -12,4 +12,5 @@
     <string name="restant">Restant</string>
     <string name="ajouter_matiere">Ajouter une matière</string>
     <string name="ajouter_seance">Ajouter une séance</string>
+    <string name="total">Total</string>
 </resources>

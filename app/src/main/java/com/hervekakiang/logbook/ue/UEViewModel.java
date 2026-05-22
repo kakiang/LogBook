@@ -40,7 +40,8 @@ public class UEViewModel extends AndroidViewModel {
 
     private final LiveData<StatsGlobal> statsGlobal;
     private final LiveData<UEListAdapter.UeWithStats> currentUeWithStats;
-    private final LiveData<MatiereListAdapter.MatiereWithStats> currentMatiereWithStats;
+//    private final LiveData<MatiereListAdapter.MatiereWithStats> currentMatiereWithStats;
+    private final MediatorLiveData<MatiereListAdapter.MatiereWithStats> currentMatiereWithStats = new MediatorLiveData<>();
 
     private final LiveData<List<Seance>> seancesForCurrentMatiere;
 
@@ -60,6 +61,10 @@ public class UEViewModel extends AndroidViewModel {
         combined.addSource(listUEs, ues -> combineAndEmit(combined));
         combined.addSource(listMatieres, matieres -> combineAndEmit(combined));
         combined.addSource(listSeances, seances -> combineAndEmit(combined));
+
+        currentMatiereWithStats.addSource(currentMatiereId, id -> updateCurrentMatiereStats());
+        currentMatiereWithStats.addSource(listMatieres, matieres -> updateCurrentMatiereStats());
+        currentMatiereWithStats.addSource(listSeances, seances -> updateCurrentMatiereStats());
 
         // Transform the combined data into the list of UeWithStats
         ueWithStatsList = Transformations.map(combined, data -> {
@@ -138,42 +143,6 @@ public class UEViewModel extends AndroidViewModel {
             });
         });
 
-        currentMatiereWithStats = Transformations.switchMap(currentMatiereId, matiereId -> {
-            Log.d("MYAPP=====UEViewModel", "currentMatiereId changed to " + matiereId);
-            if (matiereId == null || matiereId == 0) {
-                return new MutableLiveData<>(null);
-            }
-            // When matiereId changes, combine listMatieres and listSeances
-            return Transformations.map(listMatieres, allMatieres -> {
-                if (allMatieres == null) return null;
-                // Find the matiere
-                Matiere matiere = null;
-                for (Matiere m : allMatieres) {
-                    if (m.getId() == matiereId) {
-                        matiere = m;
-                        break;
-                    }
-                }
-                if (matiere == null) return null;
-
-                // Get seances cache
-                List<Seance> allSeances = listSeances.getValue();
-                if (allSeances == null) allSeances = Collections.emptyList();
-
-                // Sum durations for this matiere
-                int effectue = 0;
-                for (Seance s : allSeances) {
-                    if (s.getMatiereId() == matiereId) {
-                        effectue += s.getDuree();
-                    }
-                }
-                int total = matiere.getVolumeHoraire();
-                int percentage = total > 0 ? (effectue * 100) / total : 0;
-                String statText = String.format(Locale.getDefault(), "%dH / %dH", effectue, total);
-                return new MatiereListAdapter.MatiereWithStats(matiere, statText, percentage);
-            });
-        });
-
         seancesForCurrentMatiere = Transformations.switchMap(currentMatiereId, matiereId -> {
             if (matiereId == null || matiereId == 0) {
                 return new MutableLiveData<>(Collections.emptyList());
@@ -196,6 +165,44 @@ public class UEViewModel extends AndroidViewModel {
     }
 
     public record StatsGlobal(int total, int effectue) {
+    }
+
+    private void updateCurrentMatiereStats() {
+        Integer matiereId = currentMatiereId.getValue();
+        if (matiereId == null || matiereId == 0) {
+            currentMatiereWithStats.setValue(null);
+            return;
+        }
+        List<Matiere> allMatieres = listMatieres.getValue();
+        List<Seance> allSeances = listSeances.getValue();
+        if (allMatieres == null || allSeances == null) {
+            return; // not all data loaded yet
+        }
+
+        // Find the matiere
+        Matiere matiere = null;
+        for (Matiere m : allMatieres) {
+            if (m.getId() == matiereId) {
+                matiere = m;
+                break;
+            }
+        }
+        if (matiere == null) {
+            currentMatiereWithStats.setValue(null);
+            return;
+        }
+
+        // Sum seance durations for this matiere
+        int effectue = 0;
+        for (Seance s : allSeances) {
+            if (s.getMatiereId() == matiereId) {
+                effectue += s.getDuree();
+            }
+        }
+        int total = matiere.getVolumeHoraire();
+        int percentage = total > 0 ? (effectue * 100) / total : 0;
+        String statText = String.format(Locale.getDefault(), "%dH / %dH", effectue, total);
+        currentMatiereWithStats.setValue(new MatiereListAdapter.MatiereWithStats(matiere, statText, percentage));
     }
 
     private void combineAndEmit(MediatorLiveData<CombinedData> combined) {

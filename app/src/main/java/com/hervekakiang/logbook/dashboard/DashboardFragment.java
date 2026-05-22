@@ -1,7 +1,9 @@
 package com.hervekakiang.logbook.dashboard;
 
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -40,6 +42,7 @@ public class DashboardFragment extends Fragment {
     private TextView tvChartPercentage;
     private TextView tvVhEffectue;
     private TextView tvVhRestant;
+    private TextView tvVhTotal;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -70,6 +73,7 @@ public class DashboardFragment extends Fragment {
         tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
         tvVhRestant = view.findViewById(R.id.tvVhRestant);
+        tvVhTotal = view.findViewById(R.id.tvVhTotal);
         TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -79,10 +83,15 @@ public class DashboardFragment extends Fragment {
         ueViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
             Log.d("MYAPP:====stats=====", stats.toString());
-            tvVhEffectue.setText(String.format(Locale.getDefault(), "%dh", stats.effectue()));
-            tvVhRestant.setText(String.format(Locale.getDefault(), "%dh", stats.total() - stats.effectue()));
+            tvVhEffectue.setText(String.format(Locale.getDefault(), "%d", stats.effectue()));
+            tvVhRestant.setText(String.format(Locale.getDefault(), "%d", stats.total() - stats.effectue()));
+            tvVhTotal.setText(String.format(Locale.getDefault(), "%d", stats.total()));
             int percentage = (stats.total() > 0) ? (stats.effectue() * 100) / stats.total() : 0;
-            progressBar.setProgress(percentage);
+            ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, percentage);
+            animator.setDuration(1000);
+            animator.setInterpolator(new FastOutSlowInInterpolator());
+            animator.start();
+//            progressBar.setProgress(percentage);
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
         });
 
