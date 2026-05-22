@@ -2,66 +2,67 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="12dp"
     style="@style/Widget.Material3.CardView.Elevated">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-        <!-- Timeline Line -->
         <View
             android:id="@+id/timelineLine"
             android:layout_width="2dp"
-            android:layout_height="0dp"
-            android:background="?attr/colorOutlineVariant"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="2dp" />
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:background="?attr/colorOutlineVariant" />
 
-        <!-- Header: Date and Duration -->
-        <TextView
-            android:id="@+id/tvSeanceDate"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="14/06/2026"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            app:layout_constraintEnd_toStartOf="@+id/tvSeanceDuree"
-            app:layout_constraintStart_toEndOf="@+id/timelineLine"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginStart="8dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvSeanceDuree"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="30h"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium.Emphasized"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSeanceDate"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvSeanceDate" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <!-- Content -->
-        <TextView
-            android:id="@+id/tvSeanceContenu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:maxLines="3"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/tvSeanceDate"
-            app:layout_constraintTop_toBottomOf="@+id/tvSeanceDate"
-            android:text="Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3."/>
+                <TextView
+                    android:id="@+id/tvSeanceDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="14/06/2026"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tvSeanceDuree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    tools:text="30h"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvSeanceContenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:maxLines="3"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3." />
+
+        </LinearLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

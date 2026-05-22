@@ -25,6 +25,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="8dp"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -42,8 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="@string/ajouter"
-        android:text="@string/ajouter"
+        android:contentDescription="@string/ajouter_matiere"
+        android:text="@string/ajouter_matiere"
         android:textColor="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"
         app:icon="@drawable/baseline_add_24"

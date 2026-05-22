@@ -1,6 +1,7 @@
 package com.hervekakiang.logbook.seance;
 
 import android.app.Dialog;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -40,6 +42,7 @@ import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     private UEViewModel ueViewModel;
+    BottomSheetBehavior<View> bottomSheetBehavior;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
@@ -69,8 +72,18 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setSkipCollapsed(true);
+
+        LinearLayout layout = view.findViewById(R.id.layoutAddSeance);
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
 
         MaterialToolbar toolbar = view.findViewById(R.id.seanceToolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            dismiss();
+        });
+
         autoCompleteMatiere = view.findViewById(R.id.autoCompleteMatiere);
         editDate = view.findViewById(R.id.editSeanceDate);
         editHeure = view.findViewById(R.id.editSeanceHeure);
@@ -79,10 +92,6 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         Button btnSave = view.findViewById(R.id.btnSaveSeance);
 
         ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-
-        toolbar.setNavigationOnClickListener(v -> {
-            dismiss();
-        });
 
         setupPickers();
         loadMatieres();
@@ -199,21 +208,6 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
             });
             timePicker.show(getChildFragmentManager(), "TIME_PICKER");
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Dialog dialog = getDialog();
-        if (dialog instanceof BottomSheetDialog) {
-            View bottomSheet = ((BottomSheetDialog) dialog).findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottomSheet != null) {
-                bottomSheet.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
-                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                behavior.setSkipCollapsed(true);
-            }
-        }
     }
 
     @NonNull
