@@ -39,8 +39,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends BottomSheetDialogFragment {
-    private MatiereViewModel matiereViewModel;
-    private SeanceViewModel seanceViewModel;
     private UEViewModel ueViewModel;
 
     private AutoCompleteTextView autoCompleteMatiere;
@@ -80,9 +78,6 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         editContenu = view.findViewById(R.id.editSeanceContenu);
         Button btnSave = view.findViewById(R.id.btnSaveSeance);
 
-        matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-
-        seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
         ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
 
         toolbar.setNavigationOnClickListener(v -> {
@@ -100,46 +95,52 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         String heure = !TextUtils.isEmpty(editHeure.getText()) ? editHeure.getText().toString() : null;
         String duree = !TextUtils.isEmpty(editDuree.getText()) ? editDuree.getText().toString() : null;
         String contenu = !TextUtils.isEmpty(editContenu.getText()) ? editContenu.getText().toString() : null;
-        if (selectedMatiereId == -1 || date == null || heure == null || duree == null || contenu == null) {
-            if (selectedMatiereId == -1) {
-                autoCompleteMatiere.setError("Veuillez sélectionner une matière");
-            } else {
-                autoCompleteMatiere.setError(null);
-            }
-            if (date == null) {
-                editDate.setError("Veuillez entrer une date");
-            } else {
-                editDate.setError(null);
-            }
-            if (heure == null) {
-                editHeure.setError("Veuillez entrer une heure");
-            } else {
-                editHeure.setError(null);
-            }
-            if (duree == null) {
-                editDuree.setError("Veuillez entrer une durée");
-            } else {
-                editDuree.setError(null);
-            }
-            if (contenu == null) {
-                editContenu.setError("Veuillez entrer un contenu");
-            } else {
-                editContenu.setError(null);
-            }
-            return;
+        boolean hasError = false;
+
+        if (selectedMatiereId == -1) {
+            autoCompleteMatiere.setError("Veuillez sélectionner une matière");
+            hasError = true;
+        } else {
+            autoCompleteMatiere.setError(null);
         }
+        if (TextUtils.isEmpty(date)) {
+            editDate.setError("Veuillez entrer une date");
+            hasError = true;
+        } else {
+            editDate.setError(null);
+        }
+        if (TextUtils.isEmpty(heure)) {
+            editHeure.setError("Veuillez entrer une heure");
+            hasError = true;
+        } else {
+            editHeure.setError(null);
+        }
+        if (TextUtils.isEmpty(duree)){
+            editDuree.setError("Veuillez entrer une durée");
+            hasError = true;
+        } else {
+            editDuree.setError(null);
+        }
+        if (TextUtils.isEmpty(contenu)) {
+            editContenu.setError("Veuillez entrer un contenu");
+            hasError = true;
+        } else {
+            editContenu.setError(null);
+        }
+        if (hasError) return;
+
         Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
 
-        seanceViewModel.addSeance(seance);
-        ueViewModel.refreshList();
-        matiereViewModel.refreshSeances();
-        matiereViewModel.setCurrentMatiereId(selectedMatiereId);
-        dismiss();
-        Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
+        ueViewModel.addSeance(seance, () -> {
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
+                dismiss();
+            });
+        });
     }
 
     private void loadMatieres() {
-        matiereViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
+        ueViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
             this.matiereList = matieres;
             List<String> matiereNoms = new ArrayList<>();
             for (Matiere matiere : matiereList) {
@@ -148,14 +149,20 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, matiereNoms);
             autoCompleteMatiere.setAdapter(adapter);
             if (selectedMatiereId != -1) {
-                autoCompleteMatiere.setText(matiereList.stream().filter(m -> m.getId() == selectedMatiereId).findFirst().get().getNom(), false);
-                autoCompleteMatiere.setListSelection(selectedMatiereId);
+                for (Matiere m : matiereList) {
+                    if (m.getId() == selectedMatiereId) {
+                        autoCompleteMatiere.setText(m.getNom(), false);
+//                        autoCompleteMatiere.setListSelection(selectedMatiereId);
+                        break;
+                    }
+                }
             }
 
             autoCompleteMatiere.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     selectedMatiereId = matiereList.get(position).getId();
+                    autoCompleteMatiere.setError(null);
                 }
             });
         });

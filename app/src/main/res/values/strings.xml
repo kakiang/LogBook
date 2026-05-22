@@ -2,8 +2,14 @@
     <string name="app_name">LogBook</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="ajouter_une_ue">Ajouter une UE</string>
+    <string name="ajouter">Ajouter</string>
+    <string name="ajouter_ue">Ajouter une UE</string>
     <string name="enregistrer">Enregistrer</string>
     <string name="vue_d_ensemble_des_ue">Vue d\'ensemble des unités d\'enseignement</string>
     <string name="search">Search</string>
+    <string name="volume_horaire">Volume horaire</string>
+    <string name="dispense">Dispensé</string>
+    <string name="restant">Restant</string>
+    <string name="ajouter_matiere">Ajouter une matière</string>
+    <string name="ajouter_seance">Ajouter une séance</string>
 </resources>

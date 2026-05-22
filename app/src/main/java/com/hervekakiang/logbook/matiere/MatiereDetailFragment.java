@@ -8,6 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,17 +22,19 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.seance.AjouterSeanceFragment;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
 import com.hervekakiang.logbook.seance.SeanceViewModel;
+import com.hervekakiang.logbook.ue.UEViewModel;
 
 import java.util.Locale;
 
 public class MatiereDetailFragment extends Fragment {
 
-//    private MatiereListAdapter.MatiereWithStats matiereWithStats;
     private int matiereId;
 
     @Override
@@ -46,24 +52,36 @@ public class MatiereDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
+        NavController navController = Navigation.findNavController(view);
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+
+        if (getArguments() != null && getArguments().containsKey("matiereId")) {
+            matiereId = getArguments().getInt("matiereId");
+            Log.d("MYAPP::MatiDetailFrag", "matiereId=" + matiereId);
+        } else {
+            navController.navigateUp();
+        }
+
         ProgressBar progressBar = view.findViewById(R.id.chartProgress);
         TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
         TextView tvSeanceListTitle = view.findViewById(R.id.tvSeanceListTitle);
         TextView tvEnseignant = view.findViewById(R.id.tvEnseignant);
-        FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
 
-        if (getArguments() == null || !getArguments().containsKey("matiereId")) return;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        SeanceListAdaper mAdapter = new SeanceListAdaper();
+        recyclerView.setAdapter(mAdapter);
 
-        matiereId = getArguments().getInt("matiereId");
-
-        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-
-        matiereViewModel.setCurrentMatiereId(matiereId);
-        matiereViewModel.getCurrentMatiereWithStats().observe(getViewLifecycleOwner(), matiereWithStats -> {
-
+        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        ueViewModel.setCurrentMatiereId(matiereId);
+        ueViewModel.getCurrentMatiereWithStats().observe(getViewLifecycleOwner(), matiereWithStats -> {
+            Log.d("MYAPP::MatiereDetailFragment", "matiereWithStats=" + matiereWithStats);
+            if (matiereWithStats == null) return;
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, matiereWithStats.pourcentage());
             animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
@@ -83,18 +101,8 @@ public class MatiereDetailFragment extends Fragment {
             ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
         });
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        SeanceListAdaper mAdapter = new SeanceListAdaper();
-        recyclerView.setAdapter(mAdapter);
-
-        seanceViewModel.setMatiereId(matiereId);
-        seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
-            Log.d("Performance", "Seance count = " + seances.size());
-            long start = System.nanoTime();
+        ueViewModel.getSeancesForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
             mAdapter.submitList(seances);
-            long end = System.nanoTime();
-            Log.d("Performance", "submitList took " + (end - start) / 1_000_000 + " ms");
-
             String seanceListTitle = "Seances de cours (" + seances.size() + ")";
             tvSeanceListTitle.setText(seanceListTitle);
             mAdapter.submitList(seances);

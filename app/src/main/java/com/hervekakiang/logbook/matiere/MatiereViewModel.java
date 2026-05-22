@@ -67,7 +67,12 @@ public class MatiereViewModel extends AndroidViewModel {
 
     public void addMatiere(Matiere matiere) {
         matiereDao.insert(matiere, () -> {
-            loadMatieres(currentUeId.getValue());
+            Integer currentUe = currentUeId.getValue();
+            if (currentUe != null && currentUe != 0) {
+                loadMatieres(currentUe);
+            } else {
+                loadMatieres(0);
+            }
         });
     }
 

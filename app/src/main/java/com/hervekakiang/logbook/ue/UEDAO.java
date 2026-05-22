@@ -56,6 +56,19 @@ public class UEDAO extends DAOBase<UE> {
         });
     }
 
+    public UE getUeById(int ueId){
+        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_UE, null, MyDatabaseHelper.UE_ID + " = ?", new String[]{String.valueOf(ueId)}, null, null, null)) {
+            if (cursor.moveToFirst()) {
+                String code = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.UE_CODE));
+                String nom = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.UE_NOM));
+                return new UE(ueId, code, nom);
+            }
+        } catch (Exception e) {
+            Log.e("UEDAO", "Error fetching ue", e);
+        }
+        return null;
+    }
+
     public int getVolumeHoraire(UE ue) {
         int volumeHoraire = 0;
         try (Cursor cursor = myDb.rawQuery("SELECT SUM(" + MyDatabaseHelper.MATIERE_VOLUME_HORAIRE + ") FROM "

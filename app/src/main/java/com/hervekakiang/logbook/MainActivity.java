@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private NavController navController;
-    private MaterialToolbar topAppBar;
+//    private MaterialToolbar topAppBar;
     private BottomNavigationView bottomNavigationView;
 
 
@@ -47,11 +47,11 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        topAppBar = binding.topAppBar;
+//        topAppBar = binding.topAppBar;
         bottomNavigationView = binding.bottomNavigationView;
 
         setupNavigation();
-        setupToolbarActions();
+//        setupToolbarActions();
     }
 
     private void setupNavigation() {
@@ -87,31 +87,31 @@ public class MainActivity extends AppCompatActivity {
                             .start();
                 }
 
-                if (bundle != null && bundle.containsKey("fragmentTitle")) {
-                    String fragmentTitle = bundle.getString("fragmentTitle");
-                    topAppBar.setTitle(fragmentTitle);
-                }
+//                if (bundle != null && bundle.containsKey("fragmentTitle")) {
+//                    String fragmentTitle = bundle.getString("fragmentTitle");
+//                    topAppBar.setTitle(fragmentTitle);
+//                }
 
             }
         });
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(TOP_LEVEL_DESTINATIONS).build();
-        NavigationUI.setupWithNavController(topAppBar, navController, appBarConfiguration);
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(TOP_LEVEL_DESTINATIONS).build();
+//        NavigationUI.setupWithNavController(topAppBar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
 
-    private void setupToolbarActions() {
-        topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int itemId = item.getItemId();
-
-                if (itemId == R.id.action_search) {
-//                    navController.navigate(R.id.searchFragment);
-                    Toast.makeText(MainActivity.this, "Search", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                return NavigationUI.onNavDestinationSelected(item, navController);
-            }
-        });
-    }
+//    private void setupToolbarActions() {
+//        topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                int itemId = item.getItemId();
+//
+//                if (itemId == R.id.action_search) {
+////                    navController.navigate(R.id.searchFragment);
+//                    Toast.makeText(MainActivity.this, "Search", Toast.LENGTH_SHORT).show();
+//                    return true;
+//                }
+//                return NavigationUI.onNavDestinationSelected(item, navController);
+//            }
+//        });
+//    }
 }

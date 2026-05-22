@@ -10,24 +10,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.matiere.MatiereViewModel;
-import com.hervekakiang.logbook.seance.Seance;
-import com.hervekakiang.logbook.seance.SeanceViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class UeListFragment extends Fragment {
@@ -80,7 +71,7 @@ public class UeListFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
+        ueViewModel.getUeWithStatsList().observe(getViewLifecycleOwner(), ueUiModels -> {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });
     }

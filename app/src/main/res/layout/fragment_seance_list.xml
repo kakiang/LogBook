@@ -4,25 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="80dp"
     tools:context=".seance.SeanceListFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerviewSeance"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayoutFragmentSeanceList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainer"
+        app:elevation="4dp"
+        app:liftOnScroll="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/fragmentToolbar"
+            style="@style/Widget.Material3.Toolbar.Surface"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="88dp"
-        android:clipToPadding="false"/>
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerviewSeance"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddSeance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="@string/ajouter_une_ue"
+        android:contentDescription="@string/ajouter"
+        android:text="@string/ajouter"
+        android:textColor="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"
-        app:srcCompat="@drawable/baseline_add_24"
-        app:tint="?attr/colorOnPrimary" />
+        app:icon="@drawable/baseline_add_24"
+        app:iconPadding="0dp"
+        app:iconTint="?attr/colorOnPrimary"
+        app:layout_behavior="com.google.android.material.behavior.HideViewOnScrollBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

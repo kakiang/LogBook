@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
@@ -45,10 +49,17 @@ public class MatiereListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
+        NavController navController = Navigation.findNavController(view);
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        FloatingActionButton fab = view.findViewById(R.id.fab_add_matiere);
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_matiere);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +89,7 @@ public class MatiereListFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener);
 
         MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        mViewModel.setCurrentUeId(0);
         mViewModel.getMatieresWithStats().observe(getViewLifecycleOwner(), matieres -> {
             mAdapter.submitList(matieres);
         });

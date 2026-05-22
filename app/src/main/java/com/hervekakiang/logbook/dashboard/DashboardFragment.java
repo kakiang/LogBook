@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,37 +20,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.matiere.MatiereViewModel;
-import com.hervekakiang.logbook.seance.Seance;
-import com.hervekakiang.logbook.seance.SeanceViewModel;
 import com.hervekakiang.logbook.ue.AddUeFragment;
 import com.hervekakiang.logbook.ue.UEListAdapter;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 public class DashboardFragment extends Fragment {
 
-    private DashboardViewModel mViewModel;
-    private List<Seance> seances = new ArrayList<>();
-    private List<Matiere> matieres = new ArrayList<>();
-
     private ProgressBar progressBar;
     private TextView tvChartPercentage;
     private TextView tvVhEffectue;
     private TextView tvVhRestant;
-
-    public static DashboardFragment newInstance() {
-        return new DashboardFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -60,60 +51,67 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
+        NavController navController = Navigation.findNavController(view);
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+
+        fragmentToolbar.inflateMenu(R.menu.top_app_bar_menu);
+        fragmentToolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_search) {
+                Toast.makeText(getContext(), "Search this UE", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+
         progressBar = view.findViewById(R.id.chartProgress);
         tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
         tvVhRestant = view.findViewById(R.id.tvVhRestant);
-
         TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
-
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        FloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddUeFragment addUeFragment = new AddUeFragment();
-                addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
-            }
-        });
-
-        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        mViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
-            this.matieres = matieres;
-            calculHoraire();
-        });
-
-
-        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-        seanceViewModel.setMatiereId(0);
-        seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
-            this.seances = seances;
-            calculHoraire();
-        });
-
-        UEListAdapter mAdapter = getUeListAdapter();
-        recyclerView.setAdapter(mAdapter);
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.getUeUiModels().observe(getViewLifecycleOwner(), ueUiModels -> {
-            String uet = "Unités d'enseignement (" + ueUiModels.size() + ")";
+        ueViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
+            if (stats == null) return;
+            Log.d("MYAPP:====stats=====", stats.toString());
+            tvVhEffectue.setText(String.format(Locale.getDefault(), "%dh", stats.effectue()));
+            tvVhRestant.setText(String.format(Locale.getDefault(), "%dh", stats.total() - stats.effectue()));
+            int percentage = (stats.total() > 0) ? (stats.effectue() * 100) / stats.total() : 0;
+            progressBar.setProgress(percentage);
+            tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
+        });
+
+        UEListAdapter mAdapter = new UEListAdapter();
+        mAdapter.setOnItemClickListener(listener());
+        recyclerView.setAdapter(mAdapter);
+
+        ueViewModel.getUeWithStatsList().observe(getViewLifecycleOwner(), ueWithStatsList -> {
+            String uet = "Unités d'enseignement (" + ueWithStatsList.size() + ")";
             textViewUeListTitle.setText(uet);
-            mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
+            mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));
+        });
+
+        fab.setOnClickListener(v -> {
+            AddUeFragment addUeFragment = new AddUeFragment();
+            addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
         });
 
     }
 
     @NonNull
-    private UEListAdapter getUeListAdapter() {
-        OnItemClickListener<UEListAdapter.UeWithStats> listener = new OnItemClickListener<>() {
+    private  OnItemClickListener<UEListAdapter.UeWithStats> listener() {
+        return new OnItemClickListener<>() {
             @Override
-            public void onItemClick(UEListAdapter.UeWithStats model) {
+            public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("ueModel", model);
-                String fragmentTitle = model.ue().getCode() + " " + model.ue().getNom();
+                args.putSerializable("ueWithStats", ueWithStats);
+                String fragmentTitle = ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom();
                 args.putString("fragmentTitle", fragmentTitle);
                 navController.navigate(R.id.ueDetailFragment, args);
             }
@@ -123,29 +121,5 @@ public class DashboardFragment extends Fragment {
 
             }
         };
-
-        UEListAdapter mAdapter = new UEListAdapter();
-        mAdapter.setOnItemClickListener(listener);
-        return mAdapter;
-    }
-
-    private void calculHoraire() {
-        if (matieres.isEmpty() || seances.isEmpty()) return;
-        int horaireEffectue = 0;
-        int horaireTotal = 0;
-
-        for (Matiere m : matieres) {
-            horaireTotal += m.getVolumeHoraire();
-        }
-        for (Seance s : seances) {
-            horaireEffectue += s.getDuree();
-        }
-
-        tvVhEffectue.setText(String.format(Locale.getDefault(), "%dh", horaireEffectue));
-        tvVhRestant.setText(String.format(Locale.getDefault(), "%dh", horaireTotal - horaireEffectue));
-
-        int percentage = (horaireTotal > 0) ? (horaireEffectue * 100) / horaireTotal : 0;
-        progressBar.setProgress(percentage);
-        tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
     }
 }

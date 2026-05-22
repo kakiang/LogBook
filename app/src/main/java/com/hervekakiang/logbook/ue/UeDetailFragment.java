@@ -10,21 +10,24 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.AjouterMatiereFragment;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
-import com.hervekakiang.logbook.matiere.MatiereViewModel;
 
 import java.util.Locale;
 
@@ -57,59 +60,67 @@ public class UeDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        NavController navController = Navigation.findNavController(view);
+
         if (getArguments() != null) {
-            ueWithStats = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueModel");
+            ueWithStats = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueWithStats");
+        }else {
+            navController.navigateUp();
         }
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
+        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+
         ProgressBar progressBar = view.findViewById(R.id.chartProgress);
         TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
         TextView tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
+        fragmentToolbar.setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
 
-        if (ueWithStats != null) {
+        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        ueViewModel.setCurrentUeId(ueWithStats.ue().getId());
+
+        ueViewModel.getCurrentUeWithStats().observe(getViewLifecycleOwner(), ueWithStats -> {
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, ueWithStats.pourcentage());
-            animator.setDuration(1500);
+            animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
             animator.start();
 
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", ueWithStats.pourcentage()));
             textViewVhStat.setText(ueWithStats.volumeHoraireStat());
-        }
+            fragmentToolbar.setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
+        });
 
-        FloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment(ueWithStats.ue().getId());
-                ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
-            }
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);
+        fab.setOnClickListener(v -> {
+            AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment(ueWithStats.ue().getId());
+            ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
         });
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        MatiereListAdapter mAdapter = getMatiereListAdapter();
+        MatiereListAdapter mAdapter = new MatiereListAdapter();
 
+        mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
-        MatiereViewModel mViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        mViewModel.setCurrentUeId(ueWithStats.ue().getId());
-        mViewModel.getMatieresWithStats().observe(getViewLifecycleOwner(), matieres -> {
-            String mt = "Matières (" + matieres.size() + ")";
+        ueViewModel.getMatieresWithStatsForCurrentUe().observe(getViewLifecycleOwner(), matiereWithStatsList -> {
+            String mt = "Matières (" + matiereWithStatsList.size() + ")";
             tvMatiereListTitle.setText(mt);
-            mAdapter.submitList(matieres);
+            mAdapter.submitList(matiereWithStatsList);
         });
 
     }
 
-    @NonNull
-    private MatiereListAdapter getMatiereListAdapter() {
-        MatiereListAdapter mAdapter = new MatiereListAdapter();
-
-        OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener = new OnItemClickListener<MatiereListAdapter.MatiereWithStats>() {
+    private OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener() {
+        return new OnItemClickListener<>() {
             @Override
             public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("matiereId", matiereWithStats.matiere().getId());
+                Log.d("MYAPP::UeDetailFragment", "matiereId=" + matiereWithStats.matiere().getId());
+                args.putInt("matiereId", matiereWithStats.matiere().getId());
                 args.putString("fragmentTitle", matiereWithStats.matiere().getNom());
                 navController.navigate(R.id.matiereDetailFragment, args);
             }
@@ -119,7 +130,5 @@ public class UeDetailFragment extends Fragment {
 
             }
         };
-        mAdapter.setOnItemClickListener(listener);
-        return mAdapter;
     }
 }

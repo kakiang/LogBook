@@ -93,8 +93,13 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             autoCompleteUE.setAdapter(adapter);
 
             if (selectedUeId != -1) {
-                autoCompleteUE.setText(ueList.stream().filter(ue -> ue.getId() == selectedUeId).findFirst().get().getNom(), false);
-                autoCompleteUE.setListSelection(selectedUeId);
+                for(UE ue : ueList) {
+                    if (ue.getId() == selectedUeId) {
+                        autoCompleteUE.setText(ue.getNom(), false);
+//                        autoCompleteUE.setListSelection(selectedUeId);
+                        break;
+                    }
+                }
             }
         });
 
@@ -106,44 +111,40 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
             }
         });
 
-        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        matiereViewModel.setCurrentUeId(selectedUeId);
-        btnSaveMatiere.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String nom = !TextUtils.isEmpty(editMatiereNom.getText()) ? editMatiereNom.getText().toString() : null;
-                String enseignant = !TextUtils.isEmpty(editEnseignant.getText()) ? editEnseignant.getText().toString() : null;
-                String volumeHoraire = !TextUtils.isEmpty(editVolumeHoraire.getText()) ? editVolumeHoraire.getText().toString() : null;
-                if (selectedUeId == -1 || nom == null || enseignant == null || volumeHoraire == null) {
-                    if (selectedUeId == -1) {
-                        textInputLayoutUE.setError("Veuillez sélectionner une UE");
-                    } else {
-                        textInputLayoutUE.setError(null);
-                    }
-                    if (nom == null) {
-                        textInputLayoutMatiereNom.setError("Veuillez entrer un nom");
-                    } else {
-                        textInputLayoutMatiereNom.setError(null);
-                    }
-                    if (enseignant == null) {
-                        textInputLayoutMatiereEnseignant.setError("Veuillez entrer un enseignant");
-                    } else {
-                        textInputLayoutMatiereEnseignant.setError(null);
-                    }
-                    if (volumeHoraire == null) {
-                        textInputLayoutMatiereVolumeHoraire.setError("Veuillez entrer un volume horaire");
-                    } else {
-                        textInputLayoutMatiereVolumeHoraire.setError(null);
-                    }
-                    return;
+        btnSaveMatiere.setOnClickListener(v -> {
+            String nom = !TextUtils.isEmpty(editMatiereNom.getText()) ? editMatiereNom.getText().toString() : null;
+            String enseignant = !TextUtils.isEmpty(editEnseignant.getText()) ? editEnseignant.getText().toString() : null;
+            String volumeHoraire = !TextUtils.isEmpty(editVolumeHoraire.getText()) ? editVolumeHoraire.getText().toString() : null;
+            if (selectedUeId == -1 || nom == null || enseignant == null || volumeHoraire == null) {
+                if (selectedUeId == -1) {
+                    textInputLayoutUE.setError("Veuillez sélectionner une UE");
+                } else {
+                    textInputLayoutUE.setError(null);
                 }
-                Matiere m = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
-                matiereViewModel.addMatiere(m);
-//                matiereViewModel.refreshList();
-                ueViewModel.refreshList();
-                Toast.makeText(getActivity(), "Matière " + nom + " ajoutée avec succès", Toast.LENGTH_SHORT).show();
-                dismiss();
+                if (nom == null) {
+                    textInputLayoutMatiereNom.setError("Veuillez entrer un nom");
+                } else {
+                    textInputLayoutMatiereNom.setError(null);
+                }
+                if (enseignant == null) {
+                    textInputLayoutMatiereEnseignant.setError("Veuillez entrer un enseignant");
+                } else {
+                    textInputLayoutMatiereEnseignant.setError(null);
+                }
+                if (volumeHoraire == null) {
+                    textInputLayoutMatiereVolumeHoraire.setError("Veuillez entrer un volume horaire");
+                } else {
+                    textInputLayoutMatiereVolumeHoraire.setError(null);
+                }
+                return;
             }
+            Matiere newMatiere = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
+            ueViewModel.addMatiere(newMatiere, selectedUeId, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                });
+            });
         });
 
     }

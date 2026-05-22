@@ -7,6 +7,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
@@ -46,10 +52,17 @@ public class SeanceListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
+        NavController navController = Navigation.findNavController(view);
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        FloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,19 +71,13 @@ public class SeanceListFragment extends Fragment {
             }
         });
 
-        Log.d("FAB", "visibility = " + fab.getVisibility());
-        fab.post(() -> {
-            int[] location = new int[2];
-            fab.getLocationOnScreen(location);
-            Log.d("FAB", "Y = " + location[1] + ", screen height = " + fab.getRootView().getHeight());
-        });
-
         seanceListGroupAdaper = new SeanceListGroupAdaper();
         recyclerView.setAdapter(seanceListGroupAdaper);
 
         MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
         SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-
+        matiereViewModel.setCurrentUeId(0);
+        seanceViewModel.setMatiereId(0);
         matiereViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
             this.matieres = matieres;
             groupSeances();
@@ -94,7 +101,7 @@ public class SeanceListFragment extends Fragment {
 
         for (Seance s : seances) {
             if (s.getMatiereId() != lastMatiereId) {
-                items.add(new SeanceListItem(matiereMap.get(s.getMatiereId()),s.getMatiereId()));
+                items.add(new SeanceListItem(matiereMap.get(s.getMatiereId()), s.getMatiereId()));
                 lastMatiereId = s.getMatiereId();
             }
             items.add(new SeanceListItem(s));
