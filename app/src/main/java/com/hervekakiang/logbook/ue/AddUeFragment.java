@@ -27,6 +27,10 @@ import com.hervekakiang.logbook.R;
 
 public class AddUeFragment extends BottomSheetDialogFragment {
 
+    private UEViewModel viewModel;
+    private TextInputEditText editUeCode;
+    private TextInputEditText editUeNom;
+
     BottomSheetBehavior<View> bottomSheetBehavior;
     private int originalSoftInputMode;
 
@@ -55,27 +59,33 @@ public class AddUeFragment extends BottomSheetDialogFragment {
         toolbar.setNavigationOnClickListener(v -> {
             dismiss();
         });
-
-        UEViewModel viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        TextInputEditText editUeCode = view.findViewById(R.id.editUeCode);
-        TextInputEditText editUeNom = view.findViewById(R.id.editUeNom);
-        Button btnSaveUe = view.findViewById(R.id.btnSaveUe);
-
-        btnSaveUe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String code = editUeCode.getText() != null ? editUeCode.getText().toString() : null;
-                String nom = editUeNom.getText() != null ? editUeNom.getText().toString() : null;
-                if (code == null || nom == null) {
-                    Toast.makeText(getActivity(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                viewModel.addUE(new UE(code, nom));
-                Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
-                dismiss();
-
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_save) {
+                saveUE();
+                return true;
             }
+            return false;
         });
+
+        viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        editUeCode = view.findViewById(R.id.editUeCode);
+        editUeNom = view.findViewById(R.id.editUeNom);
+
+        view.findViewById(R.id.btnSaveUe).setOnClickListener(v -> {
+           saveUE();
+        });
+    }
+
+    private void saveUE() {
+        String code = editUeCode.getText() != null ? editUeCode.getText().toString() : null;
+        String nom = editUeNom.getText() != null ? editUeNom.getText().toString() : null;
+        if (code == null || nom == null) {
+            Toast.makeText(getActivity(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        viewModel.addUE(new UE(code, nom));
+        Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
+        dismiss();
     }
 
     @NonNull

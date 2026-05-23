@@ -14,6 +14,8 @@
         android:background="?attr/colorSurface"
         app:navigationIcon="@drawable/ic_close"
         app:title="Nouvelle UE"
+        app:menu="@menu/top_bar_add_menu"
+        app:navigationIconTint="?attr/colorOnSurface"
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
     <ScrollView
@@ -60,7 +62,8 @@
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/enregistrer" />
+                android:text="@string/enregistrer"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </ScrollView>

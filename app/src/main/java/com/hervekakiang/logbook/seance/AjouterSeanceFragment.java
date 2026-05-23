@@ -42,7 +42,6 @@ import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     private UEViewModel ueViewModel;
-    BottomSheetBehavior<View> bottomSheetBehavior;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
@@ -72,7 +71,7 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
+        BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setSkipCollapsed(true);
 
@@ -83,20 +82,26 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         toolbar.setNavigationOnClickListener(v -> {
             dismiss();
         });
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_save) {
+                saveSeance();
+                return true;
+            }
+            return false;
+        });
 
         autoCompleteMatiere = view.findViewById(R.id.autoCompleteMatiere);
         editDate = view.findViewById(R.id.editSeanceDate);
         editHeure = view.findViewById(R.id.editSeanceHeure);
         editDuree = view.findViewById(R.id.editSeanceDuree);
         editContenu = view.findViewById(R.id.editSeanceContenu);
-        Button btnSave = view.findViewById(R.id.btnSaveSeance);
 
         ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
 
         setupPickers();
         loadMatieres();
 
-        btnSave.setOnClickListener(v -> saveSeance());
+        view.findViewById(R.id.btnSaveSeance).setOnClickListener(v -> saveSeance());
     }
 
     private void saveSeance() {

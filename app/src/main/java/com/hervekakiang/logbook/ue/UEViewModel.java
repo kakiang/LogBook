@@ -35,7 +35,6 @@ public class UEViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
 
-    // Derived UI models (calculated from caches)
     private final LiveData<List<UEListAdapter.UeWithStats>> ueWithStatsList;
 
     private final LiveData<StatsGlobal> statsGlobal;
@@ -53,10 +52,8 @@ public class UEViewModel extends AndroidViewModel {
         seanceDao = new SeanceDAO(application);
         matiereDao = new MatiereDAO(application);
 
-        // Load all data initially
         refreshAllData();
 
-        // Combine the three caches into a single LiveData that updates whenever any cache changes
         MediatorLiveData<CombinedData> combined = new MediatorLiveData<>();
         combined.addSource(listUEs, ues -> combineAndEmit(combined));
         combined.addSource(listMatieres, matieres -> combineAndEmit(combined));
@@ -66,7 +63,6 @@ public class UEViewModel extends AndroidViewModel {
         currentMatiereWithStats.addSource(listMatieres, matieres -> updateCurrentMatiereStats());
         currentMatiereWithStats.addSource(listSeances, seances -> updateCurrentMatiereStats());
 
-        // Transform the combined data into the list of UeWithStats
         ueWithStatsList = Transformations.map(combined, data -> {
             if (data.ues == null) return Collections.emptyList();
             return computeUeWithStats(data.ues, data.matieres, data.seances);
@@ -176,7 +172,7 @@ public class UEViewModel extends AndroidViewModel {
         List<Matiere> allMatieres = listMatieres.getValue();
         List<Seance> allSeances = listSeances.getValue();
         if (allMatieres == null || allSeances == null) {
-            return; // not all data loaded yet
+            return;
         }
 
         // Find the matiere
@@ -270,7 +266,6 @@ public class UEViewModel extends AndroidViewModel {
     public void addMatiere(Matiere matiere, int ueId, Runnable onComplete) {
         matiereDao.insert(matiere, () -> {
             refreshAllData();
-            // Ensure currentUeId is set to the same UE to trigger recomputation of stats
             currentUeId.postValue(ueId);
             if (onComplete != null) onComplete.run();
         });
