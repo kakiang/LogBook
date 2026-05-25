@@ -1,30 +1,25 @@
 package com.hervekakiang.logbook.matiere;
 
-import android.app.Dialog;
-import android.content.res.Resources;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hervekakiang.logbook.R;
@@ -34,7 +29,7 @@ import com.hervekakiang.logbook.ue.UEViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AjouterMatiereFragment extends BottomSheetDialogFragment {
+public class AjouterMatiereFragment extends Fragment {
 
     private UEViewModel ueViewModel;
 
@@ -46,15 +41,12 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
     private TextInputEditText editEnseignant;
     private TextInputEditText editVolumeHoraire;
 
-    private int originalSoftInputMode;
+    private NavController navController;
+
     private List<UE> ueList = new ArrayList<>();
     private int selectedUeId = -1;
 
     public AjouterMatiereFragment() {
-    }
-
-    public AjouterMatiereFragment(int ueId) {
-        this.selectedUeId = ueId;
     }
 
     @Override
@@ -71,16 +63,15 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        bottomSheetBehavior.setSkipCollapsed(true);
+        if (getArguments() != null && getArguments().containsKey("selectedUeId")) {
+            selectedUeId = getArguments().getInt("selectedUeId");
+        }
 
-        LinearLayout layout = view.findViewById(R.id.layoutAddMatiere);
-        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+        navController = Navigation.findNavController(view);
         MaterialToolbar toolbar = view.findViewById(R.id.matiereToolbar);
-        toolbar.setNavigationOnClickListener(v -> {
-            dismiss();
-        });
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
+
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveMatiere();
@@ -168,31 +159,8 @@ public class AjouterMatiereFragment extends BottomSheetDialogFragment {
         ueViewModel.addMatiere(newMatiere, selectedUeId, () -> {
             requireActivity().runOnUiThread(() -> {
                 Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
-                dismiss();
+                navController.popBackStack();
             });
         });
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-        // Store the activity current mode
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            originalSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
-            // CRITICAL: Set to PAN so activity does NOT resize
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        }
-        return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        // Restore original mode when bottom sheet is dismissed
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            getActivity().getWindow().setSoftInputMode(originalSoftInputMode);
-        }
-        super.onDestroyView();
     }
 }

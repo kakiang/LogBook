@@ -1,10 +1,16 @@
 package com.hervekakiang.logbook.ue;
 
 import android.animation.ObjectAnimator;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,6 +18,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,18 +28,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.AjouterMatiereFragment;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 
 import java.util.Locale;
 
 public class UeDetailFragment extends Fragment {
     private UEListAdapter.UeWithStats ueWithStats;
+    private MatiereListAdapter mAdapter;
+    private UEViewModel ueViewModel;
+    private RecyclerView recyclerView;
 
     public UeDetailFragment() {
     }
@@ -64,7 +76,7 @@ public class UeDetailFragment extends Fragment {
 
         if (getArguments() != null) {
             ueWithStats = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueWithStats");
-        }else {
+        } else {
             navController.navigateUp();
         }
 
@@ -78,7 +90,7 @@ public class UeDetailFragment extends Fragment {
         TextView tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
         fragmentToolbar.setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
 
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
         ueViewModel.setCurrentUeId(ueWithStats.ue().getId());
 
         ueViewModel.getCurrentUeWithStats().observe(getViewLifecycleOwner(), ueWithStats -> {
@@ -94,16 +106,19 @@ public class UeDetailFragment extends Fragment {
 
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);
         fab.setOnClickListener(v -> {
-            AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment(ueWithStats.ue().getId());
-            ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
+            Bundle args = new Bundle();
+            args.putInt("selectedUeId", ueWithStats.ue().getId());
+            Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.action_to_ajouterMatiereFragment, args);
         });
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
+        recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        MatiereListAdapter mAdapter = new MatiereListAdapter();
+        mAdapter = new MatiereListAdapter();
 
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper itemTouchHelper = getItemTouchHelper();
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         ueViewModel.getMatieresWithStatsForCurrentUe().observe(getViewLifecycleOwner(), matiereWithStatsList -> {
             String mt = "Matières (" + matiereWithStatsList.size() + ")";
@@ -130,5 +145,76 @@ public class UeDetailFragment extends Fragment {
 
             }
         };
+    }
+
+    private ItemTouchHelper getItemTouchHelper() {
+
+        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAbsoluteAdapterPosition();
+
+                var item = mAdapter.getCurrentList().get(position);
+                ueViewModel.deleteMatiereTemporarily(item.matiere().getId());
+
+                Snackbar.make(recyclerView, "Matiere supprimée", Snackbar.LENGTH_LONG)
+                        .setAction("Annulé", v -> {
+                        ueViewModel.unDeleteMatiere();
+                        }).addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar, int event) {
+                                super.onDismissed(transientBottomBar, event);
+                                if (event != DISMISS_EVENT_ACTION) {
+                                    ueViewModel.deleteMatiere(item.matiere().getId());
+                                    Toast.makeText(
+                                            recyclerView.getContext(),
+                                            item.matiere().getNom() + " supprimé avec succès",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                        .show();
+
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                Paint bgPaint = new Paint();
+                bgPaint.setColor(Color.parseColor("#B00020"));
+
+                RectF background = new RectF(
+                        itemView.getRight() + dX,
+                        itemView.getTop(),
+                        itemView.getRight(),
+                        itemView.getBottom()
+                );
+                c.drawRoundRect(background, 16f, 16f, bgPaint);
+                Drawable deletIcon = ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.ic_delete_outline);
+
+                if (deletIcon == null) return;
+                int iconMargin = (itemView.getHeight() - deletIcon.getIntrinsicHeight()) / 2;
+                int iconTop = itemView.getTop() + iconMargin;
+                int iconBottom = itemView.getBottom() - iconMargin;
+                int iconLeft = itemView.getRight() - iconMargin - deletIcon.getIntrinsicWidth();
+                int iconRight = itemView.getRight() - iconMargin;
+
+                if (itemView.getRight() + dX < iconLeft) {
+                    deletIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                    deletIcon.setTint(Color.WHITE);
+                    deletIcon.draw(c);
+                }
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            }
+        });
     }
 }

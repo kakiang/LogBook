@@ -26,14 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:layout_marginHorizontal="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerviewMatiere"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="8dp"
+        android:padding="16dp"
         android:clipToPadding="false"/>
     </androidx.core.widget.NestedScrollView>
 

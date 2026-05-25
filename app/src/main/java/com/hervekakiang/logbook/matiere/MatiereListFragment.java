@@ -1,12 +1,14 @@
 package com.hervekakiang.logbook.matiere;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -14,31 +16,14 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ue.UE;
-import com.hervekakiang.logbook.ue.UEViewModel;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MatiereListFragment extends Fragment {
 
     private MatiereListAdapter mAdapter;
-
-    public static MatiereListFragment newInstance() {
-        return new MatiereListFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -59,24 +44,19 @@ public class MatiereListFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_matiere);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AjouterMatiereFragment ajouterMatiereFragment = new AjouterMatiereFragment();
-                ajouterMatiereFragment.show(getChildFragmentManager(), AjouterMatiereFragment.class.getCanonicalName());
-            }
-        });
+        fab.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.action_to_ajouterMatiereFragment));
 
         mAdapter = new MatiereListAdapter();
         recyclerView.setAdapter(mAdapter);
 
-        OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener = new OnItemClickListener<MatiereListAdapter.MatiereWithStats>() {
+        OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener = new OnItemClickListener<>() {
             @Override
             public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("matiereWithStats", matiereWithStats);
+                args.putInt("matiereId", matiereWithStats.matiere().getId());
                 args.putString("fragmentTitle", matiereWithStats.matiere().getNom());
                 navController.navigate(R.id.matiereDetailFragment, args);
             }

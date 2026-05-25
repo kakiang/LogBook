@@ -60,8 +60,9 @@ public class MatiereDetailFragment extends Fragment {
 
         if (getArguments() != null && getArguments().containsKey("matiereId")) {
             matiereId = getArguments().getInt("matiereId");
-            Log.d("MYAPP::MatiDetailFrag", "matiereId=" + matiereId);
+            Log.d("MYAPP::MatiereDetail", "matiereId=" + matiereId);
         } else {
+            Log.d("MYAPP::MatiereDetail", "matiereId=null");
             navController.navigateUp();
         }
 
@@ -80,7 +81,7 @@ public class MatiereDetailFragment extends Fragment {
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
         ueViewModel.setCurrentMatiereId(matiereId);
         ueViewModel.getCurrentMatiereWithStats().observe(getViewLifecycleOwner(), matiereWithStats -> {
-            Log.d("MYAPP::MatiereDetailFragment", "matiereWithStats=" + matiereWithStats);
+            Log.d("MYAPP::MatDetailF", "matiereWithStats=" + matiereWithStats);
             if (matiereWithStats == null) return;
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, matiereWithStats.pourcentage());
             animator.setDuration(1000);

@@ -10,15 +10,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.hervekakiang.logbook.db.DAOBase;
 import com.hervekakiang.logbook.db.MyDatabaseHelper;
-import com.hervekakiang.logbook.seance.Seance;
-import com.hervekakiang.logbook.ue.UE;
-import com.hervekakiang.logbook.ue.UEDAO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MatiereDAO extends DAOBase<Matiere> {
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
@@ -60,9 +54,9 @@ public class MatiereDAO extends DAOBase<Matiere> {
         return matieres;
     }
 
-    public List<Matiere>  fetchByUeId(int ueId){
+    public List<Matiere> fetchByUeId(int ueId) {
         List<Matiere> matieres = new ArrayList<>();
-        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, MyDatabaseHelper.MATIERE_UE_ID + " = ?", new String[]{String.valueOf(ueId)}, null, null, null)) {
+        try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, MyDatabaseHelper.MATIERE_UE_ID + " = ?", new String[]{String.valueOf(ueId)}, null, null, null)) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_ID));
                 String nom = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_NOM));
@@ -87,20 +81,20 @@ public class MatiereDAO extends DAOBase<Matiere> {
                 int volumeHoraire = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_VOLUME_HORAIRE));
                 return new Matiere(id, ueId, nom, enseignant, volumeHoraire);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.e("MatiereDAO", "Error fetching matiere", e);
         }
         return null;
     }
 
-    public void getAll(MatiereDAO.Callback<List<Matiere>> callback){
+    public void getAll(MatiereDAO.Callback<List<Matiere>> callback) {
         executorService.execute(() -> {
             List<Matiere> m = fetchAll();
             callback.onResult(m);
         });
     }
 
-    public LiveData<List<Matiere>> getAll(){
+    public LiveData<List<Matiere>> getAll() {
         executorService.execute(() -> {
             List<Matiere> matieres = fetchAll();
             listMatieres.postValue(matieres);
@@ -108,14 +102,14 @@ public class MatiereDAO extends DAOBase<Matiere> {
         return listMatieres;
     }
 
-    public void getMatieresByUeId(int ueId, MatiereDAO.Callback<List<Matiere>> callback){
+    public void getMatieresByUeId(int ueId, MatiereDAO.Callback<List<Matiere>> callback) {
         executorService.execute(() -> {
             List<Matiere> m = fetchByUeId(ueId);
             callback.onResult(m);
         });
     }
 
-    public LiveData<List<Matiere>> getMatieresByUeId(int ueId){
+    public LiveData<List<Matiere>> getMatieresByUeId(int ueId) {
         executorService.execute(() -> {
             List<Matiere> matieres = fetchByUeId(ueId);
             listMatieres.postValue(matieres);
@@ -124,8 +118,8 @@ public class MatiereDAO extends DAOBase<Matiere> {
     }
 
     public int getTotalVolumeHoraireByUeId(int ueId) {
-        String query ="SELECT SUM(m.volume_horaire) FROM matieres m INNER JOIN ues u ON m.ue_id = u.id WHERE u.id = ?";
-        try(Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})){
+        String query = "SELECT SUM(m.volume_horaire) FROM matieres m INNER JOIN ues u ON m.ue_id = u.id WHERE u.id = ?";
+        try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})) {
             int totalVolumeHoraire = 0;
             if (cursor.moveToFirst()) {
                 totalVolumeHoraire = cursor.getInt(0);
@@ -147,8 +141,9 @@ public class MatiereDAO extends DAOBase<Matiere> {
                 new String[]{String.valueOf(matiere.getId())});
     }
 
-    public int delete(Matiere matiere) {
-        return myDb.delete(MyDatabaseHelper.TABLE_MATIERE, MyDatabaseHelper.MATIERE_ID + " = ?",
-                new String[]{String.valueOf(matiere.getId())});
+    public void delete(int matiereId, Runnable onComplete) {
+        executorService.execute(() -> myDb.delete(MyDatabaseHelper.TABLE_MATIERE, MyDatabaseHelper.MATIERE_ID + " = ?",
+                new String[]{String.valueOf(matiereId)}));
+        if (onComplete != null) onComplete.run();
     }
 }
