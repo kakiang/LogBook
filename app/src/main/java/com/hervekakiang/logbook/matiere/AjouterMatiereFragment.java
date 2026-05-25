@@ -125,7 +125,7 @@ public class AjouterMatiereFragment extends Fragment {
                 }
             });
         }
-        
+
         ueViewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
             this.ueList = ues;
             List<String> ueNoms = new ArrayList<>();

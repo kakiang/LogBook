@@ -133,6 +133,8 @@ public class UEViewModel extends AndroidViewModel {
             return;
         }
 
+        matieresWithStatsForCurrentUe.setValue(Collections.emptyList());
+
         List<Matiere> filteredMatieres = new ArrayList<>();
         for (Matiere m : listMatieres.getValue()) {
             if (m.getUeId() == ueId) {
