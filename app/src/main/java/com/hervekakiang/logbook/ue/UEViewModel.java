@@ -63,7 +63,7 @@ public class UEViewModel extends AndroidViewModel {
         currentMatiereWithStats.addSource(listMatieres, matieres -> updateCurrentMatiereStats());
         currentMatiereWithStats.addSource(listSeances, seances -> updateCurrentMatiereStats());
 
-        matieresWithStatsForCurrentUe.addSource(currentMatiereId, ueId ->
+        matieresWithStatsForCurrentUe.addSource(currentUeId, ueId ->
                 computeMatieresWithStatsForSelectedUE(ueId, pendingDeleteMatiereId.getValue()));
         matieresWithStatsForCurrentUe.addSource(pendingDeleteMatiereId, hidden ->
                 computeMatieresWithStatsForSelectedUE(currentUeId.getValue(), hidden));
@@ -276,8 +276,16 @@ public class UEViewModel extends AndroidViewModel {
 
     public void addMatiere(Matiere matiere, int ueId, Runnable onComplete) {
         matiereDao.insert(matiere, () -> {
-            refreshAllData();
+            refreshMatiereData();
             currentUeId.postValue(ueId);
+            if (onComplete != null) onComplete.run();
+        });
+    }
+
+    public void updateMatiere(Matiere matiere, Runnable onComplete) {
+        Log.d("updateMatiere MYAPP", matiere.toString());
+        matiereDao.update(matiere, () -> {
+            refreshMatiereData();
             if (onComplete != null) onComplete.run();
         });
     }

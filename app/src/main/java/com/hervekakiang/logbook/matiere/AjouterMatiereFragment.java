@@ -2,12 +2,13 @@ package com.hervekakiang.logbook.matiere;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,14 +38,17 @@ public class AjouterMatiereFragment extends Fragment {
     private TextInputLayout textInputLayoutMatiereEnseignant;
     private TextInputLayout textInputLayoutMatiereVolumeHoraire;
     private TextInputLayout textInputLayoutUE;
-    private TextInputEditText editMatiereNom;
-    private TextInputEditText editEnseignant;
-    private TextInputEditText editVolumeHoraire;
+    private TextInputEditText editTextMatiereNom;
+    private TextInputEditText editTextEnseignant;
+    private TextInputEditText editTextVolumeHoraire;
 
     private NavController navController;
 
     private List<UE> ueList = new ArrayList<>();
     private int selectedUeId = -1;
+    private int editMatiereId = -1;
+    private boolean isEditing = false;
+    private Matiere matiereToEdit;
 
     public AjouterMatiereFragment() {
     }
@@ -63,15 +67,23 @@ public class AjouterMatiereFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getArguments() != null && getArguments().containsKey("selectedUeId")) {
-            selectedUeId = getArguments().getInt("selectedUeId");
-        }
-
         navController = Navigation.findNavController(view);
         MaterialToolbar toolbar = view.findViewById(R.id.matiereToolbar);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
 
+        AutoCompleteTextView autoCompleteUE = view.findViewById(R.id.autoCompleteUE);
+        editTextMatiereNom = view.findViewById(R.id.editMatiereNom);
+        editTextEnseignant = view.findViewById(R.id.editEnseignant);
+        editTextVolumeHoraire = view.findViewById(R.id.editVolumeHoraire);
+
+        textInputLayoutMatiereNom = view.findViewById(R.id.textInputLayoutMatiereNom);
+        textInputLayoutMatiereEnseignant = view.findViewById(R.id.extInputLayoutMatiereEnseignant);
+        textInputLayoutMatiereVolumeHoraire = view.findViewById(R.id.extInputLayoutMatiereVolumeHoraire);
+        textInputLayoutUE = view.findViewById(R.id.textInputLayoutUE);
+        Button btnSave = view.findViewById(R.id.btnSaveMatiere);
+
+        btnSave.setOnClickListener(v -> saveMatiere());
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveMatiere();
@@ -80,17 +92,40 @@ public class AjouterMatiereFragment extends Fragment {
             return false;
         });
 
-        AutoCompleteTextView autoCompleteUE = view.findViewById(R.id.autoCompleteUE);
-        editMatiereNom = view.findViewById(R.id.editMatiereNom);
-        editEnseignant = view.findViewById(R.id.editEnseignant);
-        editVolumeHoraire = view.findViewById(R.id.editVolumeHoraire);
-
-        textInputLayoutMatiereNom = view.findViewById(R.id.textInputLayoutMatiereNom);
-        textInputLayoutMatiereEnseignant = view.findViewById(R.id.extInputLayoutMatiereEnseignant);
-        textInputLayoutMatiereVolumeHoraire = view.findViewById(R.id.extInputLayoutMatiereVolumeHoraire);
-        textInputLayoutUE = view.findViewById(R.id.textInputLayoutUE);
-
         ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+
+        if (getArguments() != null) {
+            selectedUeId = getArguments().getInt("selectedUeId");
+            editMatiereId = getArguments().getInt("matiereId");
+            isEditing = getArguments().getBoolean("isEditing");
+        }
+
+        Log.d("MYAPP::AjoutMatiere", "selectedUeId:" + selectedUeId);
+        Log.d("MYAPP::AjoutMatiere", "editMatiereId:" + editMatiereId);
+        Log.d("MYAPP::AjoutMatiere", "isEditing:" + isEditing);
+
+        if (isEditing && editMatiereId != -1) {
+            toolbar.setTitle("Modifier la matière");
+
+            ueViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
+                if (matieres == null) return;
+                for (Matiere m : matieres) {
+                    if (m.getId() == editMatiereId) {
+                        Log.d("AJMatiere MYAPP", "m.getId() == editMatiereId");
+                        Log.d("AJMatiere MYAPP", m.toString());
+
+                        matiereToEdit = m;
+                        selectedUeId = m.getUeId();
+
+                        editTextMatiereNom.setText(m.getNom());
+                        editTextEnseignant.setText(m.getEnseignant());
+                        editTextVolumeHoraire.setText(String.valueOf(m.getVolumeHoraire()));
+                        break;
+                    }
+                }
+            });
+        }
+        
         ueViewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
             this.ueList = ues;
             List<String> ueNoms = new ArrayList<>();
@@ -110,23 +145,18 @@ public class AjouterMatiereFragment extends Fragment {
             }
         });
 
-        autoCompleteUE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedUeId = ueList.get(position).getId();
-                autoCompleteUE.setError(null);
-            }
+        autoCompleteUE.setOnItemClickListener((parent, view1, position, id) -> {
+            selectedUeId = ueList.get(position).getId();
+            autoCompleteUE.setError(null);
         });
 
-        view.findViewById(R.id.btnSaveMatiere).setOnClickListener(v -> {
-            saveMatiere();
-        });
+
     }
 
     private void saveMatiere() {
-        String nom = !TextUtils.isEmpty(editMatiereNom.getText()) ? editMatiereNom.getText().toString() : null;
-        String enseignant = !TextUtils.isEmpty(editEnseignant.getText()) ? editEnseignant.getText().toString() : null;
-        String volumeHoraire = !TextUtils.isEmpty(editVolumeHoraire.getText()) ? editVolumeHoraire.getText().toString() : null;
+        String nom = !TextUtils.isEmpty(editTextMatiereNom.getText()) ? editTextMatiereNom.getText().toString() : null;
+        String enseignant = !TextUtils.isEmpty(editTextEnseignant.getText()) ? editTextEnseignant.getText().toString() : null;
+        String volumeHoraire = !TextUtils.isEmpty(editTextVolumeHoraire.getText()) ? editTextVolumeHoraire.getText().toString() : null;
 
         boolean hasError = false;
         if (selectedUeId == -1) {
@@ -155,12 +185,24 @@ public class AjouterMatiereFragment extends Fragment {
         }
         if (hasError) return;
 
-        Matiere newMatiere = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
-        ueViewModel.addMatiere(newMatiere, selectedUeId, () -> {
-            requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
-                navController.popBackStack();
+        if (isEditing && matiereToEdit != null) {
+            matiereToEdit.setNom(nom);
+            matiereToEdit.setEnseignant(enseignant);
+            matiereToEdit.setVolumeHoraire(Integer.parseInt(volumeHoraire));
+            ueViewModel.updateMatiere(matiereToEdit, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Matière mise à jour", Toast.LENGTH_SHORT).show();
+                    navController.navigateUp();
+                });
             });
-        });
+        } else {
+            Matiere newMatiere = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
+            ueViewModel.addMatiere(newMatiere, selectedUeId, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                });
+            });
+        }
     }
 }

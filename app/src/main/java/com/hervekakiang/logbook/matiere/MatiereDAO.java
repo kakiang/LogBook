@@ -37,6 +37,25 @@ public class MatiereDAO extends DAOBase<Matiere> {
         });
     }
 
+    private void modify(Matiere matiere) {
+        ContentValues values = new ContentValues();
+        values.put(MyDatabaseHelper.MATIERE_UE_ID, matiere.getUeId());
+        values.put(MyDatabaseHelper.MATIERE_NOM, matiere.getNom());
+        values.put(MyDatabaseHelper.MATIERE_ENSEIGNANT, matiere.getEnseignant());
+        values.put(MyDatabaseHelper.MATIERE_VOLUME_HORAIRE, matiere.getVolumeHoraire());
+        myDb.update(MyDatabaseHelper.TABLE_MATIERE, values, MyDatabaseHelper.MATIERE_ID + " = ?",
+                new String[]{String.valueOf(matiere.getId())});
+    }
+
+    public void update(Matiere matiere, Runnable onComplete) {
+        executorService.execute(() -> {
+            modify(matiere);
+            onComplete.run();
+        });
+    }
+
+
+
     public List<Matiere> fetchAll() {
         List<Matiere> matieres = new ArrayList<>();
         try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, null, null, null, null, null)) {
@@ -129,16 +148,6 @@ public class MatiereDAO extends DAOBase<Matiere> {
             Log.e("MatiereDAO", "Error fetching total volume horaire", e);
         }
         return 0;
-    }
-
-    public int update(Matiere matiere) {
-        ContentValues values = new ContentValues();
-        values.put(MyDatabaseHelper.MATIERE_UE_ID, matiere.getUeId());
-        values.put(MyDatabaseHelper.MATIERE_NOM, matiere.getNom());
-        values.put(MyDatabaseHelper.MATIERE_ENSEIGNANT, matiere.getEnseignant());
-        values.put(MyDatabaseHelper.MATIERE_VOLUME_HORAIRE, matiere.getVolumeHoraire());
-        return myDb.update(MyDatabaseHelper.TABLE_MATIERE, values, MyDatabaseHelper.MATIERE_ID + " = ?",
-                new String[]{String.valueOf(matiere.getId())});
     }
 
     public void delete(int matiereId, Runnable onComplete) {

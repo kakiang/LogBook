@@ -149,7 +149,7 @@ public class UeDetailFragment extends Fragment {
 
     private ItemTouchHelper getItemTouchHelper() {
 
-        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
@@ -159,27 +159,36 @@ public class UeDetailFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAbsoluteAdapterPosition();
-
                 var item = mAdapter.getCurrentList().get(position);
-                ueViewModel.deleteMatiereTemporarily(item.matiere().getId());
 
-                Snackbar.make(recyclerView, "Matiere supprimée", Snackbar.LENGTH_LONG)
-                        .setAction("Annulé", v -> {
-                        ueViewModel.unDeleteMatiere();
-                        }).addCallback(new Snackbar.Callback() {
-                            @Override
-                            public void onDismissed(Snackbar transientBottomBar, int event) {
-                                super.onDismissed(transientBottomBar, event);
-                                if (event != DISMISS_EVENT_ACTION) {
-                                    ueViewModel.deleteMatiere(item.matiere().getId());
-                                    Toast.makeText(
-                                            recyclerView.getContext(),
-                                            item.matiere().getNom() + " supprimé avec succès",
-                                            Toast.LENGTH_LONG).show();
+                if (direction == ItemTouchHelper.LEFT) {
+                    ueViewModel.deleteMatiereTemporarily(item.matiere().getId());
+                    Snackbar.make(recyclerView, "Matiere supprimée", Snackbar.LENGTH_LONG)
+                            .setAction("Annulé", v -> {
+                                ueViewModel.unDeleteMatiere();
+                            }).addCallback(new Snackbar.Callback() {
+                                @Override
+                                public void onDismissed(Snackbar transientBottomBar, int event) {
+                                    super.onDismissed(transientBottomBar, event);
+                                    if (event != DISMISS_EVENT_ACTION) {
+                                        ueViewModel.deleteMatiere(item.matiere().getId());
+                                        Toast.makeText(
+                                                recyclerView.getContext(),
+                                                item.matiere().getNom() + " supprimé avec succès",
+                                                Toast.LENGTH_LONG).show();
+                                    }
                                 }
-                            }
-                        })
-                        .show();
+                            })
+                            .show();
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    mAdapter.notifyItemChanged(position);
+                    NavController nav = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
+                    Bundle args = new Bundle();
+                    args.putInt("selectedUeId", ueWithStats.ue().getId());
+                    args.putInt("matiereId", item.matiere().getId());
+                    args.putBoolean("isEditing", true);
+                    nav.navigate(R.id.action_to_ajouterMatiereFragment, args);
+                }
 
             }
 
@@ -187,31 +196,62 @@ public class UeDetailFragment extends Fragment {
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 View itemView = viewHolder.itemView;
 
-                Paint bgPaint = new Paint();
-                bgPaint.setColor(Color.parseColor("#B00020"));
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    Paint bgPaint = new Paint();
+                    RectF background;
+                    Drawable icon;
+                    int iconMargin, iconTop, iconBottom, iconLeft, iconRight;
 
-                RectF background = new RectF(
-                        itemView.getRight() + dX,
-                        itemView.getTop(),
-                        itemView.getRight(),
-                        itemView.getBottom()
-                );
-                c.drawRoundRect(background, 16f, 16f, bgPaint);
-                Drawable deletIcon = ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.ic_delete_outline);
+                    if (dX > 0) {// right, edit
+                        bgPaint.setColor(Color.parseColor("#2E7D32"));
+                        background = new RectF(
+                                itemView.getLeft(),
+                                itemView.getTop(),
+                                itemView.getLeft() + dX,
+                                itemView.getBottom()
+                        );
+                        c.drawRoundRect(background, 16f, 16f, bgPaint);
 
-                if (deletIcon == null) return;
-                int iconMargin = (itemView.getHeight() - deletIcon.getIntrinsicHeight()) / 2;
-                int iconTop = itemView.getTop() + iconMargin;
-                int iconBottom = itemView.getBottom() - iconMargin;
-                int iconLeft = itemView.getRight() - iconMargin - deletIcon.getIntrinsicWidth();
-                int iconRight = itemView.getRight() - iconMargin;
+                        icon = ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.ic_edit_24);
 
-                if (itemView.getRight() + dX < iconLeft) {
-                    deletIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                    deletIcon.setTint(Color.WHITE);
-                    deletIcon.draw(c);
+                        if (icon == null) return;
+                        iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                        iconTop = itemView.getTop() + iconMargin;
+                        iconBottom = itemView.getBottom() - iconMargin;
+                        iconLeft = itemView.getLeft() + iconMargin;
+                        iconRight = itemView.getLeft() + iconMargin + icon.getIntrinsicWidth();
+
+                        if (dX > iconMargin) {
+                            icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                            icon.setTint(Color.WHITE);
+                            icon.draw(c);
+                        }
+
+                    } else if (dX < 0) {
+                        bgPaint.setColor(Color.parseColor("#B00020"));
+                        background = new RectF(
+                                itemView.getRight() + dX,
+                                itemView.getTop(),
+                                itemView.getRight(),
+                                itemView.getBottom()
+                        );
+                        c.drawRoundRect(background, 16f, 16f, bgPaint);
+                        icon = ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.ic_delete_outline);
+
+                        if (icon == null) return;
+                        iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                        iconTop = itemView.getTop() + iconMargin;
+                        iconBottom = itemView.getBottom() - iconMargin;
+                        iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
+                        iconRight = itemView.getRight() - iconMargin;
+
+                        if (itemView.getRight() + dX < iconLeft) {
+                            icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                            icon.setTint(Color.WHITE);
+                            icon.draw(c);
+                        }
+                    }
                 }
-
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
             }

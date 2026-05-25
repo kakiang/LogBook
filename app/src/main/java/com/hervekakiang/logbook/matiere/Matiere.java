@@ -66,4 +66,15 @@ public class Matiere implements Serializable {
     public void setVolumeHoraire(int volumeHoraire) {
         this.volumeHoraire = volumeHoraire;
     }
+
+    @Override
+    public String toString() {
+        return "Matiere{" +
+                "id=" + id +
+                ", ueId=" + ueId +
+                ", nom='" + nom + '\'' +
+                ", enseignant='" + enseignant + '\'' +
+                ", volumeHoraire=" + volumeHoraire +
+                '}';
+    }
 }

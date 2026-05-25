@@ -64,6 +64,14 @@
             android:name="selectedUeId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <argument
+            android:name="matiereId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="isEditing"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
 </navigation>
