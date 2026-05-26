@@ -84,6 +84,7 @@ public class AjouterMatiereFragment extends Fragment {
         Button btnSave = view.findViewById(R.id.btnSaveMatiere);
 
         btnSave.setOnClickListener(v -> saveMatiere());
+        toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveMatiere();
@@ -186,6 +187,7 @@ public class AjouterMatiereFragment extends Fragment {
         if (hasError) return;
 
         if (isEditing && matiereToEdit != null) {
+            matiereToEdit.setUeId(selectedUeId);
             matiereToEdit.setNom(nom);
             matiereToEdit.setEnseignant(enseignant);
             matiereToEdit.setVolumeHoraire(Integer.parseInt(volumeHoraire));
