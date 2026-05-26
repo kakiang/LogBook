@@ -17,6 +17,7 @@ public abstract class DAOBase<T> {
     public DAOBase(Context context) {
         this.myDbHelper = MyDatabaseHelper.getInstance(context, DATABASE_NAME, VERSION);
         this.myDb = myDbHelper.openDatabase();
+        this.myDb.setForeignKeyConstraintsEnabled(true);
     }
 
 //    public void open() {
