@@ -31,7 +31,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hervekakiang.logbook.BasicSwipeCallback;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ue.AddUeFragment;
 import com.hervekakiang.logbook.ue.UEListAdapter;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
@@ -106,7 +105,7 @@ public class DashboardFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
-        ueViewModel.getUeWithStatsList().observe(getViewLifecycleOwner(), ueWithStatsList -> {
+        ueViewModel.getUeListWithStats().observe(getViewLifecycleOwner(), ueWithStatsList -> {
             String uet = "Unités d'enseignement (" + ueWithStatsList.size() + ")";
             textViewUeListTitle.setText(uet);
             mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));

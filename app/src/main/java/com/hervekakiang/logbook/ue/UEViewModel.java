@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
 import com.hervekakiang.logbook.matiere.Matiere;
@@ -35,7 +36,7 @@ public class UEViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
 
-    private final LiveData<List<UEListAdapter.UeWithStats>> ueWithStatsList;
+    private final MediatorLiveData<List<UEListAdapter.UeWithStats>> ueListWithStats = new MediatorLiveData<>();
 
     private final LiveData<StatsGlobal> statsGlobal;
     private final LiveData<UEListAdapter.UeWithStats> currentUeWithStats;
@@ -71,12 +72,10 @@ public class UEViewModel extends AndroidViewModel {
         matieresWithStatsForCurrentUe.addSource(listMatieres, matieres ->
                 computeMatieresWithStatsForSelectedUE(currentUeId.getValue(), pendingDeleteMatiereId.getValue()));
 
-        ueWithStatsList = Transformations.map(combined, data -> {
-            if (data.ues == null) return Collections.emptyList();
-            return computeUeWithStats(data.ues, data.matieres, data.seances);
-        });
+        ueListWithStats.addSource(combined, data -> computeUeWithStats(data, pendingDeleteUeId.getValue()));
+        ueListWithStats.addSource(pendingDeleteUeId, hidden -> computeUeWithStats(combined.getValue(), hidden));
 
-        statsGlobal = Transformations.map(ueWithStatsList, ues -> {
+        statsGlobal = Transformations.map(ueListWithStats, ues -> {
             if (ues == null) return new StatsGlobal(0, 0);
             List<Matiere> allMatieres = listMatieres.getValue();
             List<Seance> allSeances = listSeances.getValue();
@@ -93,7 +92,7 @@ public class UEViewModel extends AndroidViewModel {
                 return new MutableLiveData<>(null);
             }
             // Transform the ueUiModels LiveData – this will update whenever ueUiModels changes
-            return Transformations.map(ueWithStatsList, models -> {
+            return Transformations.map(ueListWithStats, models -> {
                 if (models == null) return null;
                 for (UEListAdapter.UeWithStats model : models) {
                     if (model.ue().getId() == ueId) {
@@ -139,9 +138,7 @@ public class UEViewModel extends AndroidViewModel {
         List<Matiere> filteredMatieres = new ArrayList<>();
         for (Matiere m : listMatieres.getValue()) {
             if (m.getUeId() == ueId) {
-                if (hidden != null && m.getId() == hidden) {
-                    continue;
-                }
+                if (hidden != null && m.getId() == hidden) continue;
                 filteredMatieres.add(m);
             }
         }
@@ -225,11 +222,18 @@ public class UEViewModel extends AndroidViewModel {
         combined.setValue(new CombinedData(ues, matieres, seances));
     }
 
-    private List<UEListAdapter.UeWithStats> computeUeWithStats(List<UE> ues,
-                                                               List<Matiere> matieres,
-                                                               List<Seance> seances) {
+    private void computeUeWithStats(CombinedData combinedData, Integer hidden) {
+
+        if (combinedData == null) {
+            ueListWithStats.postValue(Collections.emptyList());
+            return;
+        }
+        List<UE> ues = combinedData.ues();
+        List<Matiere> matieres = combinedData.matieres();
+        List<Seance> seances = combinedData.seances();
         if (ues == null || matieres == null || seances == null) {
-            return Collections.emptyList();
+            ueListWithStats.postValue(Collections.emptyList());
+            return;
         }
 
         // 1. Total planned hours per UE (from matières)
@@ -261,6 +265,7 @@ public class UEViewModel extends AndroidViewModel {
         // 4. Build result list
         List<UEListAdapter.UeWithStats> result = new ArrayList<>();
         for (UE ue : ues) {
+            if (hidden != null && ue.getId() == hidden) continue;
             int ueId = ue.getId();
             Integer volumeHoraire = uetotalVolumeHoraire.get(ueId);
             Integer horaireEffectue = ueVolumeHoraireEffecture.get(ueId);
@@ -270,7 +275,7 @@ public class UEViewModel extends AndroidViewModel {
             String statText = String.format(Locale.getDefault(), "%dH dispensées / %dH", effectue, total);
             result.add(new UEListAdapter.UeWithStats(ue, statText, percentage));
         }
-        return result;
+        ueListWithStats.postValue(result);
     }
 
     public void addUE(UE ue, Runnable onComplete) {
@@ -320,12 +325,13 @@ public class UEViewModel extends AndroidViewModel {
         pendingDeleteMatiereId.postValue(null);
     }
 
-    public void deleteUe(int ueId){
-        if (pendingDeleteUeId !=null && pendingDeleteUeId.getValue() == ueId){
+    public void deleteUe(int ueId) {
+        if (pendingDeleteUeId.getValue() != null && pendingDeleteUeId.getValue() == ueId) {
             pendingDeleteUeId.postValue(null);
         }
         ueDao.delete(ueId, this::refreshUeData);
     }
+
     public void deleteUeTemporarily(int ueId) {
         pendingDeleteUeId.postValue(ueId);
     }
@@ -379,8 +385,8 @@ public class UEViewModel extends AndroidViewModel {
         return statsGlobal;
     }
 
-    public LiveData<List<UEListAdapter.UeWithStats>> getUeWithStatsList() {
-        return ueWithStatsList;
+    public LiveData<List<UEListAdapter.UeWithStats>> getUeListWithStats() {
+        return ueListWithStats;
     }
 
     public LiveData<UEListAdapter.UeWithStats> getCurrentUeWithStats() {

@@ -66,7 +66,7 @@ public class UeListFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.getUeWithStatsList().observe(getViewLifecycleOwner(), ueUiModels -> {
+        ueViewModel.getUeListWithStats().observe(getViewLifecycleOwner(), ueUiModels -> {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });
     }
