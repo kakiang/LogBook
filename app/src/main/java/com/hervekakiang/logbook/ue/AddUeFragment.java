@@ -1,38 +1,35 @@
 package com.hervekakiang.logbook.ue;
 
-import android.app.Dialog;
 import android.content.res.Resources;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.hervekakiang.logbook.R;
 
-public class AddUeFragment extends BottomSheetDialogFragment {
+public class AddUeFragment extends Fragment {
 
     private UEViewModel viewModel;
-    private TextInputEditText editUeCode;
-    private TextInputEditText editUeNom;
+    private TextInputEditText editTextUeCode;
+    private TextInputEditText editTextUeNom;
 
-    BottomSheetBehavior<View> bottomSheetBehavior;
-    private int originalSoftInputMode;
+    private NavController navController;
+
+    private int editingUeId = -1;
+    private boolean isEditing = false;
+    private UE editingUe;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,17 +45,16 @@ public class AddUeFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        bottomSheetBehavior.setSkipCollapsed(true);
-
+        navController = Navigation.findNavController(view);
         LinearLayout layout = view.findViewById(R.id.layoutAddUe);
         layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
         MaterialToolbar toolbar = view.findViewById(R.id.ueToolbar);
-        toolbar.setNavigationOnClickListener(v -> {
-            dismiss();
-        });
+
+        if (getArguments() != null) {
+            editingUeId = getArguments().getInt("ueId");
+            isEditing = getArguments().getBoolean("isEditing");
+        }
+        toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveUE();
@@ -68,46 +64,55 @@ public class AddUeFragment extends BottomSheetDialogFragment {
         });
 
         viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        editUeCode = view.findViewById(R.id.editUeCode);
-        editUeNom = view.findViewById(R.id.editUeNom);
+        editTextUeCode = view.findViewById(R.id.editUeCode);
+        editTextUeNom = view.findViewById(R.id.editUeNom);
+
+        if (isEditing && editingUeId != -1) {
+            toolbar.setTitle("Modifier l'UE");
+
+            viewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
+                for (UE ue : ues) {
+                    if (ue.getId() == editingUeId) {
+                        editingUe = ue;
+                        editTextUeCode.setText(ue.getCode());
+                        editTextUeNom.setText(ue.getNom());
+                        break;
+                    }
+                }
+            });
+        }
 
         view.findViewById(R.id.btnSaveUe).setOnClickListener(v -> {
-           saveUE();
+            saveUE();
         });
     }
 
     private void saveUE() {
-        String code = editUeCode.getText() != null ? editUeCode.getText().toString() : null;
-        String nom = editUeNom.getText() != null ? editUeNom.getText().toString() : null;
+        String code = editTextUeCode.getText() != null ? editTextUeCode.getText().toString() : null;
+        String nom = editTextUeNom.getText() != null ? editTextUeNom.getText().toString() : null;
         if (code == null || nom == null) {
             Toast.makeText(getActivity(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
             return;
         }
-        viewModel.addUE(new UE(code, nom));
-        Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
-        dismiss();
-    }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (isEditing && editingUe != null) {
+            editingUe.setCode(code);
+            editingUe.setNom(nom);
 
-        // Store the activity current mode
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            originalSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
-            // CRITICAL: Set to PAN so activity does NOT resize
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+            viewModel.updateUE(editingUe, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "UE " + nom + "mise à jour", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                });
+            });
+        } else {
+            viewModel.addUE(new UE(code, nom), () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "UE " + nom + "ajouté avec succès", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                });
+            });
         }
-        return dialog;
-    }
 
-    @Override
-    public void onDestroyView() {
-        // Restore original mode when bottom sheet is dismissed
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            getActivity().getWindow().setSoftInputMode(originalSoftInputMode);
-        }
-        super.onDestroyView();
     }
 }

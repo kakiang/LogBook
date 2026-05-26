@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,13 +44,7 @@ public class UeListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         FloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddUeFragment addUeFragment = new AddUeFragment();
-                addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
-            }
-        });
+        fab.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.ajouterUeFragment));
 
         OnItemClickListener<UEListAdapter.UeWithStats> listener = new OnItemClickListener<>() {
             @Override

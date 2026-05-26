@@ -13,6 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +27,8 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.hervekakiang.logbook.BasicSwipeCallback;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ue.AddUeFragment;
@@ -37,6 +40,10 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class DashboardFragment extends Fragment {
+
+    private UEViewModel ueViewModel;
+    private UEListAdapter mAdapter;
+    private RecyclerView recyclerView;
 
     private ProgressBar progressBar;
     private TextView tvChartPercentage;
@@ -75,11 +82,11 @@ public class DashboardFragment extends Fragment {
         tvVhRestant = view.findViewById(R.id.tvVhRestant);
         tvVhTotal = view.findViewById(R.id.tvVhTotal);
         TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerviewUE);
+        recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
 
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
         ueViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
             Log.d("MYAPP:====stats=====", stats.toString());
@@ -95,7 +102,7 @@ public class DashboardFragment extends Fragment {
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
         });
 
-        UEListAdapter mAdapter = new UEListAdapter();
+        mAdapter = new UEListAdapter();
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
@@ -106,14 +113,58 @@ public class DashboardFragment extends Fragment {
         });
 
         fab.setOnClickListener(v -> {
-            AddUeFragment addUeFragment = new AddUeFragment();
-            addUeFragment.show(getChildFragmentManager(), AddUeFragment.class.getCanonicalName());
+            navController.navigate(R.id.ajouterUeFragment);
         });
 
+
+        BasicSwipeCallback swipeCallback = getBasicSwipeCallback();
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);
+    }
+
+    private BasicSwipeCallback getBasicSwipeCallback() {
+        BasicSwipeCallback.SwipeListener swipeListener = new BasicSwipeCallback.SwipeListener() {
+
+            @Override
+            public void onSwipeLeft(RecyclerView.ViewHolder viewHolder, int position) {
+                var item = mAdapter.getCurrentList().get(position);
+
+                ueViewModel.deleteUeTemporarily(item.ue().getId());
+
+                Snackbar.make(recyclerView, item.ue().getNom() + " supprimé", Snackbar.LENGTH_LONG)
+                        .setAction("Annulé", v -> ueViewModel.unDeleteUe())
+                        .addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar, int event) {
+                                super.onDismissed(transientBottomBar, event);
+                                if (event != DISMISS_EVENT_ACTION) {
+                                    ueViewModel.deleteUe(item.ue().getId());
+                                    Toast.makeText(
+                                            recyclerView.getContext(),
+                                            item.ue().getNom() + " supprimé avec succès",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }).show();
+            }
+
+            @Override
+            public void onSwipeRight(RecyclerView.ViewHolder viewHolder, int position) {
+                mAdapter.notifyItemChanged(position);
+                var item = mAdapter.getCurrentList().get(position);
+                Bundle args = new Bundle();
+                args.putInt("ueId", item.ue().getId());
+                args.putBoolean("isEditing", true);
+                Navigation.findNavController(requireActivity(), R.id.navHostFragment)
+                        .navigate(R.id.action_dashboard_to_ajouterUeFragment, args);
+
+            }
+        };
+
+        return new BasicSwipeCallback(swipeListener);
     }
 
     @NonNull
-    private  OnItemClickListener<UEListAdapter.UeWithStats> listener() {
+    private OnItemClickListener<UEListAdapter.UeWithStats> listener() {
         return new OnItemClickListener<>() {
             @Override
             public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {

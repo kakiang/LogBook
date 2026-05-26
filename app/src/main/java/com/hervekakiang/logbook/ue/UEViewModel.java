@@ -45,6 +45,7 @@ public class UEViewModel extends AndroidViewModel {
 
     private final MediatorLiveData<List<MatiereListAdapter.MatiereWithStats>> matieresWithStatsForCurrentUe = new MediatorLiveData<>();
     private final MutableLiveData<Integer> pendingDeleteMatiereId = new MutableLiveData<>();
+    private final MutableLiveData<Integer> pendingDeleteUeId = new MutableLiveData<>();
 
     public UEViewModel(@NonNull Application application) {
         super(application);
@@ -272,8 +273,20 @@ public class UEViewModel extends AndroidViewModel {
         return result;
     }
 
-    public void addUE(UE ue) {
-        ueDao.insert(ue, this::refreshAllData);
+    public void addUE(UE ue, Runnable onComplete) {
+        ueDao.insert(ue, () -> {
+            refreshUeData();
+            if (onComplete != null) onComplete.run();
+        });
+
+    }
+
+    public void updateUE(UE ue, Runnable onComplete) {
+        Log.d("updateUE MYAPP", ue.toString());
+        ueDao.update(ue, () -> {
+            refreshUeData();
+            if (onComplete != null) onComplete.run();
+        });
     }
 
     public void addMatiere(Matiere matiere, int ueId, Runnable onComplete) {
@@ -307,6 +320,20 @@ public class UEViewModel extends AndroidViewModel {
         pendingDeleteMatiereId.postValue(null);
     }
 
+    public void deleteUe(int ueId){
+        if (pendingDeleteUeId !=null && pendingDeleteUeId.getValue() == ueId){
+            pendingDeleteUeId.postValue(null);
+        }
+        ueDao.delete(ueId, this::refreshUeData);
+    }
+    public void deleteUeTemporarily(int ueId) {
+        pendingDeleteUeId.postValue(ueId);
+    }
+
+    public void unDeleteUe() {
+        pendingDeleteUeId.postValue(null);
+    }
+
     public void addSeance(Seance seance, Runnable onComplete) {
         seanceDao.insert(seance, () -> {
             refreshAllData();
@@ -326,6 +353,10 @@ public class UEViewModel extends AndroidViewModel {
 
     public void refreshMatiereData() {
         matiereDao.getAll(listMatieres::postValue);
+    }
+
+    public void refreshUeData() {
+        ueDao.getAll(listUEs::postValue);
     }
 
     public void setCurrentUeId(int currentUeId) {

@@ -8,7 +8,11 @@
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.hervekakiang.logbook.dashboard.DashboardFragment"
-        android:label="Dashboard" />
+        android:label="Dashboard">
+        <action
+            android:id="@+id/action_dashboard_to_ajouterUeFragment"
+            app:destination="@id/ajouterUeFragment"/>
+    </fragment>
 
     <fragment
         android:id="@+id/ueListFragment"
@@ -53,6 +57,22 @@
         <argument
             android:name="fragmentTitle"
             app:argType="string" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/ajouterUeFragment"
+        android:name="com.hervekakiang.logbook.ue.AddUeFragment"
+        android:label="Nouvelle UE"
+        tools:layout="@layout/fragment_add_ue">
+        <argument
+            android:name="ueId"
+            app:argType="integer"
+            android:defaultValue="-1"/>
+        <argument
+            android:name="isEditing"
+            app:argType="boolean"
+            android:defaultValue="false"/>
     </fragment>
 
     <fragment

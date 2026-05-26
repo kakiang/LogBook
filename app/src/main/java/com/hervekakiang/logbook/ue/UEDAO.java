@@ -100,7 +100,7 @@ public class UEDAO extends DAOBase<UE> {
                 """;
     }
 
-    public void update(UE ue) {
+    private void modify(UE ue) {
         ContentValues values = new ContentValues();
         values.put(MyDatabaseHelper.UE_CODE, ue.getCode());
         values.put(MyDatabaseHelper.UE_NOM, ue.getNom());
@@ -108,8 +108,16 @@ public class UEDAO extends DAOBase<UE> {
                 new String[]{String.valueOf(ue.getId())});
     }
 
-    public void delete(UE ue) {
-        myDb.delete(MyDatabaseHelper.TABLE_UE, MyDatabaseHelper.UE_ID + " = ?",
-                new String[]{String.valueOf(ue.getId())});
+    public void update(UE ue, Runnable onComplete) {
+        executorService.execute(() -> {
+            modify(ue);
+            onComplete.run();
+        });
+    }
+
+    public void delete(int ueId, Runnable onComplete) {
+        executorService.execute(() -> myDb.delete(MyDatabaseHelper.TABLE_UE, MyDatabaseHelper.UE_ID + " = ?",
+                new String[]{String.valueOf(ueId)}));
+        if (onComplete!=null) onComplete.run();
     }
 }
