@@ -59,6 +59,11 @@
             app:argType="string" />
     </fragment>
 
+    <fragment
+        android:id="@+id/seanceDetailFragment"
+        android:name="com.hervekakiang.logbook.seance.SeanceDetailFragment"
+        android:label="Seance Details"/>
+
 
     <fragment
         android:id="@+id/ajouterUeFragment"
@@ -92,6 +97,25 @@
             android:name="isEditing"
             app:argType="boolean"
             android:defaultValue="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ajouterSeanceFragment"
+        android:name="com.hervekakiang.logbook.seance.AjouterSeanceFragment"
+        android:label="Nouvelle Seance"
+        tools:layout="@layout/fragment_ajouter_seance">
+        <argument
+            android:name="selectedMatiereId"
+            app:argType="integer"
+            android:defaultValue="-1"/>
+        <argument
+            android:name="seanceId"
+            app:argType="integer"
+            android:defaultValue="-1"/>
+        <argument
+            android:name="isEditing"
+            app:argType="boolean"
+            android:defaultValue="false"/>
     </fragment>
 
 </navigation>

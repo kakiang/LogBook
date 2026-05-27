@@ -13,11 +13,14 @@ import com.hervekakiang.logbook.db.MyDatabaseHelper;
 import com.hervekakiang.logbook.matiere.Matiere;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SeanceDAO extends DAOBase<Seance> {
 
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
+    private final MutableLiveData<Map<String, String>> seanceObj = new MutableLiveData<>();
 
     public SeanceDAO(Context context) {
         super(context);
@@ -42,7 +45,7 @@ public class SeanceDAO extends DAOBase<Seance> {
 
     public List<Seance> fetchAll() {
         List<Seance> seances = new ArrayList<>();
-        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, null, null, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
+        try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, null, null, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
                 int matiereId = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_MATIERE_ID));
@@ -58,9 +61,39 @@ public class SeanceDAO extends DAOBase<Seance> {
         return seances;
     }
 
+    private Map<String, String> fetchById(int seanceId) {
+        String query = "SELECT s.id, s.date, s.heure_debut, s.duree, s.contenu_pedagogique, m.nom, m.enseignant "
+                + "FROM seances s "
+                + "INNER JOIN matieres m ON m.id = s.matiere_id "
+                + "WHERE s.id = ?";
+        Map<String, String> seanceObj = new HashMap<>();
+        try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(seanceId)})) {
+            if (cursor.moveToFirst()) {
+                seanceObj.put("id", cursor.getString(0));
+                seanceObj.put("date", cursor.getString(1));
+                seanceObj.put("heure_debut", cursor.getString(2));
+                seanceObj.put("duree", cursor.getString(3));
+                seanceObj.put("contenu_pedagogique", cursor.getString(4));
+                seanceObj.put("matiere", cursor.getString(5));
+                seanceObj.put("enseignant", cursor.getString(6));
+            }
+        } catch (Exception e) {
+            Log.e("SeanceDAO", "Error fetching seance", e);
+        }
+        return seanceObj;
+    }
+
+    public LiveData<Map<String, String>> getSeanceById(int seanceId) {
+        executorService.execute(() -> {
+            var obj = fetchById(seanceId);
+            seanceObj.postValue(obj);
+        });
+        return seanceObj;
+    }
+
     public List<Seance> fetchByMatiereId(int matiereId) {
         List<Seance> seances = new ArrayList<>();
-        try(Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, MyDatabaseHelper.SEANCE_MATIERE_ID + " = ?", new String[]{String.valueOf(matiereId)}, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
+        try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_SEANCE, null, MyDatabaseHelper.SEANCE_MATIERE_ID + " = ?", new String[]{String.valueOf(matiereId)}, null, null, MyDatabaseHelper.SEANCE_DATE + " DESC")) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_ID));
                 String date = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.SEANCE_DATE));
@@ -76,14 +109,14 @@ public class SeanceDAO extends DAOBase<Seance> {
     }
 
 
-    public void getAll(SeanceDAO.Callback<List<Seance>> callback){
+    public void getAll(SeanceDAO.Callback<List<Seance>> callback) {
         executorService.execute(() -> {
             List<Seance> ues = fetchAll();
             callback.onResult(ues);
         });
     }
 
-    public LiveData<List<Seance>> getAll(){
+    public LiveData<List<Seance>> getAll() {
         executorService.execute(() -> {
             List<Seance> list = fetchAll();
             listSeances.postValue(list);
@@ -92,7 +125,7 @@ public class SeanceDAO extends DAOBase<Seance> {
         return listSeances;
     }
 
-    public LiveData<List<Seance>> getSeancesByMatiereId(int matiereId){
+    public LiveData<List<Seance>> getSeancesByMatiereId(int matiereId) {
         executorService.execute(() -> {
             List<Seance> list = fetchByMatiereId(matiereId);
             listSeances.postValue(list);
@@ -101,8 +134,8 @@ public class SeanceDAO extends DAOBase<Seance> {
     }
 
     public int getTotalVolumeHoraireEffectueByUeId(int ueId) {
-        String query ="SELECT SUM(s.duree) FROM seances s INNER JOIN matieres m ON s.matiere_id = m.id WHERE m.ue_id = ?";
-        try(Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})){
+        String query = "SELECT SUM(s.duree) FROM seances s INNER JOIN matieres m ON s.matiere_id = m.id WHERE m.ue_id = ?";
+        try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})) {
             int totalVolumeHoraireEffectue = 0;
             if (cursor.moveToFirst()) {
                 totalVolumeHoraireEffectue = cursor.getInt(0);
@@ -115,8 +148,8 @@ public class SeanceDAO extends DAOBase<Seance> {
     }
 
     public int getTotalVolumeHoraireEffectueByMatiereId(int matiereId) {
-        String query ="SELECT SUM(s.duree) FROM seances s WHERE s.matiere_id = ?";
-        try(Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(matiereId)})){
+        String query = "SELECT SUM(s.duree) FROM seances s WHERE s.matiere_id = ?";
+        try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(matiereId)})) {
             int totalVolumeHoraireEffectue = 0;
             if (cursor.moveToFirst()) {
                 totalVolumeHoraireEffectue = cursor.getInt(0);
@@ -129,8 +162,8 @@ public class SeanceDAO extends DAOBase<Seance> {
     }
 
     public int getTotalVolumeHoraireEffectue() {
-        String query ="SELECT SUM(s.duree) FROM seances s";
-        try(Cursor cursor = myDb.rawQuery(query, null)){
+        String query = "SELECT SUM(s.duree) FROM seances s";
+        try (Cursor cursor = myDb.rawQuery(query, null)) {
             int totalVolumeHoraireEffectue = 0;
             if (cursor.moveToFirst()) {
                 totalVolumeHoraireEffectue = cursor.getInt(0);
@@ -143,19 +176,27 @@ public class SeanceDAO extends DAOBase<Seance> {
     }
 
 
-    public int update(Seance seance) {
+    public void modify(Seance seance) {
         ContentValues values = new ContentValues();
         values.put(MyDatabaseHelper.SEANCE_MATIERE_ID, seance.getMatiereId());
         values.put(MyDatabaseHelper.SEANCE_DATE, seance.getDate());
         values.put(MyDatabaseHelper.SEANCE_HEURE_DEBUT, seance.getHeureDebut());
         values.put(MyDatabaseHelper.SEANCE_DUREE, seance.getDuree());
         values.put(MyDatabaseHelper.SEANCE_CONTENU_PEDAGOGIQUE, seance.getContenuPedagogique());
-        return myDb.update(MyDatabaseHelper.TABLE_SEANCE, values, MyDatabaseHelper.SEANCE_ID + " = ?",
+         myDb.update(MyDatabaseHelper.TABLE_SEANCE, values, MyDatabaseHelper.SEANCE_ID + " = ?",
                 new String[]{String.valueOf(seance.getId())});
     }
 
-    public int delete(Seance seance) {
-        return myDb.delete(MyDatabaseHelper.TABLE_SEANCE, MyDatabaseHelper.SEANCE_ID + " = ?",
-                new String[]{String.valueOf(seance.getId())});
+    public void update(Seance seance, Runnable onComplete) {
+        executorService.execute(() -> {
+            modify(seance);
+            onComplete.run();
+        });
+    }
+
+    public void delete(int seanceId, Runnable onComplete) {
+        executorService.execute(() -> myDb.delete(MyDatabaseHelper.TABLE_SEANCE, MyDatabaseHelper.SEANCE_ID + " = ?",
+                new String[]{String.valueOf(seanceId)}));
+        if (onComplete != null) onComplete.run();
     }
 }

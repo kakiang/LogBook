@@ -1,36 +1,31 @@
 package com.hervekakiang.logbook.seance;
 
-import android.app.Dialog;
 import android.content.res.Resources;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.matiere.MatiereViewModel;
 import com.hervekakiang.logbook.ue.UEViewModel;
 
 import java.text.SimpleDateFormat;
@@ -40,21 +35,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class AjouterSeanceFragment extends BottomSheetDialogFragment {
+public class AjouterSeanceFragment extends Fragment {
     private UEViewModel ueViewModel;
+    private NavController navController;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
     private int selectedMatiereId = -1;
+    private boolean isEditing = false;
+    private int seanceIdToEdit = -1;
+    private Seance seanceToEdit;
     private List<Matiere> matiereList = new ArrayList<>();
 
-    private int originalSoftInputMode;
 
     public AjouterSeanceFragment() {
-    }
-
-    public AjouterSeanceFragment(int matiereId) {
-        this.selectedMatiereId = matiereId;
     }
 
     @Override
@@ -71,24 +65,17 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        bottomSheetBehavior.setSkipCollapsed(true);
-
-        LinearLayout layout = view.findViewById(R.id.layoutAddSeance);
-        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
-
+        navController = Navigation.findNavController(view);
         MaterialToolbar toolbar = view.findViewById(R.id.seanceToolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            dismiss();
+            navController.popBackStack();
         });
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_save) {
-                saveSeance();
-                return true;
-            }
-            return false;
-        });
+
+        if (getArguments() != null) {
+            selectedMatiereId = getArguments().getInt("selectedMatiereId");
+            isEditing = getArguments().getBoolean("isEditing");
+            seanceIdToEdit = getArguments().getInt("seanceId");
+        }
 
         autoCompleteMatiere = view.findViewById(R.id.autoCompleteMatiere);
         editDate = view.findViewById(R.id.editSeanceDate);
@@ -97,6 +84,30 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         editContenu = view.findViewById(R.id.editSeanceContenu);
 
         ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+
+        if (isEditing && seanceIdToEdit != -1) {
+            toolbar.setTitle("Modifier la seance");
+            ueViewModel.getSeancesForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
+                for (Seance s : seances) {
+                    if (s.getId() == seanceIdToEdit) {
+                        seanceToEdit = s;
+                        editDate.setText(s.getDate());
+                        editHeure.setText(s.getHeureDebut());
+                        editDuree.setText(String.valueOf(s.getMatiereId()));
+                        editContenu.setText(s.getContenuPedagogique());
+                        break;
+                    }
+                }
+            });
+        }
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_save) {
+                saveSeance();
+                return true;
+            }
+            return false;
+        });
 
         setupPickers();
         loadMatieres();
@@ -129,7 +140,7 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         } else {
             editHeure.setError(null);
         }
-        if (TextUtils.isEmpty(duree)){
+        if (TextUtils.isEmpty(duree)) {
             editDuree.setError("Veuillez entrer une durée");
             hasError = true;
         } else {
@@ -143,14 +154,29 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
         }
         if (hasError) return;
 
-        Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
 
-        ueViewModel.addSeance(seance, () -> {
-            requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
-                dismiss();
+        if (isEditing && seanceToEdit != null) {
+            seanceToEdit.setDate(date);
+            seanceToEdit.setHeureDebut(heure);
+            seanceToEdit.setDuree(Integer.parseInt(duree));
+            seanceToEdit.setContenuPedagogique(contenu);
+
+            ueViewModel.updateSeance(seanceToEdit, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                });
             });
-        });
+        } else {
+            Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
+            ueViewModel.addSeance(seance, () -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                });
+            });
+        }
+
     }
 
     private void loadMatieres() {
@@ -166,18 +192,14 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
                 for (Matiere m : matiereList) {
                     if (m.getId() == selectedMatiereId) {
                         autoCompleteMatiere.setText(m.getNom(), false);
-//                        autoCompleteMatiere.setListSelection(selectedMatiereId);
                         break;
                     }
                 }
             }
 
-            autoCompleteMatiere.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    selectedMatiereId = matiereList.get(position).getId();
-                    autoCompleteMatiere.setError(null);
-                }
+            autoCompleteMatiere.setOnItemClickListener((parent, view, position, id) -> {
+                selectedMatiereId = matiereList.get(position).getId();
+                autoCompleteMatiere.setError(null);
             });
         });
 
@@ -213,28 +235,5 @@ public class AjouterSeanceFragment extends BottomSheetDialogFragment {
             });
             timePicker.show(getChildFragmentManager(), "TIME_PICKER");
         });
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-        // Store the activity current mode
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            originalSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
-            // CRITICAL: Set to PAN so activity does NOT resize
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        }
-        return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        // Restore original mode when bottom sheet is dismissed
-        if (getActivity() != null && getActivity().getWindow() != null) {
-            getActivity().getWindow().setSoftInputMode(originalSoftInputMode);
-        }
-        super.onDestroyView();
     }
 }

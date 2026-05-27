@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import kotlin.jvm.functions.Function1;
+
 public class UEViewModel extends AndroidViewModel {
     private final UEDAO ueDao;
     private final SeanceDAO seanceDao;
@@ -31,6 +33,7 @@ public class UEViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Integer> currentUeId = new MutableLiveData<>();
     private final MutableLiveData<Integer> currentMatiereId = new MutableLiveData<>();
+    private final MutableLiveData<Integer> currentSeanceId = new MutableLiveData<>();
 
     private final MutableLiveData<List<UE>> listUEs = new MutableLiveData<>();
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
@@ -40,6 +43,7 @@ public class UEViewModel extends AndroidViewModel {
 
     private final LiveData<StatsGlobal> statsGlobal;
     private final LiveData<UEListAdapter.UeWithStats> currentUeWithStats;
+    private final LiveData<Map<String, String>> currentSeanceObj;
     private final MediatorLiveData<MatiereListAdapter.MatiereWithStats> currentMatiereWithStats = new MediatorLiveData<>();
 
     private final LiveData<List<Seance>> seancesForCurrentMatiere;
@@ -121,6 +125,8 @@ public class UEViewModel extends AndroidViewModel {
                 return filtered;
             });
         });
+
+        currentSeanceObj = Transformations.switchMap(currentSeanceId, seanceId -> seanceDao.getSeanceById(seanceId));
 
     }
 
@@ -305,7 +311,7 @@ public class UEViewModel extends AndroidViewModel {
     public void updateMatiere(Matiere matiere, Runnable onComplete) {
         Log.d("updateMatiere MYAPP", matiere.toString());
         matiereDao.update(matiere, () -> {
-            refreshMatiereData();
+            refreshAllData();
             if (onComplete != null) onComplete.run();
         });
     }
@@ -314,7 +320,7 @@ public class UEViewModel extends AndroidViewModel {
         if (pendingDeleteMatiereId.getValue() != null && pendingDeleteMatiereId.getValue() == matiereId) {
             pendingDeleteMatiereId.postValue(null);
         }
-        matiereDao.delete(matiereId, this::refreshMatiereData);
+        matiereDao.delete(matiereId, this::refreshAllData);
     }
 
     public void deleteMatiereTemporarily(int matiereId) {
@@ -329,7 +335,7 @@ public class UEViewModel extends AndroidViewModel {
         if (pendingDeleteUeId.getValue() != null && pendingDeleteUeId.getValue() == ueId) {
             pendingDeleteUeId.postValue(null);
         }
-        ueDao.delete(ueId, this::refreshUeData);
+        ueDao.delete(ueId, this::refreshAllData);
     }
 
     public void deleteUeTemporarily(int ueId) {
@@ -340,6 +346,10 @@ public class UEViewModel extends AndroidViewModel {
         pendingDeleteUeId.postValue(null);
     }
 
+    public void deleteSeance(int seanceId) {
+        seanceDao.delete(seanceId, this::refreshAllData);
+    }
+
     public void addSeance(Seance seance, Runnable onComplete) {
         seanceDao.insert(seance, () -> {
             refreshAllData();
@@ -347,6 +357,14 @@ public class UEViewModel extends AndroidViewModel {
             if (currentId != null) {
                 currentMatiereId.postValue(currentId);
             }
+            if (onComplete != null) onComplete.run();
+        });
+    }
+
+    public void updateSeance(Seance seance, Runnable onComplete) {
+        Log.d("updateSeance MYAPP", seance.toString());
+        seanceDao.update(seance, () -> {
+            refreshAllData();
             if (onComplete != null) onComplete.run();
         });
     }
@@ -371,6 +389,10 @@ public class UEViewModel extends AndroidViewModel {
 
     public void setCurrentMatiereId(int currentMatiereId) {
         this.currentMatiereId.setValue(currentMatiereId);
+    }
+
+    public void setCurrentSeanceId(int currentSeanceId) {
+        this.currentSeanceId.setValue(currentSeanceId);
     }
 
     public LiveData<List<Matiere>> getListMatieres() {
@@ -403,5 +425,9 @@ public class UEViewModel extends AndroidViewModel {
 
     public LiveData<MatiereListAdapter.MatiereWithStats> getCurrentMatiereWithStats() {
         return currentMatiereWithStats;
+    }
+
+    public LiveData<Map<String, String>> getCurrentSeanceObj() {
+        return currentSeanceObj;
     }
 }

@@ -25,8 +25,10 @@ import android.widget.TextView;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.seance.AjouterSeanceFragment;
+import com.hervekakiang.logbook.seance.Seance;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
 import com.hervekakiang.logbook.seance.SeanceViewModel;
 import com.hervekakiang.logbook.ue.UEViewModel;
@@ -76,6 +78,7 @@ public class MatiereDetailFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         SeanceListAdaper mAdapter = new SeanceListAdaper();
+        mAdapter.setOnItemClickListener(listener(navController));
         recyclerView.setAdapter(mAdapter);
 
         UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
@@ -98,8 +101,9 @@ public class MatiereDetailFragment extends Fragment {
 
 
         fab.setOnClickListener(v -> {
-            AjouterSeanceFragment ajouterSeanceFragment = new AjouterSeanceFragment(matiereId);
-            ajouterSeanceFragment.show(getChildFragmentManager(), AjouterSeanceFragment.class.getCanonicalName());
+            Bundle args = new Bundle();
+            args.putInt("selectedMatiereId", matiereId);
+            navController.navigate(R.id.ajouterSeanceFragment, args);
         });
 
         ueViewModel.getSeancesForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
@@ -108,5 +112,22 @@ public class MatiereDetailFragment extends Fragment {
             tvSeanceListTitle.setText(seanceListTitle);
             mAdapter.submitList(seances);
         });
+    }
+
+    private OnItemClickListener<Seance> listener(NavController navController) {
+        return  new OnItemClickListener<>() {
+            @Override
+            public void onItemClick(Seance obj) {
+                Bundle args = new Bundle();
+                args.putInt("seanceId", obj.getId());
+                args.putSerializable("seance", obj);
+                navController.navigate(R.id.seanceDetailFragment, args);
+            }
+
+            @Override
+            public void onItemLongClick(Seance obj) {
+
+            }
+        };
     }
 }

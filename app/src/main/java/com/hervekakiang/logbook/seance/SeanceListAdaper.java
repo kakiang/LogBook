@@ -73,5 +73,15 @@ public class SeanceListAdaper extends ListAdapter<Seance, SeanceListAdaper.Seanc
         holder.textViewSeanceDate.setText(seance.getDate());
         holder.textViewSeanceDuree.setText(String.format(Locale.getDefault(), "%dh", seance.getDuree()));
         holder.textViewSeanceContenu.setText(seance.getContenuPedagogique());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(seance);
+            }
+        });
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<Seance> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 }
