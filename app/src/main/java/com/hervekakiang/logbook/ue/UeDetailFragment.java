@@ -31,9 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
@@ -41,9 +41,9 @@ import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 import java.util.Locale;
 
 public class UeDetailFragment extends Fragment {
-    private UEListAdapter.UeWithStats ueWithStats;
+    private UEListAdapter.UEDTO ueDTO;
     private MatiereListAdapter mAdapter;
-    private UEViewModel ueViewModel;
+    private MyAppViewModel myAppViewModel;
     private RecyclerView recyclerView;
 
     public UeDetailFragment() {
@@ -75,7 +75,7 @@ public class UeDetailFragment extends Fragment {
         NavController navController = Navigation.findNavController(view);
 
         if (getArguments() != null) {
-            ueWithStats = (UEListAdapter.UeWithStats) getArguments().getSerializable("ueWithStats");
+            ueDTO = (UEListAdapter.UEDTO) getArguments().getSerializable("ueWithStats");
         } else {
             navController.navigateUp();
         }
@@ -88,12 +88,12 @@ public class UeDetailFragment extends Fragment {
         TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
         TextView tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
-        fragmentToolbar.setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
+        fragmentToolbar.setTitle(ueDTO.ue().getCode() + " " + ueDTO.ue().getNom());
 
-        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.setCurrentUeId(ueWithStats.ue().getId());
+        myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        myAppViewModel.setCurrentUeId(ueDTO.ue().getId());
 
-        ueViewModel.getCurrentUeWithStats().observe(getViewLifecycleOwner(), ueWithStats -> {
+        myAppViewModel.getCurrentUEDTO().observe(getViewLifecycleOwner(), ueWithStats -> {
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, ueWithStats.pourcentage());
             animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
@@ -107,7 +107,7 @@ public class UeDetailFragment extends Fragment {
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);
         fab.setOnClickListener(v -> {
             Bundle args = new Bundle();
-            args.putInt("selectedUeId", ueWithStats.ue().getId());
+            args.putInt("selectedUeId", ueDTO.ue().getId());
             Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.action_to_ajouterMatiereFragment, args);
         });
 
@@ -120,7 +120,7 @@ public class UeDetailFragment extends Fragment {
         ItemTouchHelper itemTouchHelper = getItemTouchHelper();
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        ueViewModel.getMatieresWithStatsForCurrentUe().observe(getViewLifecycleOwner(), matiereWithStatsList -> {
+        myAppViewModel.getListMatiereDTOForCurrentUE().observe(getViewLifecycleOwner(), matiereWithStatsList -> {
             String mt = "Matières (" + matiereWithStatsList.size() + ")";
             tvMatiereListTitle.setText(mt);
             mAdapter.submitList(matiereWithStatsList);
@@ -128,20 +128,20 @@ public class UeDetailFragment extends Fragment {
 
     }
 
-    private OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener() {
+    private OnItemClickListener<MatiereListAdapter.MatiereDTO> listener() {
         return new OnItemClickListener<>() {
             @Override
-            public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
+            public void onItemClick(MatiereListAdapter.MatiereDTO matiereDTO) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                Log.d("MYAPP::UeDetailFragment", "matiereId=" + matiereWithStats.matiere().getId());
-                args.putInt("matiereId", matiereWithStats.matiere().getId());
-                args.putString("fragmentTitle", matiereWithStats.matiere().getNom());
+                Log.d("MYAPP::UeDetailFragment", "matiereId=" + matiereDTO.matiere().getId());
+                args.putInt("matiereId", matiereDTO.matiere().getId());
+                args.putString("fragmentTitle", matiereDTO.matiere().getNom());
                 navController.navigate(R.id.matiereDetailFragment, args);
             }
 
             @Override
-            public void onItemLongClick(MatiereListAdapter.MatiereWithStats obj) {
+            public void onItemLongClick(MatiereListAdapter.MatiereDTO obj) {
 
             }
         };
@@ -162,16 +162,16 @@ public class UeDetailFragment extends Fragment {
                 var item = mAdapter.getCurrentList().get(position);
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    ueViewModel.deleteMatiereTemporarily(item.matiere().getId());
+                    myAppViewModel.deleteMatiereTemporarily(item.matiere().getId());
                     Snackbar.make(recyclerView, "Matiere supprimée", Snackbar.LENGTH_LONG)
                             .setAction("Annulé", v -> {
-                                ueViewModel.unDeleteMatiere();
+                                myAppViewModel.unDeleteMatiere();
                             }).addCallback(new Snackbar.Callback() {
                                 @Override
                                 public void onDismissed(Snackbar transientBottomBar, int event) {
                                     super.onDismissed(transientBottomBar, event);
                                     if (event != DISMISS_EVENT_ACTION) {
-                                        ueViewModel.deleteMatiere(item.matiere().getId());
+                                        myAppViewModel.deleteMatiere(item.matiere().getId());
                                         Toast.makeText(
                                                 recyclerView.getContext(),
                                                 item.matiere().getNom() + " supprimé avec succès",
@@ -184,7 +184,7 @@ public class UeDetailFragment extends Fragment {
                     mAdapter.notifyItemChanged(position);
                     NavController nav = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                     Bundle args = new Bundle();
-                    args.putInt("selectedUeId", ueWithStats.ue().getId());
+                    args.putInt("selectedUeId", ueDTO.ue().getId());
                     args.putInt("matiereId", item.matiere().getId());
                     args.putBoolean("isEditing", true);
                     nav.navigate(R.id.action_to_ajouterMatiereFragment, args);

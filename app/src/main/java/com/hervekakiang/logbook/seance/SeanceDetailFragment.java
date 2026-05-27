@@ -1,12 +1,10 @@
 package com.hervekakiang.logbook.seance;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,9 +21,7 @@ import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.ue.UEViewModel;
-
-import java.util.Map;
+import com.hervekakiang.logbook.MyAppViewModel;
 
 public class SeanceDetailFragment extends Fragment {
 
@@ -72,10 +68,10 @@ public class SeanceDetailFragment extends Fragment {
         TextView tvDuree = view.findViewById(R.id.textViewDuree);
         TextView tvContenu = view.findViewById(R.id.textViewContenuPedagogique);
 
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.setCurrentSeanceId(seanceId);
+        MyAppViewModel myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        myAppViewModel.setCurrentSeanceId(seanceId);
 
-        ueViewModel.getCurrentSeanceObj().observe(getViewLifecycleOwner(), seanceObj -> {
+        myAppViewModel.getCurrentSeanceDTO().observe(getViewLifecycleOwner(), seanceObj -> {
             Log.d("MYAPP::SEANCEDetailF", "seanceObj=" + seanceObj.get("matiere"));
             tvMatiere.setText(seanceObj.get("matiere"));
             tvEnseignant.setText(seanceObj.get("enseignant"));
@@ -94,7 +90,7 @@ public class SeanceDetailFragment extends Fragment {
 
                     })
                     .setPositiveButton("OUI", (dialog, which) -> {
-                        ueViewModel.deleteSeance(seanceId);
+                        myAppViewModel.deleteSeance(seanceId);
                         requireActivity().runOnUiThread(() -> {
                             Toast.makeText(getContext(),
                                     "Seance supprimée avec succès",

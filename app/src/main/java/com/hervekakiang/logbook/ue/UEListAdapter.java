@@ -16,32 +16,27 @@ import com.hervekakiang.logbook.R;
 
 import java.io.Serializable;
 
-public class UEListAdapter extends ListAdapter<UEListAdapter.UeWithStats, UEListAdapter.ViewHolder> {
+public class UEListAdapter extends ListAdapter<UEListAdapter.UEDTO, UEListAdapter.ViewHolder> {
 
-    private OnItemClickListener<UeWithStats> onItemClickListener;
+    private OnItemClickListener<UEDTO> onItemClickListener;
 
     public UEListAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    public UEListAdapter(OnItemClickListener<UeWithStats> onItemClickListener) {
-        super(DIFF_CALLBACK);
-        this.onItemClickListener = onItemClickListener;
-    }
-
-    public record UeWithStats(
+    public record UEDTO(
             UE ue,
             String volumeHoraireStat,
             int pourcentage) implements Serializable {}
 
-    private static final DiffUtil.ItemCallback<UeWithStats> DIFF_CALLBACK = new DiffUtil.ItemCallback<UeWithStats>() {
+    private static final DiffUtil.ItemCallback<UEDTO> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
-        public boolean areItemsTheSame(@NonNull UeWithStats oldItem, @NonNull UeWithStats newItem) {
-            return oldItem.ue.getId() == newItem.ue.getId() ;
+        public boolean areItemsTheSame(@NonNull UEDTO oldItem, @NonNull UEDTO newItem) {
+            return oldItem.ue.getId() == newItem.ue.getId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull UeWithStats oldItem, @NonNull UeWithStats newItem) {
+        public boolean areContentsTheSame(@NonNull UEDTO oldItem, @NonNull UEDTO newItem) {
             return oldItem.equals(newItem);
         }
     };
@@ -72,33 +67,27 @@ public class UEListAdapter extends ListAdapter<UEListAdapter.UeWithStats, UEList
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UeWithStats ueWithStats = getItem(position);
-        holder.textViewCode.setText(ueWithStats.ue.getCode());
-        holder.textViewNom.setText(ueWithStats.ue.getNom());
-        holder.progressBar.setProgress(ueWithStats.pourcentage());
-        String percent = ueWithStats.pourcentage() + "%";
+        UEDTO ueDTO = getItem(position);
+        holder.textViewCode.setText(ueDTO.ue.getCode());
+        holder.textViewNom.setText(ueDTO.ue.getNom());
+        holder.progressBar.setProgress(ueDTO.pourcentage());
+        String percent = ueDTO.pourcentage() + "%";
         holder.tvChartPercentage.setText(percent);
-        holder.textViewVolumehoraireStat.setText(ueWithStats.volumeHoraireStat());
+        holder.textViewVolumehoraireStat.setText(ueDTO.volumeHoraireStat());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(ueWithStats);
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(ueDTO);
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                onItemClickListener.onItemLongClick(ueWithStats);
-                return false;
-            }
+        holder.itemView.setOnLongClickListener(v -> {
+            onItemClickListener.onItemLongClick(ueDTO);
+            return false;
         });
     }
 
-    public void setOnItemClickListener(OnItemClickListener<UeWithStats> onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener<UEDTO> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 }

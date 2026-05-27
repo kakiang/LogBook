@@ -25,10 +25,10 @@
 
     </fragment>
 
-    <fragment
-        android:id="@+id/matiereListFragment"
-        android:name="com.hervekakiang.logbook.matiere.MatiereListFragment"
-        android:label="Matières" />
+<!--    <fragment-->
+<!--        android:id="@+id/matiereListFragment"-->
+<!--        android:name="com.hervekakiang.logbook.matiere.MatiereListFragment"-->
+<!--        android:label="Matières" />-->
 
     <fragment
         android:id="@+id/seanceListFragment"

@@ -14,4 +14,7 @@
     <string name="ajouter_seance">Ajouter une séance</string>
     <string name="total">Total</string>
     <string name="contenu_pedagogique_sample">Global System for Mobile Communications (GSM) 1 ­Circuit-Switched Data Transmission 2 Classic Circuit Switching 2 Virtual Circuit Switching over IP 3 ­Standards 4 ­Transmission Speeds 5 ­The Signaling System Number 7 6 The Classic SS-7 Protocol Stack 7 SS-7 Protocols for GSM 10 IP-Based SS-7 Protocol Stack 11 ­The GSM Subsystems 12 ­The Network Subsystem 12 The Mobile Switching Center (MSC), Server, and Gateway 13 The Visitor Location Register (VLR)</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="matieres">Matières</string>
+    <string name="seances">Seances</string>
 </resources>

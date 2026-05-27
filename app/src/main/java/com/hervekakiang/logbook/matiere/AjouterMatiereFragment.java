@@ -25,14 +25,14 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ue.UE;
-import com.hervekakiang.logbook.ue.UEViewModel;
+import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AjouterMatiereFragment extends Fragment {
 
-    private UEViewModel ueViewModel;
+    private MyAppViewModel myAppViewModel;
 
     private TextInputLayout textInputLayoutMatiereNom;
     private TextInputLayout textInputLayoutMatiereEnseignant;
@@ -93,7 +93,7 @@ public class AjouterMatiereFragment extends Fragment {
             return false;
         });
 
-        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
 
         if (getArguments() != null) {
             selectedUeId = getArguments().getInt("selectedUeId");
@@ -108,7 +108,7 @@ public class AjouterMatiereFragment extends Fragment {
         if (isEditing && editMatiereId != -1) {
             toolbar.setTitle("Modifier la matière");
 
-            ueViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
+            myAppViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
                 if (matieres == null) return;
                 for (Matiere m : matieres) {
                     if (m.getId() == editMatiereId) {
@@ -127,7 +127,7 @@ public class AjouterMatiereFragment extends Fragment {
             });
         }
 
-        ueViewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
+        myAppViewModel.getListUEs().observe(getViewLifecycleOwner(), ues -> {
             this.ueList = ues;
             List<String> ueNoms = new ArrayList<>();
             for (UE ue : ueList) {
@@ -191,7 +191,7 @@ public class AjouterMatiereFragment extends Fragment {
             matiereToEdit.setNom(nom);
             matiereToEdit.setEnseignant(enseignant);
             matiereToEdit.setVolumeHoraire(Integer.parseInt(volumeHoraire));
-            ueViewModel.updateMatiere(matiereToEdit, () -> {
+            myAppViewModel.updateMatiere(matiereToEdit, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Matière mise à jour", Toast.LENGTH_SHORT).show();
                     navController.navigateUp();
@@ -199,7 +199,7 @@ public class AjouterMatiereFragment extends Fragment {
             });
         } else {
             Matiere newMatiere = new Matiere(selectedUeId, nom, enseignant, Integer.parseInt(volumeHoraire));
-            ueViewModel.addMatiere(newMatiere, selectedUeId, () -> {
+            myAppViewModel.addMatiere(newMatiere, selectedUeId, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
                     navController.popBackStack();

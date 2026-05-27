@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 
@@ -46,9 +47,9 @@ public class UeListFragment extends Fragment {
         FloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
         fab.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.ajouterUeFragment));
 
-        OnItemClickListener<UEListAdapter.UeWithStats> listener = new OnItemClickListener<>() {
+        OnItemClickListener<UEListAdapter.UEDTO> listener = new OnItemClickListener<>() {
             @Override
-            public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {
+            public void onItemClick(UEListAdapter.UEDTO ueWithStats) {
                 UeDetailFragment ueDetailFragment = UeDetailFragment.newInstance(ueWithStats.ue());
                 getChildFragmentManager().beginTransaction()
                         .replace(R.id.navHostFragment, ueDetailFragment)
@@ -57,7 +58,7 @@ public class UeListFragment extends Fragment {
             }
 
             @Override
-            public void onItemLongClick(UEListAdapter.UeWithStats ue) {
+            public void onItemLongClick(UEListAdapter.UEDTO ue) {
 
             }
         };
@@ -65,8 +66,8 @@ public class UeListFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener);
         recyclerView.setAdapter(mAdapter);
 
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.getListUEWithStats().observe(getViewLifecycleOwner(), ueUiModels -> {
+        MyAppViewModel myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        myAppViewModel.getListUEDTO().observe(getViewLifecycleOwner(), ueUiModels -> {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueUiModels, ArrayList::new));
         });
     }

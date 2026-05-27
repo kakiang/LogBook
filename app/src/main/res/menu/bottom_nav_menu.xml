@@ -3,20 +3,15 @@
     <item
         android:id="@+id/dashboardFragment"
         android:icon="@drawable/baseline_dashboard_24"
-        android:title="Dashboard" />
+        android:title="@string/dashboard" />
 
 <!--    <item-->
-<!--        android:id="@+id/ueListFragment"-->
+<!--        android:id="@+id/matiereListFragment"-->
 <!--        android:icon="@drawable/baseline_menu_book_24"-->
-<!--        android:title="UE" />-->
-
-    <item
-        android:id="@+id/matiereListFragment"
-        android:icon="@drawable/baseline_menu_book_24"
-        android:title="Matières" />
+<!--        android:title="@string/matieres" />-->
 
     <item
         android:id="@+id/seanceListFragment"
         android:icon="@drawable/baseline_menu_book_24"
-        android:title="Seances" />
+        android:title="@string/seances" />
 </menu>

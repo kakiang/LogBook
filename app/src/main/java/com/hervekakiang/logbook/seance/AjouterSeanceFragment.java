@@ -23,7 +23,7 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.ue.UEViewModel;
+import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class AjouterSeanceFragment extends Fragment {
-    private UEViewModel ueViewModel;
+    private MyAppViewModel myAppViewModel;
     private NavController navController;
 
     private AutoCompleteTextView autoCompleteMatiere;
@@ -78,11 +78,11 @@ public class AjouterSeanceFragment extends Fragment {
         editDuree = view.findViewById(R.id.editSeanceDuree);
         editContenu = view.findViewById(R.id.editSeanceContenu);
 
-        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
 
         if (isEditing && seanceIdToEdit != -1) {
             toolbar.setTitle("Modifier la seance");
-            ueViewModel.getSeancesForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
+            myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
                 for (Seance s : seances) {
                     if (s.getId() == seanceIdToEdit) {
                         seanceToEdit = s;
@@ -156,13 +156,13 @@ public class AjouterSeanceFragment extends Fragment {
             seanceToEdit.setDuree(Integer.parseInt(duree));
             seanceToEdit.setContenuPedagogique(contenu);
 
-            ueViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
+            myAppViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
                 Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
                 navController.popBackStack();
             }));
         } else {
             Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
-            ueViewModel.addSeance(seance, () -> {
+            myAppViewModel.addSeance(seance, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
                     navController.popBackStack();
@@ -173,7 +173,7 @@ public class AjouterSeanceFragment extends Fragment {
     }
 
     private void loadMatieres() {
-        ueViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
+        myAppViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
             this.matiereList = matieres;
             List<String> matiereNoms = new ArrayList<>();
             for (Matiere matiere : matiereList) {

@@ -17,11 +17,12 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.R;
 
 public class AddUeFragment extends Fragment {
 
-    private UEViewModel viewModel;
+    private MyAppViewModel viewModel;
     private TextInputEditText editTextUeCode;
     private TextInputEditText editTextUeNom;
 
@@ -63,7 +64,7 @@ public class AddUeFragment extends Fragment {
             return false;
         });
 
-        viewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         editTextUeCode = view.findViewById(R.id.editUeCode);
         editTextUeNom = view.findViewById(R.id.editUeNom);
 

@@ -26,8 +26,8 @@ public class MatiereViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Matiere>> listMatieres = new MutableLiveData<>();
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
 
-    private final LiveData<MatiereListAdapter.MatiereWithStats> currentMatiereWithStats;
-    private final MediatorLiveData<List<MatiereListAdapter.MatiereWithStats>> matieresWithStats = new MediatorLiveData<>();
+    private final LiveData<MatiereListAdapter.MatiereDTO> currentMatiereWithStats;
+    private final MediatorLiveData<List<MatiereListAdapter.MatiereDTO>> matieresWithStats = new MediatorLiveData<>();
 
     public MatiereViewModel(Application application) {
         super(application);
@@ -42,7 +42,7 @@ public class MatiereViewModel extends AndroidViewModel {
         matieresWithStats.addSource(listSeances, seances -> calculHoraireEffectueAndPourcentage());
 
         currentMatiereWithStats = Transformations.switchMap(currentMatiereId, matiereId -> {
-            MutableLiveData<MatiereListAdapter.MatiereWithStats> result = new MutableLiveData<>();
+            MutableLiveData<MatiereListAdapter.MatiereDTO> result = new MutableLiveData<>();
             if (matiereId == null || matiereId == 0) {
                 result.setValue(null);
                 return result;
@@ -55,8 +55,8 @@ public class MatiereViewModel extends AndroidViewModel {
                         ? (horaireEffectue * 100) / matiere.getVolumeHoraire() : 0;
                 String volumeHoraireStat = String.format(Locale.getDefault(),
                         "%dH / %dH", horaireEffectue, matiere.getVolumeHoraire());
-                MatiereListAdapter.MatiereWithStats mws =
-                        new MatiereListAdapter.MatiereWithStats(matiere, volumeHoraireStat, percentage);
+                MatiereListAdapter.MatiereDTO mws =
+                        new MatiereListAdapter.MatiereDTO(matiere, volumeHoraireStat, percentage);
                 result.postValue(mws);
             });
             return result;
@@ -76,7 +76,7 @@ public class MatiereViewModel extends AndroidViewModel {
         });
     }
 
-    public LiveData<List<MatiereListAdapter.MatiereWithStats>> getMatieresWithStats() {
+    public LiveData<List<MatiereListAdapter.MatiereDTO>> getMatieresWithStats() {
         return matieresWithStats;
     }
 
@@ -97,7 +97,7 @@ public class MatiereViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<MatiereListAdapter.MatiereWithStats> getCurrentMatiereWithStats() {
+    public LiveData<MatiereListAdapter.MatiereDTO> getCurrentMatiereWithStats() {
         return currentMatiereWithStats;
     }
 
@@ -105,12 +105,12 @@ public class MatiereViewModel extends AndroidViewModel {
         List<Matiere> matieres = listMatieres.getValue();
         if (matieres == null) return;
         matiereDao.getExecutorService().execute(() -> {
-            List<MatiereListAdapter.MatiereWithStats> matieresWithStats = new ArrayList<>();
+            List<MatiereListAdapter.MatiereDTO> matieresWithStats = new ArrayList<>();
             for (Matiere matiere : matieres) {
                 int horaireEffectue = seanceDao.getTotalVolumeHoraireEffectueByMatiereId(matiere.getId());
                 int percentage = (matiere.getVolumeHoraire() > 0) ? (horaireEffectue * 100) / matiere.getVolumeHoraire() : 0;
                 String volumeHoraireStat = String.format(Locale.getDefault(), "%dH / %dH", horaireEffectue, matiere.getVolumeHoraire());
-                matieresWithStats.add(new MatiereListAdapter.MatiereWithStats(matiere, volumeHoraireStat, percentage));
+                matieresWithStats.add(new MatiereListAdapter.MatiereDTO(matiere, volumeHoraireStat, percentage));
             }
             this.matieresWithStats.postValue(matieresWithStats);
         });

@@ -51,9 +51,9 @@ public class MatiereListFragment extends Fragment {
         mAdapter = new MatiereListAdapter();
         recyclerView.setAdapter(mAdapter);
 
-        OnItemClickListener<MatiereListAdapter.MatiereWithStats> listener = new OnItemClickListener<>() {
+        OnItemClickListener<MatiereListAdapter.MatiereDTO> listener = new OnItemClickListener<>() {
             @Override
-            public void onItemClick(MatiereListAdapter.MatiereWithStats matiereWithStats) {
+            public void onItemClick(MatiereListAdapter.MatiereDTO matiereWithStats) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
                 args.putInt("matiereId", matiereWithStats.matiere().getId());
@@ -62,7 +62,7 @@ public class MatiereListFragment extends Fragment {
             }
 
             @Override
-            public void onItemLongClick(MatiereListAdapter.MatiereWithStats obj) {
+            public void onItemLongClick(MatiereListAdapter.MatiereDTO obj) {
 
             }
         };

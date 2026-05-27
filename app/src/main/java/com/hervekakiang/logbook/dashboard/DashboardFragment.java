@@ -31,8 +31,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hervekakiang.logbook.BasicSwipeCallback;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.ue.UEListAdapter;
-import com.hervekakiang.logbook.ue.UEViewModel;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -40,7 +40,7 @@ import java.util.Objects;
 
 public class DashboardFragment extends Fragment {
 
-    private UEViewModel ueViewModel;
+    private MyAppViewModel myAppViewModel;
     private UEListAdapter mAdapter;
     private RecyclerView recyclerView;
 
@@ -85,8 +85,8 @@ public class DashboardFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
 
-        ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
+        myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        myAppViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
             Log.d("MYAPP:====stats=====", stats.toString());
             tvVhEffectue.setText(String.format(Locale.getDefault(), "%d", stats.effectue()));
@@ -105,16 +105,13 @@ public class DashboardFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
-        ueViewModel.getListUEWithStats().observe(getViewLifecycleOwner(), ueWithStatsList -> {
+        myAppViewModel.getListUEDTO().observe(getViewLifecycleOwner(), ueWithStatsList -> {
             String uet = "Unités d'enseignement (" + ueWithStatsList.size() + ")";
             textViewUeListTitle.setText(uet);
             mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));
         });
 
-        fab.setOnClickListener(v -> {
-            navController.navigate(R.id.ajouterUeFragment);
-        });
-
+        fab.setOnClickListener(v -> navController.navigate(R.id.ajouterUeFragment));
 
         BasicSwipeCallback swipeCallback = getBasicSwipeCallback();
         new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);
@@ -127,16 +124,16 @@ public class DashboardFragment extends Fragment {
             public void onSwipeLeft(RecyclerView.ViewHolder viewHolder, int position) {
                 var item = mAdapter.getCurrentList().get(position);
 
-                ueViewModel.deleteUeTemporarily(item.ue().getId());
+                myAppViewModel.deleteUeTemporarily(item.ue().getId());
 
                 Snackbar.make(recyclerView, item.ue().getNom() + " supprimé", Snackbar.LENGTH_LONG)
-                        .setAction("Annulé", v -> ueViewModel.unDeleteUe())
+                        .setAction("Annulé", v -> myAppViewModel.unDeleteUe())
                         .addCallback(new Snackbar.Callback() {
                             @Override
                             public void onDismissed(Snackbar transientBottomBar, int event) {
                                 super.onDismissed(transientBottomBar, event);
                                 if (event != DISMISS_EVENT_ACTION) {
-                                    ueViewModel.deleteUe(item.ue().getId());
+                                    myAppViewModel.deleteUe(item.ue().getId());
                                     Toast.makeText(
                                             recyclerView.getContext(),
                                             item.ue().getNom() + " supprimé avec succès",
@@ -163,20 +160,20 @@ public class DashboardFragment extends Fragment {
     }
 
     @NonNull
-    private OnItemClickListener<UEListAdapter.UeWithStats> listener() {
+    private OnItemClickListener<UEListAdapter.UEDTO> listener() {
         return new OnItemClickListener<>() {
             @Override
-            public void onItemClick(UEListAdapter.UeWithStats ueWithStats) {
+            public void onItemClick(UEListAdapter.UEDTO ueDTO) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("ueWithStats", ueWithStats);
-                String fragmentTitle = ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom();
+                args.putSerializable("ueWithStats", ueDTO);
+                String fragmentTitle = ueDTO.ue().getCode() + " " + ueDTO.ue().getNom();
                 args.putString("fragmentTitle", fragmentTitle);
                 navController.navigate(R.id.ueDetailFragment, args);
             }
 
             @Override
-            public void onItemLongClick(UEListAdapter.UeWithStats uiModel) {
+            public void onItemLongClick(UEListAdapter.UEDTO uiModel) {
 
             }
         };

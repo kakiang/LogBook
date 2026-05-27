@@ -24,14 +24,11 @@ import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.seance.AjouterSeanceFragment;
 import com.hervekakiang.logbook.seance.Seance;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
-import com.hervekakiang.logbook.seance.SeanceViewModel;
-import com.hervekakiang.logbook.ue.UEViewModel;
+import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.util.Locale;
 
@@ -81,9 +78,9 @@ public class MatiereDetailFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener(navController));
         recyclerView.setAdapter(mAdapter);
 
-        UEViewModel ueViewModel = new ViewModelProvider(requireActivity()).get(UEViewModel.class);
-        ueViewModel.setCurrentMatiereId(matiereId);
-        ueViewModel.getCurrentMatiereWithStats().observe(getViewLifecycleOwner(), matiereWithStats -> {
+        MyAppViewModel myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        myAppViewModel.setCurrentMatiereId(matiereId);
+        myAppViewModel.getCurrentMatiereDTO().observe(getViewLifecycleOwner(), matiereWithStats -> {
             Log.d("MYAPP::MatDetailF", "matiereWithStats=" + matiereWithStats);
             if (matiereWithStats == null) return;
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, matiereWithStats.pourcentage());
@@ -106,7 +103,7 @@ public class MatiereDetailFragment extends Fragment {
             navController.navigate(R.id.ajouterSeanceFragment, args);
         });
 
-        ueViewModel.getSeancesForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
+        myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
             mAdapter.submitList(seances);
             String seanceListTitle = "Seances de cours (" + seances.size() + ")";
             tvSeanceListTitle.setText(seanceListTitle);
