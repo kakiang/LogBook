@@ -105,7 +105,7 @@ public class DashboardFragment extends Fragment {
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
-        ueViewModel.getUeListWithStats().observe(getViewLifecycleOwner(), ueWithStatsList -> {
+        ueViewModel.getListUEWithStats().observe(getViewLifecycleOwner(), ueWithStatsList -> {
             String uet = "Unités d'enseignement (" + ueWithStatsList.size() + ")";
             textViewUeListTitle.setText(uet);
             mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));

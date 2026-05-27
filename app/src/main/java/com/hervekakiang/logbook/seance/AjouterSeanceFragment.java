@@ -1,6 +1,5 @@
 package com.hervekakiang.logbook.seance;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -8,13 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -67,9 +64,7 @@ public class AjouterSeanceFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
         MaterialToolbar toolbar = view.findViewById(R.id.seanceToolbar);
-        toolbar.setNavigationOnClickListener(v -> {
-            navController.popBackStack();
-        });
+        toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
 
         if (getArguments() != null) {
             selectedMatiereId = getArguments().getInt("selectedMatiereId");
@@ -161,12 +156,10 @@ public class AjouterSeanceFragment extends Fragment {
             seanceToEdit.setDuree(Integer.parseInt(duree));
             seanceToEdit.setContenuPedagogique(contenu);
 
-            ueViewModel.updateSeance(seanceToEdit, () -> {
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
-                    navController.popBackStack();
-                });
-            });
+            ueViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
+                navController.popBackStack();
+            }));
         } else {
             Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
             ueViewModel.addSeance(seance, () -> {
