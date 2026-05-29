@@ -59,14 +59,14 @@ public class DashboardFragment extends BaseFragment {
         TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
         recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_ue);
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_seance);
 
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         myAppViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
             Log.d("MYAPP:====stats=====", stats.toString());
             tvVhEffectue.setText(String.format(Locale.getDefault(), "%d", stats.effectue()));
-            tvVhRestant.setText(String.format(Locale.getDefault(), "%d", stats.total() - stats.effectue()));
+            tvVhRestant.setText(String.format(Locale.getDefault(), "%d", Math.max(stats.total() - stats.effectue(), 0)));
             tvVhTotal.setText(String.format(Locale.getDefault(), "%d", stats.total()));
             int percentage = (stats.total() > 0) ? (stats.effectue() * 100) / stats.total() : 0;
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, percentage);
@@ -87,7 +87,8 @@ public class DashboardFragment extends BaseFragment {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));
         });
 
-        fab.setOnClickListener(v -> getNavController().navigate(R.id.ajouterUeFragment));
+        fab.setOnClickListener(v -> getNavController().navigate(R.id.ajouterSeanceFragment));
+        view.findViewById(R.id.btnAjouterUe).setOnClickListener(v -> getNavController().navigate(R.id.ajouterUeFragment));
 
         BasicSwipeCallback swipeCallback = getBasicSwipeCallback();
         new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);
@@ -142,7 +143,7 @@ public class DashboardFragment extends BaseFragment {
             public void onItemClick(UEListAdapter.UEDTO ueDTO) {
                 NavController navController = Navigation.findNavController(requireActivity(), R.id.navHostFragment);
                 Bundle args = new Bundle();
-                args.putSerializable("ueWithStats", ueDTO);
+                args.putSerializable("ueDTO", ueDTO);
                 String fragmentTitle = ueDTO.ue().getCode() + " " + ueDTO.ue().getNom();
                 args.putString("fragmentTitle", fragmentTitle);
                 navController.navigate(R.id.ueDetailFragment, args);

@@ -13,9 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="4dp"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="16dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,10 +33,11 @@
                 android:id="@+id/tvSeanceDuree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium.Emphasized"
                 android:textColor="?attr/colorPrimary"
-                android:background="@drawable/bg_chip_light"
+                app:drawableStartCompat="@drawable/ic_time"
+                app:drawableTint="?attr/colorSecondary"
+                android:drawablePadding="4dp"
                 tools:text="30h" />
         </LinearLayout>
 
@@ -58,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
                 android:maxLines="3"
                 android:lineSpacingMultiplier="2"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"

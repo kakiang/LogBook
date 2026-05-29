@@ -7,47 +7,41 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.hervekakiang.logbook.BaseFragment;
 import com.hervekakiang.logbook.MyAppViewModel;
-import com.hervekakiang.logbook.NavigationConfig;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
 
 import java.util.Locale;
 
-public class UeDetailFragment extends Fragment {
+public class UeDetailFragment extends BaseFragment {
     private UEListAdapter.UEDTO ueDTO;
     private MatiereListAdapter mAdapter;
     private MyAppViewModel myAppViewModel;
     private RecyclerView recyclerView;
 
     public UeDetailFragment() {
+        super(R.layout.fragment_ue_detail);
     }
 
     public static UeDetailFragment newInstance(UE ue) {
@@ -59,37 +53,20 @@ public class UeDetailFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_ue_detail, container, false);
-
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NavController navController = Navigation.findNavController(view);
 
         if (getArguments() != null) {
-            ueDTO = (UEListAdapter.UEDTO) getArguments().getSerializable("ueWithStats");
+            ueDTO = (UEListAdapter.UEDTO) getArguments().getSerializable("ueDTO");
         } else {
-            navController.navigateUp();
+            getNavController().navigateUp();
         }
-
-        AppBarConfiguration appBarConfiguration = NavigationConfig.getAppBarConfiguration();
-        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
-        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
 
         ProgressBar progressBar = view.findViewById(R.id.chartProgress);
         TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
         TextView textViewVhStat = view.findViewById(R.id.textViewVhStat);
         TextView tvMatiereListTitle = view.findViewById(R.id.tvMatiereListTitle);
-        fragmentToolbar.setTitle(ueDTO.ue().getCode() + " " + ueDTO.ue().getNom());
+        getToolbar().setTitle(ueDTO.ue().getCode() + " " + ueDTO.ue().getNom());
 
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         myAppViewModel.setCurrentUeId(ueDTO.ue().getId());
@@ -102,7 +79,7 @@ public class UeDetailFragment extends Fragment {
 
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", ueWithStats.pourcentage()));
             textViewVhStat.setText(ueWithStats.volumeHoraireStat());
-            fragmentToolbar.setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
+            getToolbar().setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
         });
 
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddMatiere);

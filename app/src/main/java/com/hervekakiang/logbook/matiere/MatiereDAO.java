@@ -90,7 +90,21 @@ public class MatiereDAO extends DAOBase<Matiere> {
 
     }
 
-    public Matiere getMatiereById(int matiereId) {
+    public void getAll(MatiereDAO.Callback<List<Matiere>> callback) {
+        executorService.execute(() -> {
+            List<Matiere> m = fetchAll();
+            callback.onResult(m);
+        });
+    }
+
+    public LiveData<List<Matiere>> getAll() {
+        executorService.execute(() -> {
+            List<Matiere> matieres = fetchAll();
+            listMatieres.postValue(matieres);
+        });
+        return listMatieres;
+    }
+    private Matiere fetchById(int matiereId) {
         try (Cursor cursor = myDb.query(MyDatabaseHelper.TABLE_MATIERE, null, MyDatabaseHelper.MATIERE_ID + " = ?", new String[]{String.valueOf(matiereId)}, null, null, null)) {
             if (cursor.moveToFirst()) {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.MATIERE_ID));
@@ -106,19 +120,13 @@ public class MatiereDAO extends DAOBase<Matiere> {
         return null;
     }
 
-    public void getAll(MatiereDAO.Callback<List<Matiere>> callback) {
+    public LiveData<Matiere> getMatiereById(int matiereId) {
+        MutableLiveData<Matiere> matiere = new MutableLiveData<>();
         executorService.execute(() -> {
-            List<Matiere> m = fetchAll();
-            callback.onResult(m);
+            Matiere m = fetchById(matiereId);
+            matiere.postValue(m);
         });
-    }
-
-    public LiveData<List<Matiere>> getAll() {
-        executorService.execute(() -> {
-            List<Matiere> matieres = fetchAll();
-            listMatieres.postValue(matieres);
-        });
-        return listMatieres;
+        return matiere;
     }
 
     public void getMatieresByUeId(int ueId, MatiereDAO.Callback<List<Matiere>> callback) {

@@ -56,7 +56,9 @@ public class SeanceListFragment extends Fragment {
         recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
-        fab.setOnClickListener(v -> navController.navigate(R.id.ajouterSeanceFragment));
+        fab.setOnClickListener(v -> {
+            navController.navigate(R.id.ajouterSeanceFragment);
+        });
 
         seanceListAdaper = new SeanceListAdaper();
         seanceListAdaper.setOnItemClickListener(listener(navController));

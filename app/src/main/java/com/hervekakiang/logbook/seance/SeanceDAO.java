@@ -132,7 +132,7 @@ public class SeanceDAO extends DAOBase<Seance> {
         return listSeances;
     }
 
-    public int getTotalVolumeHoraireEffectueByMatiereId(int matiereId) {
+    public int getTotalVhDispenseByMatiere(int matiereId) {
         String query = "SELECT SUM(s.duree) FROM seances s WHERE s.matiere_id = ?";
         try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(matiereId)})) {
             int totalVolumeHoraireEffectue = 0;

@@ -28,12 +28,6 @@ public class SeanceDetailFragment extends BaseFragment {
         super(R.layout.fragment_seance_detail);
     }
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_seance_detail, container, false);
-//    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -54,19 +48,23 @@ public class SeanceDetailFragment extends BaseFragment {
 
         MyAppViewModel myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         myAppViewModel.setCurrentSeanceId(seanceId);
+        Log.d("MYAPP:ARG:SEANCEF", "seanceId=" + seanceId);
+        Log.d("MYAPP:ARG:SEANCEF", "seance=" + seance);
 
         myAppViewModel.getCurrentSeanceDTO().observe(getViewLifecycleOwner(), seanceObj -> {
-            Log.d("MYAPP::SEANCEDetailF", "seanceObj=" + seanceObj.get("matiere"));
+            Log.d("MYAPP::SEANCEF", "myAppViewModel.getCurrentSeanceDTO()");
+            Log.d("MYAPP::SEANCEF", "seanceObj=" + seanceObj);
+            if (seanceObj.isEmpty()) return;
             tvMatiere.setText(seanceObj.get("matiere"));
             tvEnseignant.setText(seanceObj.get("enseignant"));
-            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy", Locale.getDefault());
-            LocalDate date = LocalDate.parse(seanceObj.get("date"), inputFormatter);
-            tvDate.setText(date.format(outputFormatter));
+            Log.d("MYAPP::SEANCEF", "date=" + seanceObj.get("date"));
+            LocalDate date = LocalDate.parse(seanceObj.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            tvDate.setText(date.format(DateTimeFormatter.ofPattern("EEEE dd MMM yyyy", Locale.getDefault())));
             tvHeure.setText(seanceObj.get("heure_debut"));
-            String duree = seanceObj.get("duree") + "h";
+            String duree = seanceObj.get("duree") + " heures";
             tvDuree.setText(duree);
             tvContenu.setText(seanceObj.get("contenu_pedagogique"));
+            Log.d("MYAPP::SEANCEF", "END myAppViewModel.getCurrentSeanceDTO()");
         });
 
         view.findViewById(R.id.btnSeanceDelete).setOnClickListener(v -> {

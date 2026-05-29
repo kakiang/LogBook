@@ -5,16 +5,12 @@ import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hervekakiang.logbook.databinding.ActivityMainBinding;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupNavigation() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.navHostFragment);
-        FragmentContainerView fragmentContainerView = findViewById(R.id.navHostFragment);
+//        FragmentContainerView fragmentContainerView = findViewById(R.id.navHostFragment);
         if (navHostFragment == null) {
             throw new IllegalStateException("NavHostFragment R.id.navHostFragment not found");
         }

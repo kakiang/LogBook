@@ -13,12 +13,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.hervekakiang.logbook.BaseFragment;
 import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
+import com.hervekakiang.logbook.matiere.MatiereViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class AjouterSeanceFragment extends BaseFragment {
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
+    private TextInputLayout editDateLayout, editHeureLayout, editDureeLayout, editContenuLayout;
     private int selectedMatiereId = -1;
     private boolean isEditing = false;
     private int seanceIdToEdit = -1;
@@ -58,6 +61,8 @@ public class AjouterSeanceFragment extends BaseFragment {
         editHeure = view.findViewById(R.id.editSeanceHeure);
         editDuree = view.findViewById(R.id.editSeanceDuree);
         editContenu = view.findViewById(R.id.editSeanceContenu);
+        editDureeLayout = view.findViewById(R.id.layoutSeanceDuree);
+        editDureeLayout.setErrorEnabled(true);
 
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
 
@@ -69,7 +74,7 @@ public class AjouterSeanceFragment extends BaseFragment {
                         seanceToEdit = s;
                         editDate.setText(s.getDate());
                         editHeure.setText(s.getHeureDebut());
-                        editDuree.setText(String.valueOf(s.getMatiereId()));
+                        editDuree.setText(String.valueOf(s.getDuree()));
                         editContenu.setText(s.getContenuPedagogique());
                         break;
                     }
@@ -130,26 +135,41 @@ public class AjouterSeanceFragment extends BaseFragment {
         }
         if (hasError) return;
 
+        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
+        matiereViewModel.getMatiereById(selectedMatiereId).observe(getViewLifecycleOwner(), matiere -> {
+            if (matiere == null) return;
+            int vhDispense = matiereViewModel.getTotalVhDispenseByMatiere(selectedMatiereId);
+            if (vhDispense + Integer.parseInt(duree) > matiere.getVolumeHoraire()) {
+                Toast.makeText(getActivity(),
+                        "La durée de la séance dépasse le volume horaire de la matière",
+                        Toast.LENGTH_SHORT).show();
+                int maxDuree = matiere.getVolumeHoraire() - vhDispense;
+                editDuree.setError("Durée maximale " + maxDuree + " heures");
+                editDureeLayout.setError("Durée maximale " + maxDuree + " heures");
+                return;
+            }
 
-        if (isEditing && seanceToEdit != null) {
-            seanceToEdit.setDate(date);
-            seanceToEdit.setHeureDebut(heure);
-            seanceToEdit.setDuree(Integer.parseInt(duree));
-            seanceToEdit.setContenuPedagogique(contenu);
+            if (isEditing && seanceToEdit != null) {
+                seanceToEdit.setDate(date);
+                seanceToEdit.setHeureDebut(heure);
+                seanceToEdit.setDuree(Integer.parseInt(duree));
+                seanceToEdit.setContenuPedagogique(contenu);
 
-            myAppViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
-                getNavController().popBackStack();
-            }));
-        } else {
-            Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
-            myAppViewModel.addSeance(seance, () -> {
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
-                    getNavController().popBackStack();
+                myAppViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
+                    getNavController().navigate(R.id.seanceListFragment);
+                }));
+            } else {
+                Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
+                myAppViewModel.addSeance(seance, () -> {
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
+                        getNavController().navigate(R.id.seanceListFragment);
+                    });
                 });
-            });
-        }
+            }
+        });
+
 
     }
 
