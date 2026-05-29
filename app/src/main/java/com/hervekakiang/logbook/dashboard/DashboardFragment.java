@@ -1,44 +1,37 @@
 package com.hervekakiang.logbook.dashboard;
 
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.hervekakiang.logbook.BaseFragment;
 import com.hervekakiang.logbook.BasicSwipeCallback;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.ue.UEListAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends BaseFragment {
 
     private MyAppViewModel myAppViewModel;
     private UEListAdapter mAdapter;
@@ -50,30 +43,13 @@ public class DashboardFragment extends Fragment {
     private TextView tvVhRestant;
     private TextView tvVhTotal;
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dashboard, container, false);
+    public DashboardFragment() {
+        super(R.layout.fragment_dashboard);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
-        NavController navController = Navigation.findNavController(view);
-
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
-
-        fragmentToolbar.inflateMenu(R.menu.top_app_bar_menu);
-        fragmentToolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_search) {
-                Toast.makeText(getContext(), "Search this UE", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
 
         progressBar = view.findViewById(R.id.chartProgress);
         tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
@@ -111,7 +87,7 @@ public class DashboardFragment extends Fragment {
             mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));
         });
 
-        fab.setOnClickListener(v -> navController.navigate(R.id.ajouterUeFragment));
+        fab.setOnClickListener(v -> getNavController().navigate(R.id.ajouterUeFragment));
 
         BasicSwipeCallback swipeCallback = getBasicSwipeCallback();
         new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);

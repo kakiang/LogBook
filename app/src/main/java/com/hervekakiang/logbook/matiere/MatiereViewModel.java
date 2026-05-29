@@ -27,7 +27,7 @@ public class MatiereViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
 
     private final LiveData<MatiereListAdapter.MatiereDTO> currentMatiereWithStats;
-    private final MediatorLiveData<List<MatiereListAdapter.MatiereDTO>> matieresWithStats = new MediatorLiveData<>();
+    private final MediatorLiveData<List<MatiereListAdapter.MatiereDTO>> listMatiereDTO = new MediatorLiveData<>();
 
     public MatiereViewModel(Application application) {
         super(application);
@@ -38,8 +38,8 @@ public class MatiereViewModel extends AndroidViewModel {
         currentUeId.observeForever(this::loadMatieres);
         setCurrentUeId(0);
 
-        matieresWithStats.addSource(listMatieres, matieres -> calculHoraireEffectueAndPourcentage());
-        matieresWithStats.addSource(listSeances, seances -> calculHoraireEffectueAndPourcentage());
+        listMatiereDTO.addSource(listMatieres, matieres -> calculHoraireEffectueAndPourcentage());
+        listMatiereDTO.addSource(listSeances, seances -> calculHoraireEffectueAndPourcentage());
 
         currentMatiereWithStats = Transformations.switchMap(currentMatiereId, matiereId -> {
             MutableLiveData<MatiereListAdapter.MatiereDTO> result = new MutableLiveData<>();
@@ -76,8 +76,8 @@ public class MatiereViewModel extends AndroidViewModel {
         });
     }
 
-    public LiveData<List<MatiereListAdapter.MatiereDTO>> getMatieresWithStats() {
-        return matieresWithStats;
+    public LiveData<List<MatiereListAdapter.MatiereDTO>> getListMatiereDTO() {
+        return listMatiereDTO;
     }
 
     private void loadSeances() {
@@ -112,7 +112,7 @@ public class MatiereViewModel extends AndroidViewModel {
                 String volumeHoraireStat = String.format(Locale.getDefault(), "%dH / %dH", horaireEffectue, matiere.getVolumeHoraire());
                 matieresWithStats.add(new MatiereListAdapter.MatiereDTO(matiere, volumeHoraireStat, percentage));
             }
-            this.matieresWithStats.postValue(matieresWithStats);
+            this.listMatiereDTO.postValue(matieresWithStats);
         });
 
     }

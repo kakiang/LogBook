@@ -1,11 +1,8 @@
 package com.hervekakiang.logbook.seance;
 
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,13 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.Matiere;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Map;
 
 public class SeanceListAdaper extends ListAdapter<Seance, SeanceListAdaper.SeanceViewHolder> {
     private OnItemClickListener<Seance> onItemClickListener;
@@ -38,6 +33,8 @@ public class SeanceListAdaper extends ListAdapter<Seance, SeanceListAdaper.Seanc
             textViewSeanceContenu = itemView.findViewById(R.id.tvSeanceContenu);
         }
     }
+
+    public record SeanceDTO(Seance seance, String matiereNom) implements Serializable {}
 
 
     public SeanceListAdaper() {
@@ -70,7 +67,9 @@ public class SeanceListAdaper extends ListAdapter<Seance, SeanceListAdaper.Seanc
     @Override
     public void onBindViewHolder(@NonNull SeanceViewHolder holder, int position) {
         Seance seance = getItem(position);
-        holder.textViewSeanceDate.setText(seance.getDate());
+        LocalDate date = LocalDate.parse(seance.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String periode = date.format(DateTimeFormatter.ofPattern("E dd MMM", Locale.getDefault()))+ " " + seance.getHeureDebut();
+        holder.textViewSeanceDate.setText(periode);
         holder.textViewSeanceDuree.setText(String.format(Locale.getDefault(), "%dh", seance.getDuree()));
         holder.textViewSeanceContenu.setText(seance.getContenuPedagogique());
 

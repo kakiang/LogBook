@@ -8,7 +8,7 @@
     android:id="@+id/layoutAddSeance">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/seanceToolbar"
+        android:id="@+id/fragmentToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
@@ -35,11 +35,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Sélectionner la matière">
+                android:hint="@string/choose_matiere">
                 <AutoCompleteTextView
                     android:id="@+id/autoCompleteMatiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:labelFor="@id/autoCompleteMatiere"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Date"
+                android:hint="@string/date"
                 app:startIconDrawable="@drawable/ic_calendar_month">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editSeanceDate"
@@ -74,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
-                    android:hint="Heure de début"
+                    android:hint="@string/heure_de_debut"
                     app:startIconDrawable="@drawable/ic_access_time">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editSeanceHeure"
@@ -92,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    android:hint="Durée"
+                    android:hint="@string/duree"
                     app:suffixText="Heures">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -110,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:hint="Contenu pédagogique">
+                android:hint="@string/contenu_pedagogique">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editSeanceContenu"

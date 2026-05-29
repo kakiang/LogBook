@@ -95,8 +95,14 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         try {
             db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE1', 'Administration Système')");
             db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE2', 'Communication')");
-            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE4', 'Propagation')");
-            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE5', 'Electronique')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE3', 'Propagation')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE4', 'Electronique')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE5', 'Cellular Networks')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE6', 'Mobile Communication')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE7', 'Internet des objets')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE8', 'Réseaux Mobile')");
+            db.execSQL("INSERT INTO " + TABLE_UE + " (" + UE_CODE + ", " + UE_NOM + ") VALUES ('UE9', 'Réseaux Informatiques')");
+
 
             db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (1, 'Administration Réseaux Sous Linux', 'Dr. Drame', 40)");
             db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (1, 'Administration Linux', 'Dr. Gaye Lamine', 30)");
@@ -105,16 +111,23 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (3, 'Antennes et signal', 'Dr. Ibra Dioum', 30)");
             db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (3, 'Antenna & Microwave', 'Dr. Ibra Dioum', 35)");
             db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (4, 'Système embarqué', 'Dr. Ouya Samuel', 40)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (5, 'From GSM to UMTS', 'Rr. Martin Sauter', 40)");
+            db.execSQL("INSERT INTO " + TABLE_MATIERE + " (" + MATIERE_UE_ID + ", " + MATIERE_NOM + ", " + MATIERE_ENSEIGNANT + ", " + MATIERE_VOLUME_HORAIRE + ") VALUES (5, 'GSM to UMTS', 'Rr. Martin Sauter', 40)");
 
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '14 Mai 2026', '16h:00', 2, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '07 Mai 2026', '12h:30', 1, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '14 Mai 2026', '16h:00', 3, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '05 Mai 2026', '12h:30', 2, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '14 Mai 2026', '16h:00', 2, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '15 Mai 2026', '14h:30', 3, 'Configuration des protocoles de routage BGP et tests de connectivité sur simulateur GNS3.')");
-            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '10 Avril 2026', '12h:30', 3, 'Configuration Parefeu et tests de connectivité sur simulateur GNS3')");
+
+
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (1, '14/05/2026', '16h:00', 2, 'Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (8, '15/03/2026', '14h:30', 3, 'Circuit-Switched Data Transmission.')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (8, '07/05/2026', '12h:30', 1, 'Classic Circuit Switching')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '14/02/2026', '15h:00', 3, 'The Mobile Switching Center (MSC), Server, and Gateway')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (2, '14/02/2026', '16h:00', 3, 'The Mobile Switching Center (MSC), Server, and Gateway')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (4, '15/05/2026', '14h:30', 3, 'Le role de la langue Anglaise dans la communication')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (4, '15/05/2026', '13h:30', 2, 'Le wolof et la langue Anglaise')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (8, '05/02/2026', '12h:30', 2, 'GPRS Mobility Management and Session Management (GMM/SM)')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '14/01/2026', '16h:00', 2, 'Universal Mobile Telecommunications System (UMTS) and High-Speed Packet Access (HSPA)')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (3, '15/05/2026', '14h:30', 3, 'Adaptive Multirate (AMR) NB and WB Codecs for Voice Calls')");
+            db.execSQL("INSERT INTO " + TABLE_SEANCE + " (" + SEANCE_MATIERE_ID + ", " + SEANCE_DATE + ", " + SEANCE_HEURE_DEBUT + ", " + SEANCE_DUREE + ", " + SEANCE_CONTENU_PEDAGOGIQUE + ") VALUES (8, '10/04/2026', '12h:30', 3, 'Adaptive Modulation and Coding, Transmission Rates, and Multicarrier Operation')");
+
 
             db.setTransactionSuccessful();
         } finally {

@@ -2,28 +2,23 @@ package com.hervekakiang.logbook.seance;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.hervekakiang.logbook.BaseFragment;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,9 +27,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class AjouterSeanceFragment extends Fragment {
+public class AjouterSeanceFragment extends BaseFragment {
     private MyAppViewModel myAppViewModel;
-    private NavController navController;
 
     private AutoCompleteTextView autoCompleteMatiere;
     private TextInputEditText editDate, editHeure, editDuree, editContenu;
@@ -46,25 +40,12 @@ public class AjouterSeanceFragment extends Fragment {
 
 
     public AjouterSeanceFragment() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_ajouter_seance, container, false);
+        super(R.layout.fragment_ajouter_seance);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
-        MaterialToolbar toolbar = view.findViewById(R.id.seanceToolbar);
-        toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
 
         if (getArguments() != null) {
             selectedMatiereId = getArguments().getInt("selectedMatiereId");
@@ -81,7 +62,7 @@ public class AjouterSeanceFragment extends Fragment {
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
 
         if (isEditing && seanceIdToEdit != -1) {
-            toolbar.setTitle("Modifier la seance");
+            getToolbar().setTitle("Modifier la seance");
             myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
                 for (Seance s : seances) {
                     if (s.getId() == seanceIdToEdit) {
@@ -96,7 +77,7 @@ public class AjouterSeanceFragment extends Fragment {
             });
         }
 
-        toolbar.setOnMenuItemClickListener(item -> {
+        getToolbar().setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveSeance();
                 return true;
@@ -158,14 +139,14 @@ public class AjouterSeanceFragment extends Fragment {
 
             myAppViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
                 Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
-                navController.popBackStack();
+                getNavController().popBackStack();
             }));
         } else {
             Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
             myAppViewModel.addSeance(seance, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
-                    navController.popBackStack();
+                    getNavController().popBackStack();
                 });
             });
         }

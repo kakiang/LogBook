@@ -34,6 +34,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.hervekakiang.logbook.MyAppViewModel;
+import com.hervekakiang.logbook.NavigationConfig;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.matiere.MatiereListAdapter;
@@ -80,7 +81,7 @@ public class UeDetailFragment extends Fragment {
             navController.navigateUp();
         }
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        AppBarConfiguration appBarConfiguration = NavigationConfig.getAppBarConfiguration();
         MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
         NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
 

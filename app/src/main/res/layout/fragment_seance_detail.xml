@@ -28,12 +28,11 @@
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="12dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardInfos"
@@ -47,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="12dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -58,9 +57,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:paddingBottom="4dp"
-                            android:text="Matière" />
+                            android:text="@string/matiere"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/textViewMatiere"
@@ -77,7 +76,6 @@
                         android:layout_height="1dp"
                         android:background="?attr/colorOutlineVariant" />
 
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -87,9 +85,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:paddingBottom="4dp"
-                            android:text="Enseignant" />
+                            android:text="@string/enseignant"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/textViewEnseignant"
@@ -107,11 +105,40 @@
                         android:background="?attr/colorOutlineVariant" />
 
                     <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="4dp"
+                            android:text="@string/date"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/textViewDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="26/05/2026" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:baselineAligned="false"
-                        android:paddingVertical="12dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp">
+
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -122,32 +149,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:paddingBottom="4dp"
-                                android:text="Date" />
-
-                            <TextView
-                                android:id="@+id/textViewDate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
-                                android:textColor="?attr/colorOnSurface"
-                                tools:text="26/05/2026" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:paddingBottom="4dp"
-                                android:text="Heure Debut" />
+                                android:text="@string/heure_de_debut"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
 
                             <TextView
                                 android:id="@+id/textViewHeure"
@@ -159,7 +163,6 @@
 
                         </LinearLayout>
 
-
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -169,9 +172,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:paddingBottom="4dp"
-                                android:text="Durée" />
+                                android:text="@string/duree"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
 
                             <TextView
                                 android:id="@+id/textViewDuree"
@@ -206,8 +209,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:text="CONTENU PEDAGOGIQUE" />
+                        android:text="@string/contenu_pedagogique"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
                     <TextView
                         android:id="@+id/textViewContenuPedagogique"
@@ -234,17 +238,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
+                    android:text="@string/supprimer"
                     android:textColor="?attr/colorOnErrorContainer"
                     app:backgroundTint="?attr/colorErrorContainer"
-                    app:iconTint="?attr/colorOnErrorContainer"
-                    android:text="Supprimer" />
+                    app:iconTint="?attr/colorOnErrorContainer" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSeanceEdit"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Modifier" />
+                    android:text="@string/modifier" />
 
             </LinearLayout>
 

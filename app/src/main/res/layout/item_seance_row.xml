@@ -13,7 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:paddingTop="4dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,23 +29,22 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="?attr/colorOnSurface"
                 tools:text="14/06/2026" />
 
             <TextView
                 android:id="@+id/tvSeanceDuree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:padding="8dp"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium.Emphasized"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
+                android:background="@drawable/bg_chip_light"
                 tools:text="30h" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:orientation="horizontal">
 
             <View
@@ -62,6 +63,7 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="Configuration des protocoles de routage OSPF et tests de connectivité sur simulateur GNS3." />
+
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -3,9 +3,7 @@ package com.hervekakiang.logbook.matiere;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -13,24 +11,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.hervekakiang.logbook.BaseFragment;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.ue.UE;
-import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AjouterMatiereFragment extends Fragment {
+public class AjouterMatiereFragment extends BaseFragment {
 
     private MyAppViewModel myAppViewModel;
 
@@ -42,8 +35,6 @@ public class AjouterMatiereFragment extends Fragment {
     private TextInputEditText editTextEnseignant;
     private TextInputEditText editTextVolumeHoraire;
 
-    private NavController navController;
-
     private List<UE> ueList = new ArrayList<>();
     private int selectedUeId = -1;
     private int editMatiereId = -1;
@@ -51,26 +42,18 @@ public class AjouterMatiereFragment extends Fragment {
     private Matiere matiereToEdit;
 
     public AjouterMatiereFragment() {
+        super(R.layout.fragment_ajouter_matiere);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_ajouter_matiere, container, false);
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                             Bundle savedInstanceState) {
+//        return inflater.inflate(R.layout.fragment_ajouter_matiere, container, false);
+//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
-        MaterialToolbar toolbar = view.findViewById(R.id.matiereToolbar);
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
 
         AutoCompleteTextView autoCompleteUE = view.findViewById(R.id.autoCompleteUE);
         editTextMatiereNom = view.findViewById(R.id.editMatiereNom);
@@ -84,8 +67,8 @@ public class AjouterMatiereFragment extends Fragment {
         Button btnSave = view.findViewById(R.id.btnSaveMatiere);
 
         btnSave.setOnClickListener(v -> saveMatiere());
-        toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
-        toolbar.setOnMenuItemClickListener(item -> {
+
+        getToolbar().setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_save) {
                 saveMatiere();
                 return true;
@@ -106,7 +89,7 @@ public class AjouterMatiereFragment extends Fragment {
         Log.d("MYAPP::AjoutMatiere", "isEditing:" + isEditing);
 
         if (isEditing && editMatiereId != -1) {
-            toolbar.setTitle("Modifier la matière");
+            getToolbar().setTitle("Modifier la matière");
 
             myAppViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
                 if (matieres == null) return;
@@ -194,7 +177,7 @@ public class AjouterMatiereFragment extends Fragment {
             myAppViewModel.updateMatiere(matiereToEdit, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Matière mise à jour", Toast.LENGTH_SHORT).show();
-                    navController.navigateUp();
+                    getNavController().navigateUp();
                 });
             });
         } else {
@@ -202,7 +185,7 @@ public class AjouterMatiereFragment extends Fragment {
             myAppViewModel.addMatiere(newMatiere, selectedUeId, () -> {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Matière " + nom + " ajoutée", Toast.LENGTH_SHORT).show();
-                    navController.popBackStack();
+                    getNavController().popBackStack();
                 });
             });
         }

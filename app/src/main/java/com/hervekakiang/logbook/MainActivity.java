@@ -18,14 +18,6 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final Set<Integer> TOP_LEVEL_DESTINATIONS = new HashSet<>();
-
-    static {
-        TOP_LEVEL_DESTINATIONS.add(R.id.dashboardFragment);
-//        TOP_LEVEL_DESTINATIONS.add(R.id.matiereListFragment);
-        TOP_LEVEL_DESTINATIONS.add(R.id.seanceListFragment);
-    }
-
     private BottomNavigationView bottomNavigationView;
 
 
@@ -50,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
 
         navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
-            boolean isTopLevel = TOP_LEVEL_DESTINATIONS.contains(navDestination.getId());
+            boolean isTopLevel = NavigationConfig.isTopLevel(navDestination.getId());
 
             if (isTopLevel) {
                 bottomNavigationView.animate()
@@ -59,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
                         .withStartAction(() -> bottomNavigationView.setVisibility(View.VISIBLE))
                         .start();
             } else {
-                fragmentContainerView.setPadding(16,0,16,0);
                 bottomNavigationView.animate()
                         .translationY(bottomNavigationView.getHeight())
                         .setDuration(200)

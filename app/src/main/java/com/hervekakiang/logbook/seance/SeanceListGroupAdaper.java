@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class SeanceListGroupAdaper extends ListAdapter<SeanceListItem, RecyclerView.ViewHolder> {
@@ -104,7 +106,10 @@ public class SeanceListGroupAdaper extends ListAdapter<SeanceListItem, RecyclerV
         } else {
             SeanceViewHolder seanceViewHolder = (SeanceViewHolder) holder;
             Seance seance = item.getSeance();
-            seanceViewHolder.textViewSeanceDate.setText(seance.getDate());
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE dd MMM", Locale.getDefault());
+            LocalDate date = LocalDate.parse(seance.getDate(), inputFormatter);
+            seanceViewHolder.textViewSeanceDate.setText(date.format(outputFormatter));
             seanceViewHolder.textViewSeanceDuree.setText(String.format(Locale.getDefault(),"%dh", seance.getDuree()));
             seanceViewHolder.textViewSeanceContenu.setText(seance.getContenuPedagogique());
         }

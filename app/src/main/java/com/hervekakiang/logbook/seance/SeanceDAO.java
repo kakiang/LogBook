@@ -10,7 +10,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.hervekakiang.logbook.db.DAOBase;
 import com.hervekakiang.logbook.db.MyDatabaseHelper;
-import com.hervekakiang.logbook.matiere.Matiere;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,20 +132,6 @@ public class SeanceDAO extends DAOBase<Seance> {
         return listSeances;
     }
 
-    public int getTotalVolumeHoraireEffectueByUeId(int ueId) {
-        String query = "SELECT SUM(s.duree) FROM seances s INNER JOIN matieres m ON s.matiere_id = m.id WHERE m.ue_id = ?";
-        try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(ueId)})) {
-            int totalVolumeHoraireEffectue = 0;
-            if (cursor.moveToFirst()) {
-                totalVolumeHoraireEffectue = cursor.getInt(0);
-            }
-            return totalVolumeHoraireEffectue;
-        } catch (Exception e) {
-            Log.e("SeanceDAO", "Error fetching total volume horaire effectué", e);
-        }
-        return 0;
-    }
-
     public int getTotalVolumeHoraireEffectueByMatiereId(int matiereId) {
         String query = "SELECT SUM(s.duree) FROM seances s WHERE s.matiere_id = ?";
         try (Cursor cursor = myDb.rawQuery(query, new String[]{String.valueOf(matiereId)})) {
@@ -160,21 +145,6 @@ public class SeanceDAO extends DAOBase<Seance> {
         }
         return 0;
     }
-
-    public int getTotalVolumeHoraireEffectue() {
-        String query = "SELECT SUM(s.duree) FROM seances s";
-        try (Cursor cursor = myDb.rawQuery(query, null)) {
-            int totalVolumeHoraireEffectue = 0;
-            if (cursor.moveToFirst()) {
-                totalVolumeHoraireEffectue = cursor.getInt(0);
-            }
-            return totalVolumeHoraireEffectue;
-        } catch (Exception e) {
-            Log.e("SeanceDAO", "Error fetching total volume horaire effectué", e);
-        }
-        return 0;
-    }
-
 
     public void modify(Seance seance) {
         ContentValues values = new ContentValues();

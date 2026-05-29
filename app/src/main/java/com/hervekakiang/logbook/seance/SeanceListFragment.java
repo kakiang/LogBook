@@ -1,46 +1,36 @@
 package com.hervekakiang.logbook.seance;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.matiere.Matiere;
-import com.hervekakiang.logbook.matiere.MatiereViewModel;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.search.SearchBar;
+import com.google.android.material.search.SearchView;
+import com.hervekakiang.logbook.MyAppViewModel;
+import com.hervekakiang.logbook.OnItemClickListener;
+import com.hervekakiang.logbook.R;
 
 public class SeanceListFragment extends Fragment {
 
-    private SeanceListGroupAdaper seanceListGroupAdaper;
-    private List<Seance> seances = new ArrayList<>();
-    private List<Matiere> matieres = new ArrayList<>();
-
-    public static SeanceListFragment newInstance() {
-        return new SeanceListFragment();
-    }
+    private SeanceListAdaper seanceListAdaper;
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -52,54 +42,93 @@ public class SeanceListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
         NavController navController = Navigation.findNavController(view);
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
+        SearchBar searchBar = view.findViewById(R.id.search_bar);
+        SearchView searchView = view.findViewById(R.id.search_view);
 
+        searchView.setupWithSearchBar(searchBar);
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerviewSearchSeance);
+        recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getContext()));
+
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
         fab.setOnClickListener(v -> navController.navigate(R.id.ajouterSeanceFragment));
 
-        seanceListGroupAdaper = new SeanceListGroupAdaper();
-        recyclerView.setAdapter(seanceListGroupAdaper);
+        seanceListAdaper = new SeanceListAdaper();
+        seanceListAdaper.setOnItemClickListener(listener(navController));
+        recyclerView.setAdapter(seanceListAdaper);
+        recyclerViewSearch.setAdapter(seanceListAdaper);
 
-        MatiereViewModel matiereViewModel = new ViewModelProvider(requireActivity()).get(MatiereViewModel.class);
-        SeanceViewModel seanceViewModel = new ViewModelProvider(requireActivity()).get(SeanceViewModel.class);
-        matiereViewModel.setCurrentUeId(0);
-        seanceViewModel.setMatiereId(0);
-        matiereViewModel.getListMatieres().observe(getViewLifecycleOwner(), matieres -> {
-            this.matieres = matieres;
-            groupSeances();
+        MyAppViewModel viewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
+        viewModel.getFilteredSeances().observe(getViewLifecycleOwner(), seances -> {
+            seanceListAdaper.submitList(seances);
         });
 
-        seanceViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
-            this.seances = seances;
-            groupSeances();
+        searchView.addTransitionListener((sv, previousState, newState) -> {
+            if (newState == SearchView.TransitionState.SHOWING) {
+                fab.hide();
+            } else if (newState == SearchView.TransitionState.HIDDEN) {
+                fab.show();
+                viewModel.setSeanceSearchQuery("");
+            }
+        });
+
+
+        searchView.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                searchRunnable = () -> {
+                    if (isAdded()) {
+                        viewModel.setSeanceSearchQuery(s.toString());
+                    }
+                };
+                searchHandler.postDelayed(searchRunnable, 200);
+            }
+        });
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (searchView.isShowing()) {
+                    searchView.hide();
+                } else {
+                    setEnabled(false);
+                    requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
         });
     }
 
-    private void groupSeances() {
-        if (matieres.isEmpty() || seances.isEmpty()) return;
-        Map<Integer, String> matiereMap = new HashMap<>();
-        for (Matiere m : matieres) matiereMap.put(m.getId(), m.getNom());
-//        seances.sort((s1, s2) -> Integer.compare(s1.getMatiereId(), s2.getMatiereId()));
-        seances.sort(Comparator.comparingInt(Seance::getMatiereId));
-
-        List<SeanceListItem> items = new ArrayList<>();
-        int lastMatiereId = -1;
-
-        for (Seance s : seances) {
-            if (s.getMatiereId() != lastMatiereId) {
-                items.add(new SeanceListItem(matiereMap.get(s.getMatiereId()), s.getMatiereId()));
-                lastMatiereId = s.getMatiereId();
+    private OnItemClickListener<Seance> listener(NavController navController) {
+        return  new OnItemClickListener<>() {
+            @Override
+            public void onItemClick(Seance obj) {
+                Bundle args = new Bundle();
+                args.putInt("seanceId", obj.getId());
+                args.putSerializable("seance", obj);
+                navController.navigate(R.id.seanceDetailFragment, args);
             }
-            items.add(new SeanceListItem(s));
-        }
-        seanceListGroupAdaper.submitList(items);
+
+            @Override
+            public void onItemLongClick(Seance obj) {
+
+            }
+        };
     }
 }

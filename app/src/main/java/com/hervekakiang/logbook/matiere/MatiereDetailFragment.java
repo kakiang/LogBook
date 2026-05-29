@@ -2,67 +2,46 @@ package com.hervekakiang.logbook.matiere;
 
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.material.appbar.MaterialToolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.hervekakiang.logbook.BaseFragment;
+import com.hervekakiang.logbook.MyAppViewModel;
 import com.hervekakiang.logbook.OnItemClickListener;
 import com.hervekakiang.logbook.R;
 import com.hervekakiang.logbook.seance.Seance;
 import com.hervekakiang.logbook.seance.SeanceListAdaper;
-import com.hervekakiang.logbook.MyAppViewModel;
 
 import java.util.Locale;
 
-public class MatiereDetailFragment extends Fragment {
+public class MatiereDetailFragment extends BaseFragment {
 
     private int matiereId;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_matiere_detail, container, false);
+    public MatiereDetailFragment() {
+        super(R.layout.fragment_matiere_detail);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
-        NavController navController = Navigation.findNavController(view);
-
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
-
         if (getArguments() != null && getArguments().containsKey("matiereId")) {
             matiereId = getArguments().getInt("matiereId");
             Log.d("MYAPP::MatiereDetail", "matiereId=" + matiereId);
         } else {
             Log.d("MYAPP::MatiereDetail", "matiereId=null");
-            navController.navigateUp();
+            getNavController().navigateUp();
         }
 
         ProgressBar progressBar = view.findViewById(R.id.chartProgress);
@@ -75,7 +54,7 @@ public class MatiereDetailFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         SeanceListAdaper mAdapter = new SeanceListAdaper();
-        mAdapter.setOnItemClickListener(listener(navController));
+        mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
         MyAppViewModel myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
@@ -100,25 +79,24 @@ public class MatiereDetailFragment extends Fragment {
         fab.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putInt("selectedMatiereId", matiereId);
-            navController.navigate(R.id.ajouterSeanceFragment, args);
+            getNavController().navigate(R.id.ajouterSeanceFragment, args);
         });
 
         myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
-            mAdapter.submitList(seances);
             String seanceListTitle = "Seances de cours (" + seances.size() + ")";
             tvSeanceListTitle.setText(seanceListTitle);
             mAdapter.submitList(seances);
         });
     }
 
-    private OnItemClickListener<Seance> listener(NavController navController) {
+    private OnItemClickListener<Seance> listener() {
         return  new OnItemClickListener<>() {
             @Override
             public void onItemClick(Seance obj) {
                 Bundle args = new Bundle();
                 args.putInt("seanceId", obj.getId());
                 args.putSerializable("seance", obj);
-                navController.navigate(R.id.seanceDetailFragment, args);
+                getNavController().navigate(R.id.seanceDetailFragment, args);
             }
 
             @Override

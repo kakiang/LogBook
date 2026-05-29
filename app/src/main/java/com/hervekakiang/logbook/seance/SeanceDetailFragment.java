@@ -1,64 +1,48 @@
 package com.hervekakiang.logbook.seance;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hervekakiang.logbook.R;
-import com.hervekakiang.logbook.MyAppViewModel;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
-public class SeanceDetailFragment extends Fragment {
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hervekakiang.logbook.BaseFragment;
+import com.hervekakiang.logbook.MyAppViewModel;
+import com.hervekakiang.logbook.R;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class SeanceDetailFragment extends BaseFragment {
 
     private int seanceId;
     private Seance seance;
 
     public SeanceDetailFragment() {
-        // Required empty public constructor
+        super(R.layout.fragment_seance_detail);
     }
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_seance_detail, container, false);
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                             Bundle savedInstanceState) {
+//        return inflater.inflate(R.layout.fragment_seance_detail, container, false);
+//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MaterialToolbar fragmentToolbar = view.findViewById(R.id.fragmentToolbar);
-        NavController navController = Navigation.findNavController(view);
-
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupWithNavController(fragmentToolbar, navController, appBarConfiguration);
-
 
         if (getArguments() != null) {
             seanceId = getArguments().getInt("seanceId");
             seance = (Seance) getArguments().getSerializable("seance");
         } else {
-            navController.popBackStack();
+            getNavController().popBackStack();
         }
 
         TextView tvMatiere = view.findViewById(R.id.textViewMatiere);
@@ -75,7 +59,10 @@ public class SeanceDetailFragment extends Fragment {
             Log.d("MYAPP::SEANCEDetailF", "seanceObj=" + seanceObj.get("matiere"));
             tvMatiere.setText(seanceObj.get("matiere"));
             tvEnseignant.setText(seanceObj.get("enseignant"));
-            tvDate.setText(seanceObj.get("date"));
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy", Locale.getDefault());
+            LocalDate date = LocalDate.parse(seanceObj.get("date"), inputFormatter);
+            tvDate.setText(date.format(outputFormatter));
             tvHeure.setText(seanceObj.get("heure_debut"));
             String duree = seanceObj.get("duree") + "h";
             tvDuree.setText(duree);
@@ -95,20 +82,17 @@ public class SeanceDetailFragment extends Fragment {
                             Toast.makeText(getContext(),
                                     "Seance supprimée avec succès",
                                     Toast.LENGTH_LONG).show();
-                            navController.popBackStack();
+                            getNavController().popBackStack();
                         });
                     }).show();
         });
 
-        view.findViewById(R.id.btnSeanceEdit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putInt("selectedMatiereId", seance.getMatiereId());
-                args.putInt("seanceId", seanceId);
-                args.putBoolean("isEditing", true);
-                navController.navigate(R.id.ajouterSeanceFragment, args);
-            }
+        view.findViewById(R.id.btnSeanceEdit).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putInt("selectedMatiereId", seance.getMatiereId());
+            args.putInt("seanceId", seanceId);
+            args.putBoolean("isEditing", true);
+            getNavController().navigate(R.id.ajouterSeanceFragment, args);
         });
     }
 }

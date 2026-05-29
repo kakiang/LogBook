@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">LogBook</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ajouter">Ajouter</string>
     <string name="ajouter_ue">Ajouter une UE</string>
@@ -13,8 +12,20 @@
     <string name="ajouter_matiere">Ajouter une matière</string>
     <string name="ajouter_seance">Ajouter une séance</string>
     <string name="total">Total</string>
-    <string name="contenu_pedagogique_sample">Global System for Mobile Communications (GSM) 1 ­Circuit-Switched Data Transmission 2 Classic Circuit Switching 2 Virtual Circuit Switching over IP 3 ­Standards 4 ­Transmission Speeds 5 ­The Signaling System Number 7 6 The Classic SS-7 Protocol Stack 7 SS-7 Protocols for GSM 10 IP-Based SS-7 Protocol Stack 11 ­The GSM Subsystems 12 ­The Network Subsystem 12 The Mobile Switching Center (MSC), Server, and Gateway 13 The Visitor Location Register (VLR)</string>
+    <string name="contenu_pedagogique_sample">Global System for Mobile Communications (GSM) 1 Circuit-Switched Data Transmission 2 Classic Circuit Switching</string>
     <string name="dashboard">Dashboard</string>
     <string name="matieres">Matières</string>
+    <string name="matiere">Matière</string>
     <string name="seances">Seances</string>
+    <string name="duree">Durée</string>
+    <string name="date">Date</string>
+    <string name="heure_de_debut">Heure de début</string>
+    <string name="contenu_pedagogique">Contenu pédagogique</string>
+    <string name="supprimer">Supprimer</string>
+    <string name="modifier">Modifier</string>
+    <string name="enseignant">Enseignant</string>
+    <string name="choose_matiere">Sélectionner la matière</string>
+    <string name="search_seance">Rechercher une seance…</string>
+    <string name="search_matiere">Rechercher une matière…</string>
+    <string name="historique">Historique</string>
 </resources>
