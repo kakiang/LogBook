@@ -29,21 +29,21 @@ public class BaseFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
         toolbar = view.findViewById(R.id.fragmentToolbar);
-        if(toolbar != null) {
+        if (toolbar != null) {
             AppBarConfiguration appBarConfiguration = NavigationConfig.getAppBarConfiguration();
             NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
         }
     }
 
     protected NavController getNavController() {
-        if (navController == null){
+        if (navController == null) {
             Log.e("BASEFRAGMENT MYAPP", "navController == null");
         }
         return navController;
     }
 
     protected MaterialToolbar getToolbar() {
-        if (toolbar == null){
+        if (toolbar == null) {
             Log.e("BASEFRAGMENT MYAPP", "navController == null ");
         }
         return toolbar;

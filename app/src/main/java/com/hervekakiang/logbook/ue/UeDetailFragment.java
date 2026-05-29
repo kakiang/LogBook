@@ -89,6 +89,8 @@ public class UeDetailFragment extends BaseFragment {
             Navigation.findNavController(requireActivity(), R.id.navHostFragment).navigate(R.id.action_to_ajouterMatiereFragment, args);
         });
 
+        TextView layoutEmpty = view.findViewById(R.id.layoutEmpty);
+
         recyclerView = view.findViewById(R.id.recyclerviewMatiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new MatiereListAdapter();
@@ -98,10 +100,17 @@ public class UeDetailFragment extends BaseFragment {
         ItemTouchHelper itemTouchHelper = getItemTouchHelper();
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        myAppViewModel.getListMatiereDTOForCurrentUE().observe(getViewLifecycleOwner(), matiereWithStatsList -> {
-            String mt = "Matières (" + matiereWithStatsList.size() + ")";
+        myAppViewModel.getListMatiereDTOForCurrentUE().observe(getViewLifecycleOwner(), dtoList -> {
+            String mt = "Matières (" + dtoList.size() + ")";
             tvMatiereListTitle.setText(mt);
-            mAdapter.submitList(matiereWithStatsList);
+            if (dtoList.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+                mAdapter.submitList(dtoList);
+            }
         });
 
     }

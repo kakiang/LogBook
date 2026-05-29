@@ -79,7 +79,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_MATIERE);
         db.execSQL(CREATE_TABLE_SEANCE);
 
-        insertDefaultData(db);
+//        insertDefaultData(db);
     }
 
     @Override

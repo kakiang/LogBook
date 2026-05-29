@@ -61,6 +61,8 @@ public class DashboardFragment extends BaseFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_seance);
 
+        TextView layoutEmpty = view.findViewById(R.id.layoutEmpty);
+
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         myAppViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
@@ -81,10 +83,18 @@ public class DashboardFragment extends BaseFragment {
         mAdapter.setOnItemClickListener(listener());
         recyclerView.setAdapter(mAdapter);
 
-        myAppViewModel.getListUEDTO().observe(getViewLifecycleOwner(), ueWithStatsList -> {
-            String uet = "Unités d'enseignement (" + ueWithStatsList.size() + ")";
+        myAppViewModel.getListUEDTO().observe(getViewLifecycleOwner(), uedtos -> {
+            String uet = "Unités d'enseignement (" + uedtos.size() + ")";
             textViewUeListTitle.setText(uet);
-            mAdapter.submitList(Objects.requireNonNullElseGet(ueWithStatsList, ArrayList::new));
+            if (uedtos.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+                mAdapter.submitList(uedtos);
+            }
+
         });
 
         fab.setOnClickListener(v -> getNavController().navigate(R.id.ajouterSeanceFragment));

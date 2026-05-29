@@ -2,6 +2,7 @@ package com.hervekakiang.logbook.seance;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -55,20 +56,37 @@ public class AjouterSeanceFragment extends BaseFragment {
             isEditing = getArguments().getBoolean("isEditing");
             seanceIdToEdit = getArguments().getInt("seanceId");
         }
+        Log.d("MYAPP:==ADD SEANCE=======", "====================================");
+        Log.d("MYAPP:selectedMatiereId=", selectedMatiereId+"");
+        Log.d("MYAPP:isEditing=", isEditing+"");
+        Log.d("MYAPP:seanceIdToEdit=", seanceIdToEdit+"");
+
 
         autoCompleteMatiere = view.findViewById(R.id.autoCompleteMatiere);
         editDate = view.findViewById(R.id.editSeanceDate);
         editHeure = view.findViewById(R.id.editSeanceHeure);
         editDuree = view.findViewById(R.id.editSeanceDuree);
         editContenu = view.findViewById(R.id.editSeanceContenu);
+
         editDureeLayout = view.findViewById(R.id.layoutSeanceDuree);
         editDureeLayout.setErrorEnabled(true);
+        editDateLayout = view.findViewById(R.id.layoutSeanceDate);
+        editDateLayout.setErrorEnabled(true);
+        editHeureLayout = view.findViewById(R.id.layoutSeanceHeure);
+        editHeureLayout.setErrorEnabled(true);
+        editContenuLayout = view.findViewById(R.id.layoutSeanceContenu);
+        editContenuLayout.setErrorEnabled(true);
+
 
         myAppViewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
 
         if (isEditing && seanceIdToEdit != -1) {
             getToolbar().setTitle("Modifier la seance");
-            myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
+            myAppViewModel.getListSeances().observe(getViewLifecycleOwner(), seances -> {
+                if (seances == null) {
+                    Log.d("MYAPP:==getListSeanceForCurrentMatiere==", "null");
+                    return;
+                }
                 for (Seance s : seances) {
                     if (s.getId() == seanceIdToEdit) {
                         seanceToEdit = s;
@@ -111,27 +129,35 @@ public class AjouterSeanceFragment extends BaseFragment {
         }
         if (TextUtils.isEmpty(date)) {
             editDate.setError("Veuillez entrer une date");
+            editDateLayout.setError("Veuillez entrer une date");
             hasError = true;
         } else {
+            editDateLayout.setError(null);
             editDate.setError(null);
         }
         if (TextUtils.isEmpty(heure)) {
             editHeure.setError("Veuillez entrer une heure");
+            editHeureLayout.setError("Veuillez entrer une heure");
             hasError = true;
         } else {
             editHeure.setError(null);
+            editHeureLayout.setError(null);
         }
         if (TextUtils.isEmpty(duree)) {
             editDuree.setError("Veuillez entrer une durée");
+            editDureeLayout.setError("Veuillez entrer une durée");
             hasError = true;
         } else {
             editDuree.setError(null);
+            editDureeLayout.setError(null);
         }
         if (TextUtils.isEmpty(contenu)) {
             editContenu.setError("Veuillez entrer un contenu");
+            editContenuLayout.setError("Veuillez entrer un contenu");
             hasError = true;
         } else {
             editContenu.setError(null);
+            editContenuLayout.setError(null);
         }
         if (hasError) return;
 
@@ -147,6 +173,9 @@ public class AjouterSeanceFragment extends BaseFragment {
                 editDuree.setError("Durée maximale " + maxDuree + " heures");
                 editDureeLayout.setError("Durée maximale " + maxDuree + " heures");
                 return;
+            } else {
+                editDuree.setError(null);
+                editDureeLayout.setError(null);
             }
 
             if (isEditing && seanceToEdit != null) {

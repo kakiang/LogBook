@@ -51,6 +51,8 @@ public class MatiereDetailFragment extends BaseFragment {
         TextView tvEnseignant = view.findViewById(R.id.tvEnseignant);
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddSeance);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
+        TextView layoutEmpty = view.findViewById(R.id.layoutEmpty);
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         SeanceListAdaper mAdapter = new SeanceListAdaper();
@@ -85,17 +87,24 @@ public class MatiereDetailFragment extends BaseFragment {
         myAppViewModel.getListSeanceForCurrentMatiere().observe(getViewLifecycleOwner(), seances -> {
             String seanceListTitle = "Seances de cours (" + seances.size() + ")";
             tvSeanceListTitle.setText(seanceListTitle);
-            mAdapter.submitList(seances);
+            if (seances.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+                mAdapter.submitList(seances);
+            }
         });
     }
 
     private OnItemClickListener<Seance> listener() {
         return  new OnItemClickListener<>() {
             @Override
-            public void onItemClick(Seance obj) {
+            public void onItemClick(Seance s) {
                 Bundle args = new Bundle();
-                args.putInt("seanceId", obj.getId());
-                args.putSerializable("seance", obj);
+                args.putInt("seanceId", s.getId());
+                args.putSerializable("seance", s);
                 getNavController().navigate(R.id.seanceDetailFragment, args);
             }
 

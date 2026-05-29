@@ -28,4 +28,5 @@
     <string name="search_seance">Rechercher une seance…</string>
     <string name="search_matiere">Rechercher une matière…</string>
     <string name="historique">Historique</string>
+    <string name="no_data">Aucune donnée trouvée</string>
 </resources>

@@ -94,6 +94,20 @@
                 android:layout_height="match_parent"
                 android:paddingVertical="8dp"
                 android:clipToPadding="false"/>
+
+            <TextView
+                android:id="@+id/layoutEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/no_data"
+                android:textSize="18sp"
+                android:layout_marginTop="72dp"
+                android:textColor="#888888"
+                android:visibility="gone"
+                app:drawableTopCompat="@android:drawable/ic_menu_search"
+                android:drawablePadding="16dp" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -49,6 +50,8 @@ public class SeanceListFragment extends Fragment {
 
         searchView.setupWithSearchBar(searchBar);
 
+        TextView layoutEmpty = view.findViewById(R.id.layoutEmpty);
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerviewSeance);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -67,7 +70,14 @@ public class SeanceListFragment extends Fragment {
 
         MyAppViewModel viewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         viewModel.getFilteredSeances().observe(getViewLifecycleOwner(), seances -> {
-            seanceListAdaper.submitList(seances);
+            if (seances == null || seances.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+                seanceListAdaper.submitList(seances);
+            }
         });
 
         searchView.addTransitionListener((sv, previousState, newState) -> {
@@ -120,10 +130,10 @@ public class SeanceListFragment extends Fragment {
     private OnItemClickListener<Seance> listener(NavController navController) {
         return  new OnItemClickListener<>() {
             @Override
-            public void onItemClick(Seance obj) {
+            public void onItemClick(Seance s) {
                 Bundle args = new Bundle();
-                args.putInt("seanceId", obj.getId());
-                args.putSerializable("seance", obj);
+                args.putInt("seanceId", s.getId());
+                args.putSerializable("seance", s);
                 navController.navigate(R.id.seanceDetailFragment, args);
             }
 

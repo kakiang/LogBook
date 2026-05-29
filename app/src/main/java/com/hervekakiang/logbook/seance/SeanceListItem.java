@@ -1,7 +1,5 @@
 package com.hervekakiang.logbook.seance;
 
-import com.hervekakiang.logbook.matiere.Matiere;
-
 public class SeanceListItem {
     public static final int TYPE_MATIERE = 0;
     public static final int TYPE_SEANCE = 1;

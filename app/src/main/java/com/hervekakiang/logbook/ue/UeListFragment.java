@@ -49,8 +49,8 @@ public class UeListFragment extends Fragment {
 
         OnItemClickListener<UEListAdapter.UEDTO> listener = new OnItemClickListener<>() {
             @Override
-            public void onItemClick(UEListAdapter.UEDTO ueWithStats) {
-                UeDetailFragment ueDetailFragment = UeDetailFragment.newInstance(ueWithStats.ue());
+            public void onItemClick(UEListAdapter.UEDTO uedto) {
+                UeDetailFragment ueDetailFragment = UeDetailFragment.newInstance(uedto.ue());
                 getChildFragmentManager().beginTransaction()
                         .replace(R.id.navHostFragment, ueDetailFragment)
                         .addToBackStack(null)

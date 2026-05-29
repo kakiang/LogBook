@@ -20,21 +20,8 @@ public abstract class DAOBase<T> {
         this.myDb.setForeignKeyConstraintsEnabled(true);
     }
 
-//    public void open() {
-//        myDb = myDbHelper.getWritableDatabase();
-//    }
-//
-//    public void close() {
-//        if (myDb != null && myDb.isOpen()){
-//            myDb.close();
-//        }
-//    }
     public interface Callback<T> {
         void onResult(T result);
-    }
-
-    public ExecutorService getExecutorService() {
-        return executorService;
     }
 
     public void shutdown() {

@@ -1,15 +1,20 @@
 package com.hervekakiang.logbook;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.hervekakiang.logbook.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,12 +31,20 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = binding.bottomNavigationView;
 
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Log.d("NavDebug MYAPP", "Selected item id: ${"+item.getItemId()+"}");
+                return false;
+            }
+        });
+
         setupNavigation();
     }
 
     private void setupNavigation() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.navHostFragment);
-//        FragmentContainerView fragmentContainerView = findViewById(R.id.navHostFragment);
+        FragmentContainerView fragmentContainerView = findViewById(R.id.navHostFragment);
         if (navHostFragment == null) {
             throw new IllegalStateException("NavHostFragment R.id.navHostFragment not found");
         }

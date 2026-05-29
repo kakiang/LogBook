@@ -52,19 +52,16 @@ public class SeanceDetailFragment extends BaseFragment {
         Log.d("MYAPP:ARG:SEANCEF", "seance=" + seance);
 
         myAppViewModel.getCurrentSeanceDTO().observe(getViewLifecycleOwner(), seanceObj -> {
-            Log.d("MYAPP::SEANCEF", "myAppViewModel.getCurrentSeanceDTO()");
-            Log.d("MYAPP::SEANCEF", "seanceObj=" + seanceObj);
+//            Log.d("MYAPP::SEANCEF", "seanceObj=" + seanceObj);
             if (seanceObj.isEmpty()) return;
             tvMatiere.setText(seanceObj.get("matiere"));
             tvEnseignant.setText(seanceObj.get("enseignant"));
-            Log.d("MYAPP::SEANCEF", "date=" + seanceObj.get("date"));
             LocalDate date = LocalDate.parse(seanceObj.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             tvDate.setText(date.format(DateTimeFormatter.ofPattern("EEEE dd MMM yyyy", Locale.getDefault())));
             tvHeure.setText(seanceObj.get("heure_debut"));
             String duree = seanceObj.get("duree") + " heures";
             tvDuree.setText(duree);
             tvContenu.setText(seanceObj.get("contenu_pedagogique"));
-            Log.d("MYAPP::SEANCEF", "END myAppViewModel.getCurrentSeanceDTO()");
         });
 
         view.findViewById(R.id.btnSeanceDelete).setOnClickListener(v -> {

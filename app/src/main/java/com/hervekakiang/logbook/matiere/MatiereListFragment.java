@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -42,6 +43,8 @@ public class MatiereListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        TextView layoutEmpty = view.findViewById(R.id.layoutEmpty);
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerview_matiere);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -80,7 +83,14 @@ public class MatiereListFragment extends Fragment {
 
         MyAppViewModel viewModel = new ViewModelProvider(requireActivity()).get(MyAppViewModel.class);
         viewModel.getFilteredMatieres().observe(getViewLifecycleOwner(), matieres -> {
-            mAdapter.submitList(matieres);
+            if (matieres == null || matieres.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+                mAdapter.submitList(matieres);
+            }
         });
 
         searchView.addTransitionListener((searchView1, previousState, newState) -> {
