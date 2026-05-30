@@ -115,6 +115,18 @@
             android:name="isEditing"
             app:argType="boolean"
             android:defaultValue="false"/>
+
+        <action
+            android:id="@+id/action_create_to_seanceDetailFragment"
+            app:destination="@id/seanceDetailFragment"
+            app:popUpTo="@id/ajouterSeanceFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_update_to_seanceDetailFragment"
+            app:destination="@id/seanceDetailFragment"
+            app:popUpTo="@id/seanceDetailFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

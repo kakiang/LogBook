@@ -57,9 +57,9 @@ public class AjouterSeanceFragment extends BaseFragment {
             seanceIdToEdit = getArguments().getInt("seanceId");
         }
         Log.d("MYAPP:==ADD SEANCE=======", "====================================");
-        Log.d("MYAPP:selectedMatiereId=", selectedMatiereId+"");
-        Log.d("MYAPP:isEditing=", isEditing+"");
-        Log.d("MYAPP:seanceIdToEdit=", seanceIdToEdit+"");
+        Log.d("MYAPP:selectedMatiereId=", selectedMatiereId + "");
+        Log.d("MYAPP:isEditing=", isEditing + "");
+        Log.d("MYAPP:seanceIdToEdit=", seanceIdToEdit + "");
 
 
         autoCompleteMatiere = view.findViewById(R.id.autoCompleteMatiere);
@@ -186,14 +186,31 @@ public class AjouterSeanceFragment extends BaseFragment {
 
                 myAppViewModel.updateSeance(seanceToEdit, () -> requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Séance mise à jour", Toast.LENGTH_SHORT).show();
-                    getNavController().navigate(R.id.seanceListFragment);
+
+                    if (seanceToEdit.getId() != -1) {
+                        Bundle args = new Bundle();
+                        args.putInt("seanceId", seanceToEdit.getId());
+                        args.putSerializable("seance", seanceToEdit);
+                        getNavController().navigate(R.id.action_update_to_seanceDetailFragment, args);
+                    } else {
+                        getNavController().popBackStack();
+                    }
                 }));
             } else {
                 Seance seance = new Seance(selectedMatiereId, date, heure, Integer.parseInt(duree), contenu);
-                myAppViewModel.addSeance(seance, () -> {
+                myAppViewModel.addSeance(seance, (newId) -> {
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(getActivity(), "Séance ajoutée avec succès", Toast.LENGTH_SHORT).show();
-                        getNavController().navigate(R.id.seanceListFragment);
+                        Log.d("MYAPP:==ADD SEANCE=======", "newId=" + newId);
+                        if (newId != -1) {
+                            Bundle args = new Bundle();
+                            args.putInt("seanceId", (int) newId);
+                            args.putSerializable("seance", seance);
+
+                            getNavController().navigate(R.id.action_create_to_seanceDetailFragment, args);
+                        } else {
+                            getNavController().popBackStack();
+                        }
                     });
                 });
             }

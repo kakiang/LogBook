@@ -39,6 +39,16 @@ public class SeanceDetailFragment extends BaseFragment {
             getNavController().popBackStack();
         }
 
+        getToolbar().setNavigationOnClickListener(v -> {
+            // If we pop the details screen and find ourselves back on the Dashboard,
+            // seamlessly slide over to the Seance List view instead!
+            if (getNavController().getCurrentDestination().getId() == R.id.dashboardFragment) {
+                getNavController().navigate(R.id.seanceListFragment);
+            } else {
+                getNavController().popBackStack();
+            }
+        });
+
         TextView tvMatiere = view.findViewById(R.id.textViewMatiere);
         TextView tvEnseignant = view.findViewById(R.id.textViewEnseignant);
         TextView tvDate = view.findViewById(R.id.textViewDate);

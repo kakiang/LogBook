@@ -432,14 +432,14 @@ public class MyAppViewModel extends AndroidViewModel {
         seanceDao.delete(seanceId, this::refreshAllData);
     }
 
-    public void addSeance(Seance seance, Runnable onComplete) {
-        seanceDao.insert(seance, () -> {
+    public void addSeance(Seance seance, SeanceDAO.OnEntryInsertedListener onComplete) {
+        seanceDao.insert(seance, (newId) -> {
             refreshAllData();
             Integer currentId = currentMatiereId.getValue();
             if (currentId != null) {
                 currentMatiereId.postValue(currentId);
             }
-            if (onComplete != null) onComplete.run();
+            if (onComplete != null) onComplete.onInserted(newId);
         });
     }
 

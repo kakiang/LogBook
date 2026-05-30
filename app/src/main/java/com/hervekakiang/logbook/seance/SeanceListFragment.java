@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,6 +113,7 @@ public class SeanceListFragment extends Fragment {
                     }
                 };
                 searchHandler.postDelayed(searchRunnable, 200);
+                Log.d("SeanceSearch MYAPP", s.toString());
             }
         });
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {

@@ -21,6 +21,10 @@ public class SeanceDAO extends DAOBase<Seance> {
     private final MutableLiveData<List<Seance>> listSeances = new MutableLiveData<>();
     private final MutableLiveData<Map<String, String>> seanceObj = new MutableLiveData<>();
 
+    public interface OnEntryInsertedListener {
+        void onInserted(long insertedId);
+    }
+
     public SeanceDAO(Context context) {
         super(context);
     }
@@ -35,10 +39,10 @@ public class SeanceDAO extends DAOBase<Seance> {
         return myDb.insert(MyDatabaseHelper.TABLE_SEANCE, null, values);
     }
 
-    public void insert(Seance seance, Runnable onComplete) {
+    public void insert(Seance seance, OnEntryInsertedListener onComplete) {
         executorService.execute(() -> {
-            add(seance);
-            onComplete.run();
+            long i = add(seance);
+            if (onComplete != null) onComplete.onInserted(i);
         });
     }
 
