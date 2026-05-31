@@ -68,39 +68,26 @@ public class MyAppViewModel extends AndroidViewModel {
 
         refreshAllData();
 
-        MediatorLiveData<CombinedData> combined = new MediatorLiveData<>();
-        combined.addSource(listUEs, ues -> combineAndEmit(combined));
-        combined.addSource(listMatieres, matieres -> combineAndEmit(combined));
-        combined.addSource(listSeances, seances -> combineAndEmit(combined));
-
-        listUEDTO.addSource(combined, data -> prepareListUEDTO(data, pendingDeleteUeId.getValue()));
-        listUEDTO.addSource(pendingDeleteUeId, hidden -> prepareListUEDTO(combined.getValue(), hidden));
+        MediatorLiveData<AllData> allData = new MediatorLiveData<>();
+        allData.addSource(listUEs, ues -> updateAllData(allData));
+        allData.addSource(listMatieres, matieres -> updateAllData(allData));
+        allData.addSource(listSeances, seances -> updateAllData(allData));
 
         statsGlobal = Transformations.map(listUEDTO, ues -> {
-            if (ues == null) return new StatsGlobal(0, 0);
+            int total = 0, effectue = 0;
             List<Matiere> allMatieres = listMatieres.getValue();
+            if (allMatieres != null) {
+                for (Matiere m : allMatieres) total += m.getVolumeHoraire();
+            }
             List<Seance> allSeances = listSeances.getValue();
-            if (allMatieres == null || allSeances == null) return new StatsGlobal(0, 0);
-            int totalVh = 0;
-            for (Matiere m : allMatieres) totalVh += m.getVolumeHoraire();
-            int totalVhEffectue = 0;
-            for (Seance s : allSeances) totalVhEffectue += s.getDuree();
-            return new StatsGlobal(totalVh, totalVhEffectue);
+            if (allSeances != null) {
+                for (Seance s : allSeances) effectue += s.getDuree();
+            }
+            return new StatsGlobal(total, effectue);
         });
 
-        currentMatiereDTO.addSource(currentMatiereId, id -> prepareCurrentMatiereDTO());
-        currentMatiereDTO.addSource(listMatieres, matieres -> prepareCurrentMatiereDTO());
-        currentMatiereDTO.addSource(listSeances, seances -> prepareCurrentMatiereDTO());
-
-        listMatiereDTO.addSource(listMatieres, matieres -> prepareListMatiereDTO());
-        listMatiereDTO.addSource(listSeances, seances -> prepareListMatiereDTO());
-
-        listMatiereDTOForCurrentUE.addSource(currentUeId, ueId ->
-                prepareListMatiereDTOForSelectedUE(ueId, pendingDeleteMatiereId.getValue()));
-        listMatiereDTOForCurrentUE.addSource(pendingDeleteMatiereId, hidden ->
-                prepareListMatiereDTOForSelectedUE(currentUeId.getValue(), hidden));
-        listMatiereDTOForCurrentUE.addSource(listMatieres, matieres ->
-                prepareListMatiereDTOForSelectedUE(currentUeId.getValue(), pendingDeleteMatiereId.getValue()));
+        listUEDTO.addSource(allData, data -> prepareListUEDTO(data, pendingDeleteUeId.getValue()));
+        listUEDTO.addSource(pendingDeleteUeId, hidden -> prepareListUEDTO(allData.getValue(), hidden));
 
         currentUEDTO = Transformations.switchMap(currentUeId, ueId -> {
             if (ueId == null || ueId == 0) {
@@ -119,19 +106,33 @@ public class MyAppViewModel extends AndroidViewModel {
             });
         });
 
+        listMatiereDTO.addSource(listMatieres, matieres -> prepareListMatiereDTO());
+        listMatiereDTO.addSource(listSeances, seances -> prepareListMatiereDTO());
+
+        currentMatiereDTO.addSource(currentMatiereId, id -> prepareCurrentMatiereDTO());
+        currentMatiereDTO.addSource(listMatiereDTO, matieres -> prepareCurrentMatiereDTO());
+
+        listMatiereDTOForCurrentUE.addSource(currentUeId, ueId ->
+                prepareListMatiereDTOForSelectedUE(ueId, pendingDeleteMatiereId.getValue()));
+        listMatiereDTOForCurrentUE.addSource(pendingDeleteMatiereId, hidden ->
+                prepareListMatiereDTOForSelectedUE(currentUeId.getValue(), hidden));
+        listMatiereDTOForCurrentUE.addSource(listMatiereDTO, matieres ->
+                prepareListMatiereDTOForSelectedUE(currentUeId.getValue(), pendingDeleteMatiereId.getValue()));
+
+
         listSeanceForCurrentMatiere = Transformations.switchMap(currentMatiereId, matiereId -> {
             if (matiereId == null || matiereId == 0) {
                 return new MutableLiveData<>(Collections.emptyList());
             }
             return Transformations.map(listSeances, allSeances -> {
                 if (allSeances == null) return Collections.emptyList();
-                List<Seance> filtered = new ArrayList<>();
+                List<Seance> seanceListForCurrentMatiere = new ArrayList<>();
                 for (Seance s : allSeances) {
                     if (s.getMatiereId() == matiereId) {
-                        filtered.add(s);
+                        seanceListForCurrentMatiere.add(s);
                     }
                 }
-                return filtered;
+                return seanceListForCurrentMatiere;
             });
         });
 
@@ -180,14 +181,44 @@ public class MyAppViewModel extends AndroidViewModel {
 
     }
 
-    private void combineAndEmit(MediatorLiveData<CombinedData> combined) {
+    private void updateAllData(MediatorLiveData<AllData> data) {
         List<UE> ues = listUEs.getValue();
         List<Matiere> matieres = listMatieres.getValue();
         List<Seance> seances = listSeances.getValue();
         if (ues == null || matieres == null || seances == null) {
             return;
         }
-        combined.setValue(new CombinedData(ues, matieres, seances));
+        data.setValue(new AllData(ues, matieres, seances));
+    }
+
+    private void prepareListUEDTO(AllData allData, Integer hidden) {
+
+        if (allData == null) {
+            listUEDTO.postValue(Collections.emptyList());
+            return;
+        }
+
+        List<UE> ues = allData.ues();
+        List<Matiere> matieres = allData.matieres();
+        List<Seance> seances = allData.seances();
+
+        if (ues == null || matieres == null || seances == null) {
+            listUEDTO.postValue(Collections.emptyList());
+            return;
+        }
+
+        Map<Integer, Integer> vhTotalParUE = calculVhTotalParUE(matieres);
+        Map<Integer, Integer> vhDispenseParUE = calculVhDispenseParUE(matieres, seances);
+
+        List<UEListAdapter.UEDTO> result = new ArrayList<>();
+        for (UE ue : ues) {
+            if (hidden != null && ue.getId() == hidden) continue;
+            Integer vhTotal = vhTotalParUE.get(ue.getId());
+            Integer vhDispense = vhDispenseParUE.get(ue.getId());
+            StatInfo statInfo = new StatInfo(vhTotal, vhDispense);
+            result.add(new UEListAdapter.UEDTO(ue, statInfo.ratioText, statInfo.pourcentage));
+        }
+        listUEDTO.postValue(result);
     }
 
     private void prepareListMatiereDTO() {
@@ -200,27 +231,15 @@ public class MyAppViewModel extends AndroidViewModel {
 
         listMatiereDTO.setValue(Collections.emptyList());
 
-        List<Matiere> filteredMatieres = listMatieres.getValue();
-
-        List<Seance> allSeances = listSeances.getValue();
-        if (allSeances == null) allSeances = Collections.emptyList();
-
-        Map<Integer, Integer> volumeHoraireDispenseParMatiere = new HashMap<>();
-        for (Seance s : allSeances) {
-            int matId = s.getMatiereId();
-            Integer current = volumeHoraireDispenseParMatiere.get(matId);
-            if (current == null) current = 0;
-            volumeHoraireDispenseParMatiere.put(matId, current + s.getDuree());
-        }
-
+        List<Matiere> allMatieres = listMatieres.getValue();
+        Map<Integer, Integer> vhDispenseParMatiere = calculVhDispenseParMatiere(listSeances.getValue());
         List<MatiereListAdapter.MatiereDTO> result = new ArrayList<>();
-        for (Matiere m : filteredMatieres) {
+
+        for (Matiere m : allMatieres) {
             int vhTotal = m.getVolumeHoraire();
-            Integer vhDispense = volumeHoraireDispenseParMatiere.get(m.getId());
-            int dispense = (vhDispense == null) ? 0 : vhDispense;
-            int percentage = vhTotal > 0 ? (dispense * 100) / vhTotal : 0;
-            String statText = String.format(Locale.getDefault(), "%dH / %dH", dispense, vhTotal);
-            result.add(new MatiereListAdapter.MatiereDTO(m, statText, percentage));
+            Integer vhDispense = vhDispenseParMatiere.get(m.getId());
+            StatInfo statInfo = new StatInfo(vhTotal, vhDispense);
+            result.add(new MatiereListAdapter.MatiereDTO(m, statInfo.ratioText, statInfo.pourcentage));
         }
         listMatiereDTO.postValue(result);
     }
@@ -234,36 +253,18 @@ public class MyAppViewModel extends AndroidViewModel {
             return;
         }
 
-        listMatiereDTOForCurrentUE.setValue(Collections.emptyList());
+        List<MatiereListAdapter.MatiereDTO> result = new ArrayList<>();
 
-        List<Matiere> filteredMatieres = new ArrayList<>();
-        for (Matiere m : listMatieres.getValue()) {
-            if (m.getUeId() == ueId) {
-                if (hidden != null && m.getId() == hidden) continue;
-                filteredMatieres.add(m);
+        List<MatiereListAdapter.MatiereDTO> matiereDTOS = listMatiereDTO.getValue();
+        if (matiereDTOS == null) return;
+        listMatiereDTOForCurrentUE.setValue(Collections.emptyList());
+        for (MatiereListAdapter.MatiereDTO matiereDTO : matiereDTOS) {
+            if (matiereDTO.matiere().getUeId() == ueId){
+                if(hidden != null && matiereDTO.matiere().getId() == hidden) continue;
+                result.add(matiereDTO);
             }
         }
 
-        List<Seance> allSeances = listSeances.getValue();
-        if (allSeances == null) allSeances = Collections.emptyList();
-
-        Map<Integer, Integer> volumeHoraireDispenseParMatiere = new HashMap<>();
-        for (Seance s : allSeances) {
-            int matId = s.getMatiereId();
-            Integer current = volumeHoraireDispenseParMatiere.get(matId);
-            if (current == null) current = 0;
-            volumeHoraireDispenseParMatiere.put(matId, current + s.getDuree());
-        }
-
-        List<MatiereListAdapter.MatiereDTO> result = new ArrayList<>();
-        for (Matiere m : filteredMatieres) {
-            int vhTotal = m.getVolumeHoraire();
-            Integer vhDispense = volumeHoraireDispenseParMatiere.get(m.getId());
-            int dispense = (vhDispense == null) ? 0 : vhDispense;
-            int percentage = vhTotal > 0 ? (dispense * 100) / vhTotal : 0;
-            String statText = String.format(Locale.getDefault(), "%dH / %dH", dispense, vhTotal);
-            result.add(new MatiereListAdapter.MatiereDTO(m, statText, percentage));
-        }
         listMatiereDTOForCurrentUE.postValue(result);
     }
 
@@ -273,97 +274,80 @@ public class MyAppViewModel extends AndroidViewModel {
             currentMatiereDTO.setValue(null);
             return;
         }
-        List<Matiere> allMatieres = listMatieres.getValue();
-        List<Seance> allSeances = listSeances.getValue();
-        if (allMatieres == null || allSeances == null) {
-            return;
-        }
+        List<MatiereListAdapter.MatiereDTO> matiereDTOS = listMatiereDTO.getValue();
+        if (matiereDTOS == null) return;
 
-        Matiere matiere = null;
-        for (Matiere m : allMatieres) {
-            if (m.getId() == matiereId) {
-                matiere = m;
+        MatiereListAdapter.MatiereDTO matiereDTO = null;
+        for (MatiereListAdapter.MatiereDTO m : matiereDTOS) {
+            if (m.matiere().getId() == matiereId) {
+                matiereDTO = m;
                 break;
             }
         }
-        if (matiere == null) {
+        if (matiereDTO == null) {
             currentMatiereDTO.setValue(null);
             return;
         }
-
-        int effectue = 0;
-        for (Seance s : allSeances) {
-            if (s.getMatiereId() == matiereId) {
-                effectue += s.getDuree();
-            }
-        }
-        int total = matiere.getVolumeHoraire();
-        int percentage = total > 0 ? (effectue * 100) / total : 0;
-        String statText = String.format(Locale.getDefault(), "%dH / %dH", effectue, total);
-        currentMatiereDTO.setValue(new MatiereListAdapter.MatiereDTO(matiere, statText, percentage));
+        currentMatiereDTO.setValue(matiereDTO);
     }
 
-    private void prepareListUEDTO(CombinedData combinedData, Integer hidden) {
-
-        if (combinedData == null) {
-            listUEDTO.postValue(Collections.emptyList());
-            return;
+    private Map<Integer, Integer> calculVhDispenseParMatiere(List<Seance> seances) {
+        Map<Integer, Integer> map = new HashMap<>();
+        if (seances == null) return map;
+        for (Seance s : seances) {
+            int matId = s.getMatiereId();
+            Integer current = map.get(matId);
+            if (current == null) current = 0;
+            map.put(matId, current + s.getDuree());
         }
+        return map;
+    }
 
-        List<UE> ues = combinedData.ues();
-        List<Matiere> matieres = combinedData.matieres();
-        List<Seance> seances = combinedData.seances();
-
-        if (ues == null || matieres == null || seances == null) {
-            listUEDTO.postValue(Collections.emptyList());
-            return;
-        }
-
-        Map<Integer, Integer> volumeHoraireParUE = new HashMap<>();
-        for (Matiere m : matieres) {
-            int ueId = m.getUeId();
-            Integer vh = volumeHoraireParUE.get(ueId);
-            if (vh == null) vh = 0;
-            volumeHoraireParUE.put(ueId, vh + m.getVolumeHoraire());
-        }
-
+    private Map<Integer, Integer> calculVhDispenseParUE(List<Matiere> matieres, List<Seance> seances) {
         Map<Integer, Integer> matiereToUe = new HashMap<>();
         for (Matiere m : matieres) {
             matiereToUe.put(m.getId(), m.getUeId());
         }
-
-        Map<Integer, Integer> volumeHoraireDispenseParUE = new HashMap<>();
+        Map<Integer, Integer> vhDispenseParUE = new HashMap<>();
+        if (seances == null) return vhDispenseParUE;
         for (Seance s : seances) {
             Integer ueId = matiereToUe.get(s.getMatiereId());
             if (ueId != null) {
-                Integer vhDispense = volumeHoraireDispenseParUE.get(ueId);
+                Integer vhDispense = vhDispenseParUE.get(ueId);
                 if (vhDispense == null) vhDispense = 0;
-                volumeHoraireDispenseParUE.put(ueId, vhDispense + s.getDuree());
+                vhDispenseParUE.put(ueId, vhDispense + s.getDuree());
             }
         }
-
-        List<UEListAdapter.UEDTO> result = new ArrayList<>();
-        for (UE ue : ues) {
-            if (hidden != null && ue.getId() == hidden) continue;
-            int ueId = ue.getId();
-
-            Integer volumeHoraire = volumeHoraireParUE.get(ueId);
-            Integer vhDispense = volumeHoraireDispenseParUE.get(ueId);
-
-            int total = (volumeHoraire == null) ? 0 : volumeHoraire;
-            int effectue = (vhDispense == null) ? 0 : vhDispense;
-            int percentage = (total > 0) ? (effectue * 100) / total : 0;
-
-            String statText = String.format(Locale.getDefault(), "%dH dispensées / %dH", effectue, total);
-            result.add(new UEListAdapter.UEDTO(ue, statText, percentage));
-        }
-        listUEDTO.postValue(result);
+        return vhDispenseParUE;
     }
 
-    private record CombinedData(List<UE> ues, List<Matiere> matieres, List<Seance> seances) {
+    private Map<Integer, Integer> calculVhTotalParUE(List<Matiere> matieres) {
+        Map<Integer, Integer> vhTotalParUE = new HashMap<>();
+        for (Matiere m : matieres) {
+            int ueId = m.getUeId();
+            Integer vh = vhTotalParUE.get(ueId);
+            if (vh == null) vh = 0;
+            vhTotalParUE.put(ueId, vh + m.getVolumeHoraire());
+        }
+        return vhTotalParUE;
+    }
+
+    private record AllData(List<UE> ues, List<Matiere> matieres, List<Seance> seances) {
     }
 
     public record StatsGlobal(int total, int effectue) {
+    }
+
+    private static class StatInfo {
+        final int pourcentage;
+        final String ratioText;
+
+        StatInfo(Integer vhTotal, Integer vhDispense) {
+            int total = (vhTotal == null) ? 0 : vhTotal;
+            int effectue = (vhDispense == null) ? 0 : vhDispense;
+            pourcentage = (total > 0) ? (effectue * 100) / total : 0;
+            ratioText = String.format(Locale.getDefault(), "%dH / %dH", effectue, total);
+        }
     }
 
     public void addUE(UE ue, Runnable onComplete) {
@@ -527,20 +511,5 @@ public class MyAppViewModel extends AndroidViewModel {
 
     public LiveData<List<MatiereListAdapter.MatiereDTO>> getFilteredMatieres() {
         return filteredMatieres;
-    }
-
-    private List<Seance> seancesWithNomMatiere(List<Seance> seances) {
-        if (seances == null) return Collections.emptyList();
-        List<Matiere> matieres = listMatieres.getValue();
-        if (matieres == null) return Collections.emptyList();
-        Map<Integer, String> matiereNoms = new HashMap<>();
-        for (Matiere m : matieres) {
-            matiereNoms.put(m.getId(), m.getNom());
-        }
-
-        for (Seance s : seances) {
-            s.setContenuPedagogique(matiereNoms.get(s.getMatiereId()) + " - " + s.getContenuPedagogique());
-        }
-        return seances;
     }
 }
