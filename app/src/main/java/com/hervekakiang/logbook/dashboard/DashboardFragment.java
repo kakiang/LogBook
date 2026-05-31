@@ -73,7 +73,8 @@ public class DashboardFragment extends BaseFragment {
             animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
             animator.start();
-            tvChartPercentage.setText(format(percentage));
+            var percentageText = format(percentage) + "%";
+            tvChartPercentage.setText(percentageText);
 
             tvNbUe.setText(format(stats.nbUE()));
             tvNbMatiere.setText(format(stats.nbMatiere()));

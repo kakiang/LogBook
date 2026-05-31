@@ -219,7 +219,6 @@
                         android:layout_height="wrap_content"
                         android:lineSpacingMultiplier="2"
                         android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                        android:textColor="?attr/colorOnSurface"
                         tools:text="@string/contenu_pedagogique_sample" />
 
                 </LinearLayout>

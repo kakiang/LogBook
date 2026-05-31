@@ -36,7 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:padding="8dp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
             app:layout_behavior="@string/searchbar_scrolling_view_behavior" />
     </com.google.android.material.search.SearchView>
 
@@ -45,7 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="8dp"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <TextView
@@ -55,11 +57,10 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/no_data"
-        android:textSize="18sp"
-        android:textColor="#888888"
         android:visibility="gone"
         app:drawableTopCompat="@android:drawable/ic_menu_search"
-        android:drawablePadding="16dp" />
+        android:drawablePadding="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_matiere"

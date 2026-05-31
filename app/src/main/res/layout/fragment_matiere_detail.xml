@@ -32,14 +32,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp">
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:layout_marginHorizontal="16dp"
                 android:paddingTop="16dp">
 
                 <TextView
@@ -62,7 +62,7 @@
                 android:id="@+id/chartProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="16dp"
+                android:layout_margin="16dp"
                 android:progressTint="?attr/colorPrimary"
                 app:trackColor="#E0E0E0"
                 app:trackThickness="12dp" />
@@ -71,28 +71,32 @@
                 android:id="@+id/tvEnseignant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="?attr/colorOutline"
+                android:layout_marginVertical="8dp"
+                android:layout_marginHorizontal="16dp"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                 tools:text="Prof. Albert Einstein" />
 
             <TextView
                 android:id="@+id/tvSeanceListTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
                 android:textAppearance="@style/TextAppearance.Material3.ActionBar.Subtitle"
                 tools:text="Seances (X)" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
                 android:background="?attr/colorOutlineVariant" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerviewSeance"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingVertical="8dp"
+                android:paddingHorizontal="16dp"
                 android:clipToPadding="false"/>
 
             <TextView
@@ -102,10 +106,9 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/no_data"
-                android:textSize="18sp"
                 android:layout_marginTop="72dp"
-                android:textColor="#888888"
                 android:visibility="gone"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                 app:drawableTopCompat="@android:drawable/ic_menu_search"
                 android:drawablePadding="16dp" />
         </LinearLayout>
