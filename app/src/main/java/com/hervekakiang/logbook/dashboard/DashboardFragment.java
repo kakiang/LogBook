@@ -37,12 +37,6 @@ public class DashboardFragment extends BaseFragment {
     private UEListAdapter mAdapter;
     private RecyclerView recyclerView;
 
-    private ProgressBar progressBar;
-    private TextView tvChartPercentage;
-    private TextView tvVhEffectue;
-    private TextView tvVhRestant;
-    private TextView tvVhTotal;
-
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
     }
@@ -51,12 +45,16 @@ public class DashboardFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        progressBar = view.findViewById(R.id.chartProgress);
-        tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
-        tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
-        tvVhRestant = view.findViewById(R.id.tvVhRestant);
-        tvVhTotal = view.findViewById(R.id.tvVhTotal);
+        ProgressBar progressBar = view.findViewById(R.id.chartProgress);
+        TextView tvChartPercentage = view.findViewById(R.id.tvChartPercentage);
+        TextView tvVhEffectue = view.findViewById(R.id.tvVhEffectue);
+        TextView tvVhRestant = view.findViewById(R.id.tvVhRestant);
+        TextView tvVhTotal = view.findViewById(R.id.tvVhTotal);
         TextView textViewUeListTitle = view.findViewById(R.id.textViewUeListTitle);
+        TextView tvNbUe = view.findViewById(R.id.tvNbUe);
+        TextView tvNbMatiere = view.findViewById(R.id.tvNbMatiere);
+        TextView tvNbSeance = view.findViewById(R.id.tvNbSeance);
+
         recyclerView = view.findViewById(R.id.recyclerviewUE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ExtendedFloatingActionButton fab = view.findViewById(R.id.fab_add_seance);
@@ -67,16 +65,19 @@ public class DashboardFragment extends BaseFragment {
         myAppViewModel.getStatsGlobal().observe(getViewLifecycleOwner(), stats -> {
             if (stats == null) return;
             Log.d("MYAPP:====stats=====", stats.toString());
-            tvVhEffectue.setText(String.format(Locale.getDefault(), "%d", stats.effectue()));
-            tvVhRestant.setText(String.format(Locale.getDefault(), "%d", Math.max(stats.total() - stats.effectue(), 0)));
-            tvVhTotal.setText(String.format(Locale.getDefault(), "%d", stats.total()));
+            tvVhEffectue.setText(format(stats.effectue()));
+            tvVhRestant.setText(format(Math.max(stats.total() - stats.effectue(), 0)));
+            tvVhTotal.setText(format(stats.total()));
             int percentage = (stats.total() > 0) ? (stats.effectue() * 100) / stats.total() : 0;
             ObjectAnimator animator = ObjectAnimator.ofInt(progressBar, "progress", 0, percentage);
             animator.setDuration(1000);
             animator.setInterpolator(new FastOutSlowInInterpolator());
             animator.start();
-//            progressBar.setProgress(percentage);
-            tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", percentage));
+            tvChartPercentage.setText(format(percentage));
+
+            tvNbUe.setText(format(stats.nbUE()));
+            tvNbMatiere.setText(format(stats.nbMatiere()));
+            tvNbSeance.setText(format(stats.nbSeance()));
         });
 
         mAdapter = new UEListAdapter();
@@ -164,5 +165,9 @@ public class DashboardFragment extends BaseFragment {
 
             }
         };
+    }
+
+    private String format(int val) {
+        return String.format(Locale.getDefault(), "%d", val);
     }
 }

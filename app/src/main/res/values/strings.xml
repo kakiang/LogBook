@@ -4,7 +4,7 @@
     <string name="ajouter">Ajouter</string>
     <string name="ajouter_ue">Nouvelle UE</string>
     <string name="enregistrer">Enregistrer</string>
-    <string name="vue_d_ensemble_des_ue">Vue d\'ensemble des unités d\'enseignement</string>
+    <string name="vue_d_ensemble_des_ue">Vue d\'ensemble</string>
     <string name="search">Search</string>
     <string name="volume_horaire">Volume horaire</string>
     <string name="dispense">Dispensé</string>
@@ -14,9 +14,10 @@
     <string name="total">Total</string>
     <string name="contenu_pedagogique_sample">Global System for Mobile Communications (GSM) 1 Circuit-Switched Data Transmission 2 Classic Circuit Switching</string>
     <string name="dashboard">Dashboard</string>
+    <string name="ues">UEs</string>
     <string name="matieres">Matières</string>
     <string name="matiere">Matière</string>
-    <string name="seances">Seances</string>
+    <string name="seances">Séances</string>
     <string name="duree">Durée</string>
     <string name="date">Date</string>
     <string name="heure_de_debut">Heure de début</string>

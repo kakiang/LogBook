@@ -74,16 +74,19 @@ public class MyAppViewModel extends AndroidViewModel {
         allData.addSource(listSeances, seances -> updateAllData(allData));
 
         statsGlobal = Transformations.map(listUEDTO, ues -> {
-            int total = 0, effectue = 0;
+            int total = 0, effectue = 0, nbMatiere = 0, nbSeance = 0;
+            int nbUE = ues != null ? ues.size() : 0;
             List<Matiere> allMatieres = listMatieres.getValue();
             if (allMatieres != null) {
                 for (Matiere m : allMatieres) total += m.getVolumeHoraire();
+                nbMatiere = allMatieres.size();
             }
             List<Seance> allSeances = listSeances.getValue();
             if (allSeances != null) {
                 for (Seance s : allSeances) effectue += s.getDuree();
+                nbSeance = allSeances.size();
             }
-            return new StatsGlobal(total, effectue);
+            return new StatsGlobal(total, effectue, nbUE, nbMatiere, nbSeance);
         });
 
         listUEDTO.addSource(allData, data -> prepareListUEDTO(data, pendingDeleteUeId.getValue()));
@@ -335,7 +338,7 @@ public class MyAppViewModel extends AndroidViewModel {
     private record AllData(List<UE> ues, List<Matiere> matieres, List<Seance> seances) {
     }
 
-    public record StatsGlobal(int total, int effectue) {
+    public record StatsGlobal(int total, int effectue, int nbUE, int nbMatiere, int nbSeance) {
     }
 
     private static class StatInfo {
