@@ -78,7 +78,7 @@ public class UeDetailFragment extends BaseFragment {
             animator.start();
 
             tvChartPercentage.setText(String.format(Locale.getDefault(), "%d%%", ueWithStats.pourcentage()));
-            textViewVhStat.setText(ueWithStats.volumeHoraireStat());
+            textViewVhStat.setText(ueWithStats.volumeHoraireStat().replace("/", "dispensées /"));
             getToolbar().setTitle(ueWithStats.ue().getCode() + " " + ueWithStats.ue().getNom());
         });
 

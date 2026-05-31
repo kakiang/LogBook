@@ -47,14 +47,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    tools:text="312H effectuées / 440H" />
+                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                    tools:text="312H / 440H" />
 
                 <TextView
                     android:id="@+id/tvChartPercentage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                     tools:text="41%" />
             </LinearLayout>
 

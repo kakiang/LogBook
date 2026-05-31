@@ -73,7 +73,7 @@ public class MatiereDetailFragment extends BaseFragment {
             String vhStat = matiereWithStats.volumeHoraireStat();
             vhStat = vhStat.replace("/", "dispensées /");
             textViewVhStat.setText(vhStat);
-            String enseignant = "Enseignant : " + matiereWithStats.matiere().getEnseignant();
+            String enseignant = "Enseignant " + matiereWithStats.matiere().getEnseignant();
             tvEnseignant.setText(enseignant);
         });
 
